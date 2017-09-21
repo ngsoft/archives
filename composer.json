@@ -25,6 +25,9 @@
     "autoload": {
         "psr-4": {
             "NGSOFT\\": "src/"
-        }
+        },
+        "files": [
+            "src/include.php"
+        ]
     }
 }
