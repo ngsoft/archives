@@ -1,0 +1,5 @@
+/nbproject/
+/composer.lock
+/trash/
+/res/
+!/**/.gitignore
