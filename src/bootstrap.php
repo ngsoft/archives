@@ -74,7 +74,7 @@ call_user_func_array(function($check, $has_dependencies = false) {
     }
 }, [[
 //list of classes to detect
-__NAMESPACE__ . "\\STDIO"
+__NAMESPACE__ . "\\Api\\Contracts\Jsonable"
     ],
     //project has dependencies that needs composer autoloader
     false
