@@ -1,0 +1,30 @@
+{
+    "name": "ngsoft/utilities",
+    "description": "Utilities for NGSOFT Projects",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aymeric Anger",
+            "email": "daedelus.git@gmail.com",
+            "homepage": "https://github.com/ngsoft"
+        }
+    ],
+    "repositories": [
+        {
+            "name": "ngsoft/utilities",
+            "type": "vcs",
+            "url": "https://github.com/ngsoft/utilities"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "NGSOFT\\": "src/"
+        }
+    }
+}
