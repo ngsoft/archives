@@ -4,6 +4,8 @@ namespace NGSOFT\Api;
 
 use NGSOFT\Api\Exception\BadMethodCallException;
 use NGSOFT\Api\Exception\InvalidArgumentException;
+use Illuminate\Contracts\Support\Jsonable,
+    Illuminate\Contracts\Support\Arrayable;
 
 class Importer {
 

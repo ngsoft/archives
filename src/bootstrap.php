@@ -74,8 +74,8 @@ call_user_func_array(function($check, $has_dependencies = false) {
     }
 }, [[
 //list of classes to detect
-__NAMESPACE__ . "\\Api\\Contracts\\Importable",
- __NAMESPACE__ . "\\Api\\Contracts\\Exportable"
+__NAMESPACE__ . "\\Api\\Importer",
+ __NAMESPACE__ . "\\Api\\Exporter"
     ],
     //project has dependencies that needs composer autoloader
     false
