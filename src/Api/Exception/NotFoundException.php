@@ -2,7 +2,7 @@
 
 namespace NGSOFT\Api\Exception;
 
-class NotFoundException extends ContainerException {
+class NotFoundException extends \Exception {
 
     use Exception;
 }

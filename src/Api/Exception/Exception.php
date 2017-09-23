@@ -1,6 +1,6 @@
 <?php
 
-namespace NGSOFT\API\Exception;
+namespace NGSOFT\Api\Exception;
 
 trait Exception {
 
