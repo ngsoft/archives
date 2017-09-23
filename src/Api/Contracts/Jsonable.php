@@ -15,7 +15,8 @@ interface Jsonable {
     const JSON_UNESCAPED_UNICODE = 256;
     const JSON_PARTIAL_OUTPUT_ON_ERROR = 512;
     const JSON_PRESERVE_ZERO_FRACTION = 1024;
-    const JSON_UNESCAPED_LINE_TERMINATORS = 12345;
+    //since php 7.1
+    const JSON_UNESCAPED_LINE_TERMINATORS = 2048;
 
     /**
      * Export class data to json format
