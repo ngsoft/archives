@@ -23,7 +23,9 @@
         "php": ">=7.0",
         "illuminate/contracts": "^5.5",
         "nette/neon": "^2.4",
-        "mustangostang/spyc": "^0.6.2"
+        "mustangostang/spyc": "^0.6.2",
+        "symfony/polyfill-mbstring": "^1.5",
+        "php-ds/php-ds": "^1.2"
     },
     "autoload": {
         "psr-4": {
