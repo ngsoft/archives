@@ -17,9 +17,19 @@ class Importer {
      */
     private $valid_requests = [];
 
-    public function __construct(Importable $object, array $valid_requests = ['array']) {
+    /**
+     * Get a new instance from Importer
+     * @param \NGSOFT\Api\Importable $object
+     * @param array $valid_requests ['array','json','string','file']
+     * @return Importer
+     */
+    public static function getNewImporter(Importable $object, array $valid_requests = ['array', 'json']) {
+        return new static($object, $valid_requests);
+    }
+
+    public function __construct(Importable $object, array $valid_requests = ['array', 'json']) {
         $this->object = $object;
-        $this->valid_requests = $valid_requests;
+        call_user_func_array([$this, 'setValidRequests'], $valid_requests);
     }
 
     /**
@@ -90,7 +100,7 @@ class Importer {
      * Set the accepted import requests
      * @param string [$arg1,...arg2....]
      */
-    public function setValidRequests(...$requests) {
+    protected function setValidRequests(...$requests) {
         $valid = ['array', 'string', 'json', 'file'];
         array_map(function($x)use($valid) {
             if (!in_array($x, $valid)) {
@@ -98,7 +108,7 @@ class Importer {
             }
             return $x;
         }, $requests);
-        $this->valid_requests = $types;
+        $this->valid_requests = $requests;
     }
 
     /**
