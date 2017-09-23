@@ -72,7 +72,7 @@ class Importer {
         }
         $data = json_decode($json, true);
         if (is_array($data))
-            $this->fromArray($array);
+            $this->fromArray($data);
         elseif (is_string($data)) {
             $this->fromString($data);
         }
