@@ -13,7 +13,8 @@ interface Importable {
      * Used by Importer to inject data into the class
      *
      * @param mixed $data
+     * @param string $format The format used for importation
      * @param Importer $importer
      */
-    public function __setData($data, Importer $importer);
+    public function __setData($data, string $format, Importer $importer);
 }
