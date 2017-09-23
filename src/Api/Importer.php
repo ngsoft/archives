@@ -2,6 +2,9 @@
 
 namespace NGSOFT\Api;
 
+use NGSOFT\Api\Exception\BadMethodCallException;
+use NGSOFT\Api\Exception\InvalidArgumentException;
+
 class Importer {
 
     /**
@@ -10,8 +13,7 @@ class Importer {
     private $object;
 
     /**
-     *
-     * @var array $valid_requests
+     * @var array $valid_requests array, string, json, file
      */
     private $valid_requests = [];
 
@@ -27,7 +29,7 @@ class Importer {
      */
     public function fromArray(array $array): Importable {
         if (!in_array('array', $this->valid_requests)) {
-
+            throw new BadMethodCallException('Method %s cannot be called for %s', __METHOD__, get_class($this->object));
         }
         $this->object->__setData($array, $this);
         return $this->object;
@@ -39,6 +41,9 @@ class Importer {
      * @return \NGSOFT\Api\Importable
      */
     public function fromString(string $string): Importable {
+        if (!in_array('string', $this->valid_requests)) {
+            throw new BadMethodCallException('Method %s cannot be called for %s', __METHOD__, get_class($this->object));
+        }
         $this->object->__setData($string, $this);
         return $this->object;
     }
@@ -49,6 +54,9 @@ class Importer {
      * @return \NGSOFT\Api\Importable
      */
     public function fromJson(string $json): Importable {
+        if (!in_array('json', $this->valid_requests)) {
+            throw new BadMethodCallException('Method %s cannot be called for %s', __METHOD__, get_class($this->object));
+        }
         if (!$this->checkJson($json)) {
             return $this->object;
         }
@@ -67,12 +75,30 @@ class Importer {
      * @return \NGSOFT\Api\Importable
      */
     public function fromFile(string $filename): Importable {
+        if (!in_array('file', $this->valid_requests)) {
+            throw new BadMethodCallException('Method %s cannot be called for %s', __METHOD__, get_class($this->object));
+        }
         if (file_exists($filename)) {
             if ($data = file_get_contents($filename)) {
                 $this->object->__setData($data, $this);
             }
         }
         return $this->object;
+    }
+
+    /**
+     * Set the accepted import requests
+     * @param string [$arg1,...arg2....]
+     */
+    public function setValidRequests(...$requests) {
+        $valid = ['array', 'string', 'json', 'file'];
+        array_map(function($x)use($valid) {
+            if (!in_array($x, $valid)) {
+                throw new InvalidArgumentException('argument %s for method %s, is not valid ( accepted : %s )', $x, __METHOD__, implode(', ', $valid));
+            }
+            return $x;
+        }, $requests);
+        $this->valid_requests = $types;
     }
 
     /**
