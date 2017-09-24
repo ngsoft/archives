@@ -38,4 +38,8 @@ class ArrayConverter extends NullConverter {
         throw new InvalidFormatException('Cannot encode array to Base 64 serialized string');
     }
 
+    public static function getFormat(): string {
+        return 'array';
+    }
+
 }

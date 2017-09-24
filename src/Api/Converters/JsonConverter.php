@@ -56,6 +56,13 @@ class JsonConverter extends NullConverter {
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function getFormat(): string {
+        return 'json';
+    }
+
     private static function initialize() {
 
         $decoder = &self::$decoder;

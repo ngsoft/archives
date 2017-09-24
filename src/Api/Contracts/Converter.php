@@ -30,4 +30,10 @@ interface Converter {
      * @param string $filename
      */
     public static function decodeFromFile(string $filename);
+
+    /**
+     * Get the format name
+     * @return string Format
+     */
+    public static function getFormat(): string;
 }

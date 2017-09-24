@@ -7,7 +7,7 @@ use NGSOFT\Api\Exporter;
 interface Exportable {
 
     /**
-     * Gives access to a new Exporter instance
+     * Register with the exporter and return an instance
      */
     public function export(): Exporter;
 

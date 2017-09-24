@@ -40,4 +40,11 @@ class YamlConverter extends NullConverter {
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function getFormat(): string {
+        return 'yaml';
+    }
+
 }

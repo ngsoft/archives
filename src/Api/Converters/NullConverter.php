@@ -60,4 +60,11 @@ class NullConverter extends BaseConverter implements Converter {
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function getFormat(): string {
+        return 'string';
+    }
+
 }

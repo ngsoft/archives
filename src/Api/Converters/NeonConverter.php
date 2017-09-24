@@ -40,4 +40,11 @@ class NeonConverter extends NullConverter {
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function getFormat(): string {
+        return 'neon';
+    }
+
 }

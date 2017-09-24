@@ -4,11 +4,11 @@ namespace NGSOFT\Api;
 
 use NGSOFT\Api\Exception\BadMethodCallException;
 use NGSOFT\Api\Exception\InvalidArgumentException;
-use NGSOFT\Api\Contracts\Importable,
-    NGSOFT\Api\Contracts\Importable\Arrayable,
-    NGSOFT\Api\Contracts\Importable\Jsonable,
-    NGSOFT\Api\Contracts\Importable\Neonable,
-    NGSOFT\Api\Contracts\Importable\Yamlable;
+use NGSOFT\Api\Contracts\Importable;
+use NGSOFT\Api\Contracts\Converter,
+    NGSOFT\Api\Converters\JsonConverter,
+    NGSOFT\Api\Converters\NeonConverter,
+    NGSOFT\Api\Converters\YamlConverter;
 
 class Importer {
 
@@ -18,9 +18,9 @@ class Importer {
     private $object;
 
     /**
-     * @var array
+     * @var Converter[]
      */
-    private $capabilities = [];
+    private static $formats = [];
 
     /**
      * Get a new instance from Importer
@@ -32,25 +32,65 @@ class Importer {
         return new static($object);
     }
 
+    public static function addFormat(Converter $converter, string $format = null) {
+
+    }
+
+    /**
+     * @param Importable $object
+     */
     public function __construct(Importable $object) {
         $this->object = $object;
-        $this->setCapabilities();
     }
 
-    private function setCapabilities() {
-
-        if ($this->object instanceof Arrayable)
-            $this->capabilities[] = 'array';
-        if ($this->object instanceof Jsonable)
-            $this->capabilities[] = 'json';
-        if ($this->object instanceof Neonable)
-            $this->capabilities[] = 'neon';
-        if ($this->object instanceof Yamlable)
-            $this->capabilities[] = 'yaml';
+    /**
+     * Import data from array
+     * @param array $array
+     * @return Importable
+     */
+    public function fromArray(array $array): Importable {
+        $this->object->__setData($array, $this);
+        return $this->object;
     }
 
-    public function hasCapability(string $keyword): bool {
-        return in_array($keyword, $this->capabilities);
+    /**
+     * import data from json string
+     * @param string $json
+     * @return Importable
+     */
+    public function fromJson(string $json): Importable {
+        if ($data = JsonConverter::decode($json)) {
+            $this->object->__setData($data, $this);
+        }
+        return $this->object;
+    }
+
+    /**
+     * import data from neon string
+     * @param string $neon
+     * @return Importable
+     */
+    public function fromNeon(string $neon): Importable {
+        if ($data = NeonConverter::decode($neon)) {
+            $this->object->__setData($data, $this);
+        }
+        return $this->object;
+    }
+
+    /**
+     * import data from yaml string
+     * @param string $yaml
+     * @return Importable
+     */
+    public function fromYaml(string $yaml): Importable {
+        if ($data = NeonConverter::decode($yaml)) {
+            $this->object->__setData($data, $this);
+        }
+        return $this->object;
+    }
+
+    public function fromFile(string $filename, string $format = null): Importable {
+
     }
 
 }
