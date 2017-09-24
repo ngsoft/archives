@@ -2,7 +2,7 @@
 
 namespace NGSOFT\Api\Contracts\Importable;
 
-interface Jsonable {
+interface Jsonable extends Arrayable {
 
     /**
      * Import class data from json format

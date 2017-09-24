@@ -2,7 +2,7 @@
 
 namespace NGSOFT\Api\Contracts\Importable;
 
-interface Neonable {
+interface Neonable extends Arrayable {
 
     /**
      * Import class data from neon format
