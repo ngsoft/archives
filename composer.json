@@ -24,7 +24,8 @@
         "nette/neon": "^2.4",
         "symfony/polyfill-mbstring": "^1.5",
         "php-ds/php-ds": "^1.2",
-        "symfony/yaml": "^3.3"
+        "symfony/yaml": "^3.3",
+        "webmozart/json": "^1.2"
     },
     "autoload": {
         "psr-4": {

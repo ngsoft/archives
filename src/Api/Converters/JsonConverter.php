@@ -40,7 +40,7 @@ class JsonConverter extends BaseConverter implements Converter {
         if ($formatted = static::getFileContents($filename)) {
             return static::decode($formatted);
         }
-        throw new InvalidFormatException('Cannot decode %s, format incorrect.', $filename);
+        return null;
     }
 
     /**
