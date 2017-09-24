@@ -3,7 +3,7 @@
 /**
  * Serialize and encode string to base 64
  * \Serializable Objects and arrays will be saved into that format into the database
- * @param type $value
+ * @param mixed $value
  * @return string
  */
 function b64serialize($value): string {

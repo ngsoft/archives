@@ -2,6 +2,8 @@
 
 namespace NGSOFT\Api\Contracts;
 
+use NGSOFT\Api\Exporter;
+
 interface Exportable {
 
     /**

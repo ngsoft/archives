@@ -32,7 +32,7 @@ abstract class BaseConverter {
     /**
      * Open a file and get its contents
      * @param string $filename
-     * @return type
+     * @return string|null
      * @throws NotFoundException
      */
     public static function getFileContents(string $filename) {

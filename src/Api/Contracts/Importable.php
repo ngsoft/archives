@@ -2,6 +2,8 @@
 
 namespace NGSOFT\Api\Contracts;
 
+use NGSOFT\Api\Importer;
+
 interface Importable {
 
     /**

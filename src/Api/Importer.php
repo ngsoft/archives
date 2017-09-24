@@ -29,7 +29,7 @@ class Importer {
      * @return Importer
      */
     public static function getNewImporter(Importable $object) {
-        return new static($object, $valid_requests);
+        return new static($object);
     }
 
     public function __construct(Importable $object) {
