@@ -22,9 +22,9 @@
     "require": {
         "php": ">=7.0",
         "nette/neon": "^2.4",
-        "mustangostang/spyc": "^0.6.2",
         "symfony/polyfill-mbstring": "^1.5",
-        "php-ds/php-ds": "^1.2"
+        "php-ds/php-ds": "^1.2",
+        "symfony/yaml": "^3.3"
     },
     "autoload": {
         "psr-4": {

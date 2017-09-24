@@ -3,7 +3,6 @@
 namespace NGSOFT\Api\Converters;
 
 use NGSOFT\Api\Contracts\Converter;
-use Spyc;
 
 class YamlConverter extends BaseConverter implements Converter {
 
