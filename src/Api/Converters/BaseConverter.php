@@ -32,7 +32,7 @@ abstract class BaseConverter {
     /**
      * Open a file and get its contents
      * @param string $filename
-     * @return string|null
+     * @return string
      * @throws NotFoundException
      */
     public static function getFileContents(string $filename) {
@@ -43,7 +43,7 @@ abstract class BaseConverter {
         if ($data = @file_get_contents($filename)) {
             return $data;
         }
-        return null;
+        return "";
     }
 
     /**

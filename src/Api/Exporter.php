@@ -7,6 +7,7 @@ use NGSOFT\Api\Exception\InvalidArgumentException;
 use NGSOFT\Api\Exception\UnexpectedValueException;
 use NGSOFT\Api\Exception\InvalidFormatException;
 use NGSOFT\Api\Exception\NotFoundException;
+use NGSOFT\Api\Exception\BadMethodCallException;
 use NGSOFT\Api\Converters\ArrayConverter,
     NGSOFT\Api\Converters\JsonConverter,
     NGSOFT\Api\Converters\NeonConverter,
@@ -20,16 +21,16 @@ use NGSOFT\Api\Converters\ArrayConverter,
 class Exporter extends Format {
 
     /**
-     * @var Importable $object
+     * @var Exportable $object
      */
     private $object;
 
     /**
      * Get a new instance from Exporter
      * @param Exportable $object
-     * @return Importer
+     * @return Exporter
      */
-    public static function getNewExporter(Exportable $object) {
+    public static function getNewExporter(Exportable $object): Exporter {
         return new static($object);
     }
 
@@ -72,7 +73,8 @@ class Exporter extends Format {
      * @throws NotFoundException
      */
     public function toFile(string $filename, string $format = null): Exportable {
-        if (!$format) {
+        if (!is_string($format)) {
+            $format = "";
             $path_parts = pathinfo($format);
             if (!isset($path_parts['extension'])) {
                 throw new InvalidFormatException("Cannot define format from filename %s, doesn't have an extension", $filename);

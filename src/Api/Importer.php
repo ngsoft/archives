@@ -9,7 +9,8 @@ use NGSOFT\Api\Exception\InvalidFormatException;
 use NGSOFT\Api\Contracts\Importable;
 use NGSOFT\Api\Converters\JsonConverter,
     NGSOFT\Api\Converters\NeonConverter,
-    NGSOFT\Api\Converters\YamlConverter;
+    NGSOFT\Api\Converters\YamlConverter,
+    NGSOFT\Api\Converters\ArrayConverter;
 
 /**
  * @method Importable fromJson(string $json) Import class data from json string
@@ -28,7 +29,7 @@ class Importer extends Format {
      * @param \NGSOFT\Api\Importable $object
      * @return Importer
      */
-    public static function getNewImporter(Importable $object) {
+    public static function getNewImporter(Importable $object): Importer {
         return new static($object);
     }
 
@@ -63,7 +64,8 @@ class Importer extends Format {
      * @param string|null $format if format not defined, method will get the format from the file extension
      */
     public function fromFile(string $filename, string $format = null): Importable {
-        if (!$format) {
+        if (!is_string($format)) {
+            $format = "";
             $path_parts = pathinfo($format);
             if (!isset($path_parts['extension'])) {
                 throw new InvalidFormatException("Cannot define format from filename %s, doesn't have an extension", $filename);
@@ -88,7 +90,7 @@ class Importer extends Format {
                 if (count($args) != 1) {
                     throw new InvalidArgumentException('Method %s expect only 1 argument, %d given', $method, count($args));
                 } elseif (!is_string($args[0])) {
-                    throw new UnexpectedValueException('Argument 1 for method %s is expected to be a string, %s given', $method, gettype($formatted));
+                    throw new UnexpectedValueException('Argument 1 for method %s is expected to be a string, %s given', $method, gettype($args[0]));
                 } else {
                     $formatted = $args[0];
                     if ($data = $this->getFormatter($format)::decode($formatted)) {
