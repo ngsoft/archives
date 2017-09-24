@@ -50,7 +50,7 @@ class JsonConverter extends NullConverter {
             if ($formatted = self::$encoder->encode($var)) {
                 return $formatted;
             }
-            return null;
+            return "";
         } catch (EncodingFailedException $e) {
             throw new InvalidFormatException($e->getMessage());
         }
@@ -70,6 +70,10 @@ class JsonConverter extends NullConverter {
         $encoder->setPrettyPrinting(true);
     }
 
+    /**
+     * JsonEncoder Adapter
+     * @param array $options
+     */
     private static function setOptions(array $options) {
         if (!count($options)) {
             return;
