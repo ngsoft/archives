@@ -21,10 +21,10 @@ function b64serialize($value): string {
 /**
  * Unserialize a base 64 serialized string
  * will return \Serializable Objects or array
- * @param type $str
+ * @param string $str
  * @return mixed
  */
-function b64unserialize(string $str = null) {
+function b64unserialize(string $str) {
     $obj = null;
     if (!empty($str)) {
         $str = base64_decode($str);

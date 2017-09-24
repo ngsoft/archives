@@ -78,5 +78,5 @@ __NAMESPACE__ . "\\Api\\Importer",
  __NAMESPACE__ . "\\Api\\Exporter"
     ],
     //project has dependencies that needs composer autoloader
-    false
+    true
 ]);
