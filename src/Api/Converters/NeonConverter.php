@@ -2,6 +2,6 @@
 
 namespace NGSOFT\Api\Converters;
 
-class NeonConverter {
-    
+class NeonConverter extends NullConverter {
+
 }
