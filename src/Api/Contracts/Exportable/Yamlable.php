@@ -1,6 +1,6 @@
 <?php
 
-namespace NGSOFT\Api\Contracts;
+namespace NGSOFT\Api\Contracts\Exportable;
 
 interface Yamlable {
 

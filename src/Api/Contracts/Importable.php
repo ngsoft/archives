@@ -1,6 +1,6 @@
 <?php
 
-namespace NGSOFT\Api;
+namespace NGSOFT\Api\Contracts;
 
 interface Importable {
 

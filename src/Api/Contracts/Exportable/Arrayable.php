@@ -1,12 +1,12 @@
 <?php
 
-namespace NGSOFT\Api\Contracts;
+namespace NGSOFT\Api\Contracts\Exportable;
 
 interface Arrayable {
 
     /**
-     * Export class data to array format
-     * 
+     * Export class data to array
+     *
      * @return array
      */
     public function toArray(): array;
