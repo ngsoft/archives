@@ -2,7 +2,7 @@
 
 namespace NGSOFT\Api\Contracts\Importable;
 
-interface Yamlable extends Arrayable {
+interface Yamlable {
 
     /**
      * Import class data from yaml format
