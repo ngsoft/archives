@@ -27,7 +27,7 @@ class NeonConverter extends NullConverter {
     /**
      * {@inheritdoc}
      */
-    public static function encode($var, $options = null): string {
+    public static function encode($var, ...$options): string {
         try {
             if ($formatted = Neon::encode($var, Neon::BLOCK)) {
                 return $formatted;

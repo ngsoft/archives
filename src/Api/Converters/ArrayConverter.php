@@ -27,7 +27,7 @@ class ArrayConverter extends NullConverter {
     /**
      * {@inheritdoc}
      */
-    public static function encode($var, $options = null): string {
+    public static function encode($var, ...$options): string {
         if (!is_array($var)) {
             throw new InvalidArgumentException('first argument must be an array, %s given', gettype($var));
         }

@@ -30,7 +30,7 @@ class NullConverter extends BaseConverter implements Converter {
     /**
      * {@inheritdoc}
      */
-    public static function encode($var, $options = null): string {
+    public static function encode($var, ...$options): string {
         //convert everything to string
         switch (gettype($var)) {
             case "boolean":

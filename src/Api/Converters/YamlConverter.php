@@ -29,7 +29,7 @@ class YamlConverter extends NullConverter {
     /**
      * {@inheritdoc}
      */
-    public static function encode($var, $options = null): string {
+    public static function encode($var, ...$options): string {
         try {
             if ($data = Yaml::dump($var, 2, 4, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE)) {
                 return $data;

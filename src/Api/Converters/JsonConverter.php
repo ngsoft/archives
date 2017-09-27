@@ -33,8 +33,8 @@ class JsonConverter extends NullConverter {
     /**
      * {@inheritdoc}
      */
-    public static function encode($var, $options = null): string {
-        $options = is_array($options) ?: [Jsonable::JSON_PRETTY_PRINT];
+    public static function encode($var, ...$options): string {
+        $options = count($options) ?: [Jsonable::JSON_PRETTY_PRINT];
 
         try {
             $encoder = self::setEncoderOptions($options);
