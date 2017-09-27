@@ -168,10 +168,8 @@ function include_all(string $dir, bool $once = false, string $extensions = 'php'
         if (is_dir($filename)) {
             continue;
         }
-        if ($ext = pathinfo($filename, PATHINFO_EXTENSION)) {
-            if (in_array($ext, $extensions)) {
-                $once ? include_once $filename : include $filename;
-            }
+        if ($ext = pathinfo($filename, PATHINFO_EXTENSION) and in_array($ext, $extensions)) {
+            $once ? include_once $filename : include $filename;
         }
     }
 }
