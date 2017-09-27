@@ -16,7 +16,6 @@ class JsonConverter extends NullConverter {
      * {@inheritdoc}
      */
     public static function decode(string $formatted) {
-        self::initialize();
         try {
             $decoder = new JsonDecoder();
             $decoder->setObjectDecoding($decoder::ASSOC_ARRAY);
