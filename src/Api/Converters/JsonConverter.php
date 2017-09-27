@@ -13,22 +13,15 @@ use Webmozart\Json\EncodingFailedException;
 class JsonConverter extends NullConverter {
 
     /**
-     * @var JsonEncoder
-     */
-    private static $encoder;
-
-    /**
-     * @var JsonDecoder
-     */
-    private static $decoder;
-
-    /**
      * {@inheritdoc}
      */
     public static function decode(string $formatted) {
         self::initialize();
         try {
-            if ($data = self::$decoder->decode($formatted)) {
+            $decoder = new JsonDecoder();
+            $decoder->setObjectDecoding($decoder::ASSOC_ARRAY);
+            $decoder->setBigIntDecoding($decoder::STRING);
+            if ($data = $decoder->decode($formatted)) {
                 return $data;
             }
             return null;
@@ -41,13 +34,11 @@ class JsonConverter extends NullConverter {
      * {@inheritdoc}
      */
     public static function encode($var, $options = null): string {
-        self::initialize();
-        if (is_array($options)) {
-            self::setOptions($options);
-        }
+        $options = is_array($options) ?: [Jsonable::JSON_PRETTY_PRINT];
 
         try {
-            if ($formatted = self::$encoder->encode($var)) {
+            $encoder = self::setEncoderOptions($options);
+            if ($formatted = $encoder->encode($var)) {
                 return $formatted;
             }
             return "";
@@ -63,31 +54,18 @@ class JsonConverter extends NullConverter {
         return 'json';
     }
 
-    private static function initialize() {
-
-        $decoder = &self::$decoder;
-        $encoder = &self::$encoder;
-
-        //configure decoder
-        $decoder = new JsonDecoder();
-        $decoder->setObjectDecoding($decoder::ASSOC_ARRAY);
-        $decoder->setBigIntDecoding($decoder::STRING);
-        //configure encoder
-        $encoder = new JsonEncoder();
-        $encoder->setPrettyPrinting(true);
-    }
-
     /**
      * JsonEncoder Adapter
      * @param array $options
+     * @return JsonEncoder
      */
-    private static function setOptions(array $options) {
+    private static function setEncoderOptions(array $options) {
+        $encoder = new JsonEncoder;
         if (!count($options)) {
-            return;
+            return $encoder;
         }
 
-        $encoder = &self::$encoder;
-        $encoder = new JsonEncoder;
+
 
         $methods = [
             Jsonable::JSON_HEX_TAG => ["setEscapeGtLt" => true],
@@ -104,6 +82,8 @@ class JsonConverter extends NullConverter {
             Jsonable::JSON_PRESERVE_ZERO_FRACTION => [],
             Jsonable::JSON_UNESCAPED_LINE_TERMINATORS => [],
         ];
+        if (!count($options))
+            return $encoder;
 
 
         array_map(function($int)use($encoder, $methods) {
@@ -121,6 +101,8 @@ class JsonConverter extends NullConverter {
             $encoder->$method($value);
             return;
         }, $options);
+
+        return $encoder;
     }
 
 }
