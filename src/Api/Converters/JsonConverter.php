@@ -36,7 +36,7 @@ class JsonConverter extends NullConverter {
         $options = count($options) ?: [Jsonable::JSON_PRETTY_PRINT];
 
         try {
-            $encoder = self::setEncoderOptions($options);
+            $encoder = self::getEncoder($options);
             if ($formatted = $encoder->encode($var)) {
                 return $formatted;
             }
@@ -58,7 +58,7 @@ class JsonConverter extends NullConverter {
      * @param array $options
      * @return JsonEncoder
      */
-    private static function setEncoderOptions(array $options) {
+    private static function getEncoder(array $options) {
         $encoder = new JsonEncoder;
         if (!count($options)) {
             return $encoder;
