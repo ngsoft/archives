@@ -9,7 +9,7 @@ interface Converter {
      * @param mixed $var
      * @param mixed $options
      */
-    public static function encode($var, $options = null): string;
+    public static function encode($var, ...$options): string;
 
     /**
      * Encode $var and save to file
