@@ -5,7 +5,7 @@ namespace NGSOFT\Api;
 class FileSystemManager implements Contracts\FilePathManager {
 
     /**
-     * @var Contracts\FileSystem
+     * @var Contracts\FileSystem[]
      */
     protected $filesystems = [];
 
