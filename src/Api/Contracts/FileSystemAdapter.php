@@ -44,6 +44,12 @@ interface FileSystemAdapter {
     public function getFileInfos(string $path);
 
     /**
+     * Get Full path from a file
+     * @param string $path
+     */
+    public function getFullPath(string $path): string;
+
+    /**
      * Appends contents to a file
      * @throws FileNotFound
      * @param string $path

@@ -5,11 +5,29 @@ namespace NGSOFT\Api;
 use Psr\SimpleCache\CacheInterface;
 use NGSOFT\Api\Exception\Cache\InvalidArgumentException,
     NGSOFT\Api\Exception\Cache\CacheException;
+use DateTime,
+    DateInterval;
 
 class SimpleOpCache implements CacheInterface {
 
-    public function __construct($path) {
+    /**
+     * @var Contracts\FileSystem
+     */
+    protected $path = '';
 
+    /**
+     * @param Contracts\FileSystem|string|null $path
+     */
+    public function __construct($path = null) {
+        if (is_null($path)) {
+            $path = sys_get_temp_dir() . '/cache';
+        }
+        if (is_string($path)) {
+            $path = new FileSystem($path);
+        }
+        if ($path instanceof Contracts\FileSystem) {
+            $this->path = $path;
+        }
     }
 
     /**

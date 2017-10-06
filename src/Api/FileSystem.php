@@ -102,4 +102,11 @@ class FileSystem implements Contracts\FileSystem {
 
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getFullPath(string $path): string {
+
+    }
+
 }
