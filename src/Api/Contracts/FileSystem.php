@@ -21,13 +21,6 @@ interface FileSystem {
     public function read(string $path);
 
     /**
-     * Get a file handler
-     * @param string $path
-     * @param FileHandler $handler
-     */
-    public function get(string $path, FileHandler $handler): FileHandler;
-
-    /**
      * Get file size
      * @param string $path
      * @return int|false
@@ -52,6 +45,7 @@ interface FileSystem {
 
     /**
      * Appends contents to a file
+     * @throws FileNotFound
      * @param string $path
      * @param string $contents
      */
@@ -59,6 +53,7 @@ interface FileSystem {
 
     /**
      * Prepend contents to a file
+     * @throws FileNotFound
      * @param string $path
      * @param string $contents
      */
@@ -79,6 +74,8 @@ interface FileSystem {
 
     /**
      * Move a file
+     * @throws FileNotFound
+     * @throws FileExists
      * @param string $path
      * @param string $destination
      */
@@ -86,6 +83,8 @@ interface FileSystem {
 
     /**
      * Copy a file
+     * @throws FileNotFound
+     * @throws FileExists
      * @param string $path
      * @param string $destination
      */
