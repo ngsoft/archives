@@ -25,7 +25,8 @@
         "symfony/polyfill-mbstring": "^1.5",
         "php-ds/php-ds": "^1.2",
         "symfony/yaml": "^3.3",
-        "webmozart/json": "^1.2"
+        "webmozart/json": "^1.2",
+        "psr/simple-cache": "^1.0"
     },
     "autoload": {
         "psr-4": {
