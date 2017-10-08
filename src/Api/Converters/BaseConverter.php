@@ -22,11 +22,9 @@ abstract class BaseConverter {
         }
 
         $dirname = dirname($filename);
-        if (!file_exists($dirname) and @ mkdir($dirname, 0777, true)) {
-            return touch($filename);
-        }
-
-        return false;
+        if (!file_exists($dirname))
+            @ mkdir($dirname, 0777, true);
+        return touch($filename);
     }
 
     /**

@@ -17,7 +17,7 @@ interface Converter {
      * @param mixed $var
      * @param mixed $options
      */
-    public static function encodeToFile(string $filename, $var, $options = null): bool;
+    public static function encodeToFile(string $filename, $var, ...$options): bool;
 
     /**
      * decode formatted string

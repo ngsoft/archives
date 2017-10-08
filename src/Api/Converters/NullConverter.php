@@ -53,8 +53,9 @@ class NullConverter extends BaseConverter implements Converter {
     /**
      * {@inheritdoc}
      */
-    public static function encodeToFile(string $filename, $var, $options = null): bool {
-        if (static::createFileTree($filename) and $contents = static::encode($var, $options)) {
+    public static function encodeToFile(string $filename, $var, ...$options): bool {
+        if (static::createFileTree($filename) and $contents = static::encode($var, ...$options)) {
+
             return static::setFileContents($filename, $contents);
         }
         return false;
