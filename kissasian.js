@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
-// @namespace    ngsoft/kissasian
+// @namespace    https://github.com/ngsoft
 // @version      1.0.1
 // @description  removes adds + simplify UI
 // @author       daedelus

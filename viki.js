@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Viki Subs
-// @namespace    ngsoft/viki
+// @namespace    https://github.com/ngsoft
 // @version      1.0.1
 // @description  Get Viki Subtitles
 // @author       daedelus
