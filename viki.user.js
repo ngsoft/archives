@@ -7,8 +7,8 @@
 // @match        https://www.viki.com/videos/*
 // @noframes
 // @grant none
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/viki.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/viki.js
+// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/viki.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/viki.user.js
 // ==/UserScript==
 
 window.open = function() {};

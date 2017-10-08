@@ -9,8 +9,8 @@
 // @require     https://code.jquery.com/jquery-3.2.1.min.js
 // @noframes
 // @grant none
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/kissasian.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/kissasian.js
+// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/kissasian.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/kissasian.user.js
 // ==/UserScript==
 
 //adios popups
