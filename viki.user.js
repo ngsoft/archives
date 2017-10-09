@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viki Subs
 // @namespace    https://github.com/ngsoft
-// @version      1.0.2
+// @version      1.0.3
 // @description  Get Viki Subtitles
 // @author       daedelus
 // @match        https://www.viki.com/videos/*
@@ -43,7 +43,10 @@ window.open = function() {};
                         return;
                     }
                 }
-                txt = vikisubs.countries[lang].nativeName + " (" + percent + "%)";
+                displaylang = vikisubs.countries[lang].nativeName;
+                displaylang = displaylang.split(',');
+                displaylang = displaylang[0].trim();
+                txt = displaylang + " (" + percent + "%)";
                 link = vikisubs.dropdownitem.clone();
                 link.find('a').attr('href', src).attr('data-lang', lang).html(txt);
                 vikisubs.dropdown.find('ul').append(link);
