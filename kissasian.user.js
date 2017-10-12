@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      1.0.2
+// @version      1.1.0
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://kissasian.*/*
@@ -57,6 +57,10 @@ window.open = function() {};
                 if (link.length > 0) {
                     player.link = link;
                 }
+                //revert to device player
+                else {
+                    player.link = $("div.clsTempMSg div:contains('If the player does not work') a").first().clone();
+                }
             }
             player.addlink();
         },
@@ -72,7 +76,10 @@ window.open = function() {};
             el.attr('id', 'vidlink');
             el.append(player.link);
             a = el.find('a');
-            a.html(player.filename).attr('href', a.attr('href') + '?title=' + player.filename);
+            if (a.attr('href').indexOf('?') === -1)
+                a.html(player.filename).attr('href', a.attr('href') + '?title=' + player.filename);
+            else
+                a.html(player.filename).attr('href', a.attr('href') + '&title=' + player.filename);
             target.prepend(el);
         },
         css: function() {
