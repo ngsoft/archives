@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      1.1.0
+// @version      1.1.2
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://kissasian.*/*
@@ -81,6 +81,7 @@ window.open = function() {};
             else
                 a.html(player.filename).attr('href', a.attr('href') + '&title=' + player.filename);
             target.prepend(el);
+
         },
         css: function() {
             $('#container').addClass('videoplayer');
