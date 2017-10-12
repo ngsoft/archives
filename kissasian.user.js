@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      1.1.2
+// @version      1.1.3
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://kissasian.*/*
@@ -78,8 +78,6 @@ window.open = function() {};
             a = el.find('a');
             if (a.attr('href').indexOf('?') === -1)
                 a.html(player.filename).attr('href', a.attr('href') + '?title=' + player.filename);
-            else
-                a.html(player.filename).attr('href', a.attr('href') + '&title=' + player.filename);
             target.prepend(el);
 
         },
