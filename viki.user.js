@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viki Subs
 // @namespace    https://github.com/ngsoft
-// @version      1.1.1
+// @version      1.1.2
 // @description  Get Viki Subtitles
 // @author       daedelus
 // @match        https://www.viki.com/videos/*
@@ -26,7 +26,7 @@ window.open = function() {};
         //mobile counterpart
         mobile: `<li class="navbar-divider hide-on-large"></li><li class="navbar-item hide-on-large"><a href="#">Subtitles</a><ul class="navbar-expanded-secondary"></ul></li>`,
         //contains the links
-        dropdownitem: `<li><a target="_blank"></a></li>`,
+        dropdownitem: `<li><a class="subtitle-link-tamper" target="_blank"></a></li>`,
         //a divider, not used yet
         divider: `<li class="navbar-divider"></li>`,
         //some display fixes
