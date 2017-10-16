@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      1.1.4
+// @version      1.1.5
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://kissasian.*/*
@@ -50,7 +50,7 @@ window.open = function() {};
         },
         getlink: function() {
             //filename = $('#divFileName').clone().children().remove().end().text();
-            filename = window.title.split('-');
+            filename = document.title.split('-');
             filename = filename[0].trim();
             filename += '.mp4';
             //default mode
