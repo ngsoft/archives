@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool Lite Player UI
 // @namespace    https://github.com/ngsoft
-// @version      1.0.0
+// @version      1.0.1
 // @description  Lite UI
 // @author       daedelus
 // @include     *://dramacool*.*/*episode*
@@ -22,6 +22,9 @@
             <!--
                     header, .content-right{
                             display: none !important;
+                    }
+                    .content-left{
+                        width:100%;
                     }
             -->
         </style>`,
