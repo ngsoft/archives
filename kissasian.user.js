@@ -12,11 +12,6 @@
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/kissasian.user.js
 // ==/UserScript==
 
-
-
-
-
-
 (function() {
 
     window.adblock = false;
