@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Dramacool UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      1.0.6
+// @version      1.0.7
 // @description  UI Remaster
 // @author       daedelus
-// @include     *://dramacool*.*/*
-// @include     *://watchasia*.*/*
+// @include     *://*dramacool*/*
+// @include     *://*watchasia*/*
 // @require     https://code.jquery.com/jquery-3.2.1.min.js
 // @noframes
 // @grant none
