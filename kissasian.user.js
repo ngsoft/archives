@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      2.0.1
+// @version      2.1.0
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -95,6 +95,7 @@
                 #vidlink{display: block;text-align: center;font-size: 12pt;margin: 10px 0 20px 0;}
                 .visible{visibility: visible!important;}
                 #centerDivVideo{margin-top: 15px;}
+                .bksbutton{text-decoration: underline;}
             `,
             timeout: 1500,
             show: function() {
@@ -104,16 +105,71 @@
                 }, kissasian.ui.timeout);
             },
             bks: function() {
-                el = $("th:contains('Latest')");
-                el.css("text-decoration", "underline").attr('title', 'Show All/Uncomplete');
-                el.on('click', function(e) {
-                    tohide = $("td:contains('Completed')").parent('tr');
-                    if (tohide.hasClass('hidden')) {
-                        tohide.removeClass('hidden');
-                    } else {
-                        tohide.addClass('hidden');
+                //latest episode (auto hides completed)
+
+                var latest = {
+                    button: $("th:contains('Latest')"),
+                    completed: $("td:contains('Completed')").parent('tr'),
+                    uncomplete: $("td a:contains('Episode')").parents('tr')
+                };
+
+                latest.button.addClass('bksbutton').attr('data-toogle', 'all');
+
+                latest.button.click(function(e) {
+                    toogle = $(this).attr('data-toogle');
+                    if (toogle == "all") {
+                        $(this).attr("data-toogle", "uncomplete").attr('title', 'Show Complete');
+                        latest.completed.addClass('hidden');
+                        latest.uncomplete.removeClass('hidden');
+                        return;
+                    }
+                    if (toogle == "uncomplete") {
+                        $(this).attr("data-toogle", "complete").attr('title', 'Show All');
+                        latest.completed.removeClass('hidden');
+                        latest.uncomplete.addClass('hidden');
+                        return;
+                    }
+                    if (toogle == "complete") {
+                        $(this).attr("data-toogle", "all").attr('title', 'Show Uncomplete');
+                        latest.completed.removeClass('hidden');
+                        latest.uncomplete.removeClass('hidden');
                     }
                 }).click();
+
+
+
+
+                //status (auto hides watched)
+                var st = {
+                    button: $("th:contains('Status')"),
+                    watched: $('a.aUnRead[style*="none"]').parent('td').parent('tr'),
+                    unwatched: $('a.aRead[style*="none"]').parent('td').parent('tr'),
+                };
+
+                st.button.addClass('bksbutton').attr('title', 'Toggle Visibility').attr('data-toogle', 'all');
+                st.button.click(function(e) {
+                    toogle = $(this).attr('data-toogle');
+                    if (toogle == 'unwatched') {
+                        $(this).attr('data-toogle', 'watched').attr('title', 'Show All');
+                        st.unwatched.addClass('hidden');
+                        st.watched.removeClass('hidden');
+                        return;
+                    }
+                    if (toogle == 'watched') {
+                        $(this).attr('data-toogle', 'all').attr('title', 'Show Unwatched');
+                        st.unwatched.removeClass('hidden');
+                        st.watched.removeClass('hidden');
+                        return;
+                    }
+                    if (toogle == 'all') {
+                        $(this).attr('data-toogle', 'unwatched').attr('title', 'Show Watched');
+                        st.unwatched.removeClass('hidden');
+                        st.watched.addClass('hidden');
+                    }
+                }).click();
+
+
+
             },
             epl: function() {
                 $('table.listing tr td').parent('tr').addClass('ep');
