@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      1.1.5
+// @version      1.2.0
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://kissasian.*/*
@@ -130,25 +130,24 @@ window.open = function() {};
             }
             kissasian.hideadds();
             kissasian.hideui();
+            kissasian.episodelist();
             //});
         },
         css: function() {
             mycss = `
-				<style type="text/css">
-				<!--
-					.hidden{
-						display: none!important;
-					}
-					.nomargin{
-						margin: 0!important;
-					}
-					.clear, #container:not(.videoplayer) .clear2{
-						height: 0;
-						max-height: 0;
-					}
+                <style type="text/css"><!--
+                        .hidden{
+                                display: none!important;
+                        }
+                        .nomargin{
+                                margin: 0!important;
+                        }
+                        .clear, #container:not(.videoplayer) .clear2{
+                                height: 0;
+                                max-height: 0;
+                        }
 
-				-->
-				</style>`;
+                --></style>`;
             $('body').append(mycss);
         },
         //hide adds and some UI elements
@@ -183,6 +182,17 @@ window.open = function() {};
         },
         login: function() {
             $('#btnSubmit').attr('type', 'submit').attr('onclick', '');
+        },
+        episodelist: function() {
+            //$('ul.all-episode').html($('ul.all-episode').find('li').css('display', 'inline-block').get().reverse());
+            $('table.listing tr td').parent('tr').addClass('ep');
+
+            table = $('table.listing');
+
+            table.html(table.find('tr').get().reverse());
+            table.prepend(table.find('tr:not(.ep)').get().reverse());
+
+
         }
     };
     window.addEventListener("load", kissasian.main, false);
