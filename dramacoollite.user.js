@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Dramacool Lite Player UI
 // @namespace    https://github.com/ngsoft
-// @version      1.0.1
+// @version      1.0.2
 // @description  Lite UI
 // @author       daedelus
-// @include     *://dramacool*.*/*episode*
+// @include     *://*dramacool*/*episode*
 // @include     *://watchasia*.*/*episode*
 // @noframes
 // @grant none
