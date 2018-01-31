@@ -2,7 +2,7 @@
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
 // @version      2.0.1
-// @description  removes adds + simplify UI + Faster than v1
+// @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://*kissasian.*/*
 // @include     *://*kissanime.*/*
