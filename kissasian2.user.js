@@ -31,14 +31,47 @@ function onready(fn) {
         document.addEventListener('DOMContentLoaded', fn);
 }
 
+
 (function() {
-    kissasian = {
-        ui: {},
-        css: ``,
-        addcss: function() {
-            css = `<style type="text/css"><!-- ` + kissasian.css + `--></style>`;
-            $('body').append(css);
+    var uri = location.pathname;
+    var url = location.href;
+    if (uri.indexOf('/Special/') !== -1) {
+        return;
+    }
+    if (url.indexOf('kissasian.com') !== -1) {
+        location.href = url.replace('kissasian.com', 'kissasian.ch');
+        return;
+    }
+    if (window.top != window.self) {
+        return;
+    }
+
+
+
+
+
+
+
+    var toolkit = {
+        body: function() {
+            return $('body');
+        },
+        addcss: function(css) {
+            html = `<style type="text/css"><!-- ` + css + `--></style>`;
+            toolkit.body().append(html);
         }
+    };
+    var kissasian = {
+        ui: {
+            css: ``
+        },
+        router: function() {
+
+        },
+        init: function() {
+
+        }
+
     };
 
 
@@ -46,6 +79,12 @@ function onready(fn) {
 
 
     onready(function() {
+        interval = setInterval(function() {
+            if (typeof $ !== 'undefined' && $.fn.jquery == '3.2.1') {
+                kissasian.init();
+                clearInterval(interval);
+            }
+        }, 100);
 
     });
 
