@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      2.1.2
+// @version      2.1.3
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -224,6 +224,7 @@
                     $('.divCloseBut a').click();
                     $('div > span.st_facebook_hcount').parent('div').parent('div').remove();
                     $('#divComments').remove();
+                    $('#head').addClass('hidden');
                     kissasian.ui.player.getlink();
                 }
             },
