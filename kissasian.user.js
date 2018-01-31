@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      1.2.0
+// @version      1.2.1
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://kissasian.*/*
@@ -184,13 +184,16 @@ window.open = function() {};
             $('#btnSubmit').attr('type', 'submit').attr('onclick', '');
         },
         episodelist: function() {
-            //$('ul.all-episode').html($('ul.all-episode').find('li').css('display', 'inline-block').get().reverse());
-            $('table.listing tr td').parent('tr').addClass('ep');
 
-            table = $('table.listing');
+            if (url.match(/\/Drama\//)) {
+                $('table.listing tr td').parent('tr').addClass('ep');
+                table = $('table.listing');
+                table.html(table.find('tr').get().reverse());
+                table.prepend(table.find('tr:not(.ep)').get().reverse());
+            }
 
-            table.html(table.find('tr').get().reverse());
-            table.prepend(table.find('tr:not(.ep)').get().reverse());
+
+
 
 
         }

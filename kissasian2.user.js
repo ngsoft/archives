@@ -63,12 +63,38 @@ function onready(fn) {
     };
     var kissasian = {
         ui: {
-            css: ``
-        },
-        router: function() {
+            css: ``,
+            bks: function() {
+                el = $("th:contains('Latest')");
+                el.css("text-decoration", "underline").attr('title', 'Show All/Uncomplete');
+                el.on('click', function(e) {
+                    tohide = $("td:contains('Completed')").parent('tr');
+                    if (tohide.hasClass('hidden')) {
+                        tohide.removeClass('hidden');
+                    } else {
+                        tohide.addClass('hidden');
+                    }
+                }).click();
+            },
+            epl: function() {
 
+            }
         },
+
         init: function() {
+            toolkit.addcss(kissasian.ui.css);
+
+            if (uri == '/Login') {
+                $('#btnSubmit').attr('type', 'submit').attr('onclick', '');
+                return;
+            }
+
+            if (uri == '/BookmarkList') {
+                kissasian.ui.bks();
+            }
+
+
+
 
         }
 
