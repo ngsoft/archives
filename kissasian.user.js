@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      2.1.0
+// @version      2.1.1
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -166,7 +166,7 @@
                         st.unwatched.removeClass('hidden');
                         st.watched.addClass('hidden');
                     }
-                }).click();
+                });
 
 
 
