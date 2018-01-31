@@ -77,7 +77,16 @@ function onready(fn) {
                 }).click();
             },
             epl: function() {
+                $('table.listing tr td').parent('tr').addClass('ep');
+                table = $('table.listing');
+                table.html(table.find('tr').get().reverse());
+                table.prepend(table.find('tr:not(.ep)').get().reverse());
+            },
+            player: {
 
+                init: function() {
+
+                }
             }
         },
 
@@ -91,6 +100,12 @@ function onready(fn) {
 
             if (uri == '/BookmarkList') {
                 kissasian.ui.bks();
+            }
+            if (url.match(/\/Drama\//)) {
+                kissasian.ui.epl();
+            }
+            if ($('#centerDivVideo').length > 0) {
+                kissasian.ui.player.init();
             }
 
 
