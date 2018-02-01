@@ -16,17 +16,21 @@
     var toolbox = {
 
         loader: {
+            timeout: 1500,
             show: function() {
                 document.body.style.opacity = '0';
             },
             hide: function() {
-                document.body.style.opacity = '1';
+                setTimeout(function() {
+                    document.body.style.opacity = '1';
+                }, toolbox.loader.timeout);
+
             }
         },
         ui: {
             addcss: function(css) {
                 html = '<style type="text/css"><!-- ' + css + ' --></style>';
-                $('body').append(css);
+                $('body').append(html);
             }
         },
 
@@ -60,26 +64,96 @@
         }
     };
 
+    var natv = {
+        ui: {
+            css: `
+                iframe, .hidden, .trc_rbox_container, #comment {display: none!important;}
+                #movie iframe { display: block!important;}
+            `,
+            player: {
 
+                init: function() {
 
+                    myInterval = setInterval(function() {
+                        if (typeof $('video').attr('src') !== 'undefined') {
+                            natv.ui.player.setevent();
+                            clearInterval(myInterval);
+                        }
+                        if (typeof $('#player iframe').attr('src') !== 'undefined') {
+                            natv.ui.player.setiframelink();
+                            clearInterval(myInterval);
+                        }
+                    }, 50);
+                },
+                videoname: function() {
+                    title = document.title;
+                    title = title.split('|');
+                    mytitle = title[0].replace('Watch', '');
+                    mytitle = mytitle.replace('EngSub', '');
+                    mytitle = mytitle.trim();
+                    return mytitle + '.mp4';
+                },
+                videolink: function() {
+                    return $('video').attr('src') + "?title=" + natv.ui.player.videoname();
+                },
+                addlink: function(url) {
+                    if (typeof natv.ui.player.link !== 'undefined') {
+                        natv.ui.player.link.attr('href', url);
+                        return;
+                    }
+                    el = $('ul.menu li.child').last();
+                    el = el.clone();
+                    el.attr('id', 'videolink');
+                    $('ul.menu').append(el);
+                    natv.ui.player.link = el.find('a');
+                    natv.ui.player.link.html('Open Video').attr('target', '_blank').attr('href', url);
+                },
+                setevent: function() {
+                    natv.ui.player.addlink(natv.ui.player.videolink());
 
+                    //https://www.w3.org/2010/05/video/mediaevents.html
+                    $('video').on('loadeddata', function(e) {
+                        natv.ui.player.addlink(natv.ui.player.videolink());
+                    });
+                    //loadstart
+                    $('video').on('play', function(e) {
+                        natv.ui.player.addlink(natv.ui.player.videolink());
+                    });
+                    $('ul.episode_list a').off('click');
 
+                },
+                setiframelink: function() {
+                    url = $('#player iframe').attr('src');
+                    if (url.indexOf('?') === -1)
+                        url += '?title=' + natv.ui.player.videoname();
+                    else
+                        url += '&title=' + natv.ui.player.videoname();
+                    natv.ui.player.addlink(url);
 
+                }
+            }
+        },
+        click: function() {
+            toolbox.ui.loader.show();
+        },
 
+        init: function() {
+            toolbox.ui.addcss(natv.ui.css);
+            if (document.location.href.match(/\/watch\//) && $('video')) {
+                natv.ui.player.init();
+            }
+            $('a[href^="/"').click(natv.click);
+            $('a[href*="//newasian"').click(natv.click);
 
+            toolbox.loader.hide();
 
+        }
+    };
 
+    toolbox.onload = function() {
+        toolbox.loader.show();
+    };
 
-
-
-
-
-
-
-
-
-
-
-
+    toolbox.init(natv.init);
 
 })();
