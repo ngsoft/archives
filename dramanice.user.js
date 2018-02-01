@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Dramanice UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      2.0.1
+// @version      2.0.2
 // @description  UI Remaster
 // @author       daedelus
-// @include     *://*dramanic*.*/*
+// @include     *://*dramanic*/*
 // @noframes
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramanice.user.js
@@ -43,8 +43,9 @@
             timeout: 1500,
             show: function() {
                 setTimeout(function() {
+                    document.getElementById('wrapper_inside').style.opacity = '1';
                     toolkit.loader.hide();
-                }, dramacool.ui.timeout);
+                }, dramanice.ui.timeout);
 
             },
             player: {
@@ -56,8 +57,16 @@
         },
 
         init: function() {
-            toolkit.addcss(dramacool.ui.css);
+            toolkit.addcss(dramanice.ui.css);
             toolkit.loader.show();
+            $('a[href^="/"').click(function() {
+                document.getElementById('wrapper_inside').style.opacity = '0';
+                toolkit.loader.show();
+            });
+            $('a[href*="//ondramanice"').click(function() {
+                document.getElementById('wrapper_inside').style.opacity = '0';
+                toolkit.loader.show();
+            });
 
             dramanice.ui.show();
         }
@@ -109,6 +118,7 @@
 
     onready(function() {
         //hide container
+        document.getElementById('wrapper_inside').style.opacity = '0';
         document.body.style.opacity = '1';
         toolkit.init(dramanice.init);
     });
