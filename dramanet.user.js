@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         drama.net
-// @namespace    ngsoft/newasian
+// @namespace    ngsoft/drama.net
 // @version      1.0.1
 // @description  UI Remaster
 // @author       daedelus
@@ -63,13 +63,21 @@
     };
     var dramanet = {
         ui: {
-            css: ``,
+            css: `
+                .hidden, div[class*="-ad"], div[id*="BB_SK"]{display: none!important;}
+            `,
             player: {
 
             }
         },
+        click: function() {
+            toolbox.ui.loader.show();
+        },
         init: function() {
             toolbox.ui.addcss(dramanet.ui.css);
+
+            $('a[href^="/"').click(dramanet.click);
+            $('a[href*="drama.net"').click(dramanet.click);
 
             toolbox.loader.hide();
         }
