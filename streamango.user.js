@@ -5,7 +5,6 @@
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://streamango.*/embed/*
-// @noframes
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/streamango.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/streamango.user.js
