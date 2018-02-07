@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Dramacool UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      2.1.1
+// @version      2.1.2
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*dramacool*/*
 // @include     *://*watchasia*/*
+// @include     *://*animetv*/*
 // @noframes
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.user.js
@@ -81,7 +82,7 @@
 
         ui: {
             css: `
-                    .mediaplayer .content-right, div[class*="ads"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .tab-container .right-tab-1, .show-all, .mediaplayer header, .hidden{
+                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .tab-container .right-tab-1, .show-all, .mediaplayer header, .hidden{
                             display: none !important;
                     }
                     .mediaplayer .content-left{width:100%!important;}
