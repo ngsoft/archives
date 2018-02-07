@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      2.1.2
+// @version      2.1.3
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -82,7 +82,7 @@
 
         ui: {
             css: `
-                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .tab-container .right-tab-1, .show-all, .mediaplayer header, .hidden{
+                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .tab-container .right-tab-1, .show-all, .btn-show-all, .mediaplayer header, .hidden{
                             display: none !important;
                     }
                     .mediaplayer .content-left{width:100%!important;}
@@ -141,6 +141,7 @@
             $("ul.tab li:contains('Ads')").removeClass('selected').hide();
             $("ul.tab li:contains('Ongoing')").click();
             $('ul.all-episode').html($('ul.all-episode').find('li').css('display', 'inline-block').get().reverse());
+            $('.list_episode ul').html($('.list_episode ul').find('li').css('display', 'inline-block').get().reverse());
             $('iframe').parent('div:not(.watch-iframe)').remove();
             toolbox.loader.hide();
         }
