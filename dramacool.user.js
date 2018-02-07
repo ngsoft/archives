@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      2.1.0
+// @version      2.1.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -29,11 +29,11 @@
         loader: {
             timeout: 1500,
             show: function() {
-                document.body.style.opacity = '0';
+                //document.body.style.opacity = '0';
             },
             hide: function() {
                 setTimeout(function() {
-                    document.body.style.opacity = '1';
+                    //document.body.style.opacity = '1';
                 }, toolbox.loader.timeout);
 
             }
