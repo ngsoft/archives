@@ -100,7 +100,6 @@
                 href = new URL($(this).attr('href'));
                 //params = new URLSearchParams(href.search);
                 href.searchParams.set('title', vu.title());
-                console.debug(href);
                 $(this).attr('target', '_blank').attr('href', href);
             });
             toolbox.loader.hide();
