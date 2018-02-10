@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      3.4.0
+// @version      3.4.1
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -105,12 +105,8 @@
         }
     };
 
-    toolbox.loader.show = spinner.show;
-    toolbox.loader.hide = function() {
-        setTimeout(function() {
-            spinner.hide();
-        }, toolbox.loader.timeout);
-    };
+    toolbox.loader.onshow = spinner.show;
+    toolbox.loader.onhide = spinner.hide;
 
 
 
