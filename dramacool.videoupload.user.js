@@ -63,6 +63,35 @@
         }
     };
 
+    var vu = {
+        ui: {
+            css: `.hidden, [data-inside-iframe] header, [data-inside-iframe] footer {display: none!important;}`
+        },
+
+        title: function() {
+            params = new URLSearchParams(location.search);
+            title = params.get('title');
+            title = title.replace(':', ' ', title);
+            title = title.trim();
+            title += '.mp4';
+            return title;
+
+        },
+        links: function() {
+            return $('#main .mirror_link div.dowload a');
+        },
+        init: function() {
+            toolbox.ui.addcss(vu.ui.css);
+            if (window.top != window.self) {
+                $('body').attr('data-inside-iframe', true);
+            }
+            console.debug(vu.title());
+
+        }
+
+
+    };
+
 
 
     var videoupload = {
@@ -117,7 +146,7 @@
 
     };
 
-    toolbox.init(videoupload.init);
+    toolbox.init(vu.init);
 
 
 
