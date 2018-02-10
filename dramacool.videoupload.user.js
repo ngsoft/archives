@@ -6,6 +6,7 @@
 // @author       daedelus
 // @include     *://videoupload.space/*
 // @grant none
+// @require     https://code.jquery.com/jquery-3.2.1.min.js
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.videoupload.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.videoupload.user.js
 // ==/UserScript==
@@ -94,6 +95,7 @@
             }, 1000);
         },
         init: function() {
+            console.debug('jquery loaded');
             if (window.top != window.self) {
                 $('body').attr('data-inside-iframe', true);
             }
