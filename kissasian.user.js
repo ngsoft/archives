@@ -106,10 +106,11 @@
 
 
     var kissasian = {
+        loggedin: false,
         ui: {
 
             css: `
-                [data-player-enabled] #head, .hidden, div[id*="divAds"], div[style*="fixed;"], iframe:not(.ignored) #videoAd{ display: none!important;}
+                [data-player-enabled] #head, .hidden, div[id*="divAds"], div[style*="fixed;"], iframe:not(.ignored), #videoAd{ display: none!important;}
                 .nomargin, .banner, .bigBarContainer{margin: 0!important;}
                 .clear, #container:not(.videoplayer) .clear2{height: 0; max-height: 0;}
                 #vidlink{display: block;text-align: center;font-size: 12pt;margin: 10px 0 20px 0;}
@@ -230,6 +231,8 @@
                     $('div > span.st_facebook_hcount').parent('div').parent('div').remove();
                     $('#divComments').remove();
                     //$('div#head').addClass('hidden');
+                    if (!kissasian.loggedin)
+                        return;
                     kissasian.ui.player.getlink();
                 }
             },
@@ -255,6 +258,12 @@
                 kissasian.ui.show();
                 return;
             }
+
+            //check loggedin
+            if (typeof $('div#head div#topHolderBox a[href*="/Login"]') === 'undefined') {
+                kissasian.loggedin = true;
+            }
+
 
             if (uri == '/BookmarkList') {
                 kissasian.ui.bks();
@@ -345,7 +354,7 @@
         init: function() {
             betamode.checkbox = $(betamode.checkbox);
             $('div#menu_box').append(betamode.checkbox);
-            if (kissasian.ui.player.loaded) {
+            if (kissasian.ui.player.loaded || !kissasian.loggedin) {
                 $('div#navsubbar p').append('| ').append(betamode.checkbox);
             }
             checked = betamode.checked();
