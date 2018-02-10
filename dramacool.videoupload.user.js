@@ -65,7 +65,8 @@
 
     var vu = {
         ui: {
-            css: `.hidden, [data-inside-iframe] header, [data-inside-iframe] footer {display: none!important;}`
+            css: `  .hidden, [data-inside-iframe] header, [data-inside-iframe] footer {display: none!important;}
+                    [data-inside-iframe] .content_l {width: 200px;}`
         },
 
         title: function() {
@@ -85,6 +86,7 @@
             if (window.top != window.self) {
                 $('body').attr('data-inside-iframe', true);
             }
+            $('body').attr('data-inside-iframe', true);
             console.debug(vu.title());
 
         }
