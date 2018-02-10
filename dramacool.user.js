@@ -182,12 +182,9 @@
         }
     };
 
-    toolbox.loader.show = spinner.show;
-    toolbox.loader.hide = function() {
-        setTimeout(function() {
-            spinner.hide();
-        }, toolbox.loader.timeout);
-    };
+    toolbox.loader.onshow = spinner.show;
+    toolbox.loader.onhide = spinner.hide;
+
 
 
     toolbox.onload = function() {
