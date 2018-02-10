@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      2.2.0
+// @version      2.2.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*dramacool*/*
