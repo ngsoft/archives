@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      3.1.1
+// @version      3.2.0
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -109,7 +109,7 @@
         ui: {
 
             css: `
-                .hidden, div[id*="divAds"], div[style*="fixed;"], iframe:not(.ignored){ display: none!important;}
+                [data-player-enabled] #head, .hidden, div[id*="divAds"], div[style*="fixed;"], iframe:not(.ignored) #videoAd{ display: none!important;}
                 .nomargin, .banner, .bigBarContainer{margin: 0!important;}
                 .clear, #container:not(.videoplayer) .clear2{height: 0; max-height: 0;}
                 #vidlink{display: block;text-align: center;font-size: 12pt;margin: 10px 0 20px 0;}
@@ -184,6 +184,7 @@
             player: {
                 link: '',
                 filename: '',
+                loaded: false,
                 getlink: function() {
                     filename = document.title.split('-');
                     filename = filename[0].trim();
@@ -222,11 +223,13 @@
                 },
                 init: function() {
                     toolbox.loader.timeout = 3500;
+                    kissasian.ui.player.loaded = true;
+                    $('body').attr('data-player-enabled', true);
                     $('#divContentVideo iframe').addClass('ignored');
                     $('.divCloseBut a').click();
                     $('div > span.st_facebook_hcount').parent('div').parent('div').remove();
                     $('#divComments').remove();
-                    $('div#head').addClass('hidden');
+                    //$('div#head').addClass('hidden');
                     kissasian.ui.player.getlink();
                 }
             },
@@ -292,6 +295,11 @@
                 betamode.checked(true);
                 betamode.enable();
             }
+            if (kissasian.ui.player.loaded) {
+
+            }
+
+
         },
 
         checked: function(val = null) {
@@ -337,7 +345,7 @@
         init: function() {
             betamode.checkbox = $(betamode.checkbox);
             $('div#menu_box').append(betamode.checkbox);
-            if ($('#centerDivVideo').length > 0) {
+            if (kissasian.ui.player.loaded) {
                 $('div#navsubbar p').append('| ').append(betamode.checkbox);
             }
             checked = betamode.checked();
