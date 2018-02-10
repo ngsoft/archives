@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      2.2.1
+// @version      2.2.2
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -76,7 +76,7 @@
 
         ui: {
             css: `
-                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .tab-container .right-tab-1, .show-all, .btn-show-all, .mediaplayer header, .hidden{
+                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .tab-container .right-tab-1, .show-all, .btn-show-all, .mediaplayer header, .hidden, .plugins2 ul li.favorites{
                             display: none !important;
                     }
                     .mediaplayer .content-left{width:100%!important;}

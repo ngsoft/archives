@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Dramacool VideoUpload
 // @namespace    https://github.com/ngsoft
-// @version      1.0.0
-// @description  JD Links with custom rule ?title=*
+// @version      1.0.1
+// @description  JD Links with custom rule ?title=* + jquery integration
 // @author       daedelus
 // @include     *://videoupload.space/*
 // @grant none
@@ -74,6 +74,8 @@
             css: `  .hidden, [data-inside-iframe] header, [data-inside-iframe] footer, .watch, .sumer{display: none!important;}
                     [data-inside-iframe] .content_l {width: 200px;}
                     .mirror_link{padding-top: 10px; border-top: 1px solid #8d8d8d; margin-top: 10px;}
+                    .content_c_bg{min-height: 290px;}
+                    [data-inside-iframe] .content_c_bg{margin-top: 90px;}
                     `
         },
 
@@ -99,68 +101,12 @@
                 //params = new URLSearchParams(href.search);
                 href.searchParams.set('title', vu.title());
                 console.debug(href);
-
-
-
-
                 $(this).attr('target', '_blank').attr('href', href);
             });
             toolbox.loader.hide();
 
         }
-
-
     };
-
-
-
-    var videoupload = {
-        ui: {
-            css: `
-
-            `
-        },
-        gettitle: function() {
-            title = $('#main .content_c_bg div.name').text().trim();
-            title = title.replace(/\([a-z\-0-9]+\)/i, '', title);
-            title = title.replace(':', ' ', title);
-            title = title.trim();
-            title += '.mp4';
-            return title;
-        },
-        getfirstlink: function() {
-            return $('#main .mirror_link').first().find('div.dowload a').first();
-        },
-        getlink: function() {
-            return $('#main .mirror_link div.dowload a');
-        },
-        flash: function() {
-
-            flash = setTimeout(function() {
-                $('.content_c_bg').css('background-color', 'rgb(227, 227, 227)');
-                setTimeout(function() {
-                    $('.content_c_bg').css('background-color', 'rgb(28, 28, 28)');
-                }, 1000);
-            }, 1000);
-        },
-        init: function() {
-            console.debug('jquery loaded');
-            if (window.top != window.self) {
-                $('body').attr('data-inside-iframe', true);
-            }
-
-
-
-            videoupload.getlink().each(function() {
-                url = $(this).attr('href') + '?title=' + videoupload.gettitle();
-                $(this).attr('href', url).attr('target', '_blank');
-
-            });
-            videoupload.flash();
-
-        }
-    };
-
 
     toolbox.onload = function() {
         toolbox.loader.show();
