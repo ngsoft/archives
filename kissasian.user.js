@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      3.4.1
+// @version      3.5.0
 // @description  removes adds + simplify UI
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -316,9 +316,9 @@
                 s = 'default';
                 if (checked == true)
                     s = 'beta';
-                params = new URLSearchParams(location.search);
-                params.set('s', s);
-                location.href = `${location.pathname}?${params}`;
+                page = new URL($(this).attr('href'));
+                page.searchParams.set('s', s);
+                location.href = page.href;
             }
 
 
