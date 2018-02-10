@@ -163,7 +163,7 @@
     toolbox.loader.hide = function() {
         setTimeout(function() {
             spinner.hide();
-        }, toolbox.loader.timeout)
+        }, toolbox.loader.timeout);
     };
 
 
