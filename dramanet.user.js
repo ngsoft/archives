@@ -19,12 +19,16 @@
         loader: {
             timeout: 1500,
             show: function() {
-                document.body.style.opacity = '0';
+                toolbox.loader.onshow();
             },
             hide: function() {
-                setTimeout(function() {
-                    document.body.style.opacity = '1';
-                }, toolbox.loader.timeout);
+                setTimeout(toolbox.loader.onhide, toolbox.loader.timeout);
+            },
+            onshow: function() {
+                document.body.style.opacity = '0';
+            },
+            onhide: function() {
+                document.body.style.opacity = '1';
             }
         },
         ui: {
