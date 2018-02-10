@@ -26,8 +26,14 @@
 
         loader: {
             timeout: 1500,
-            show: function() {},
-            hide: function() {}
+            show: function() {
+                document.body.style.opacity = 0;
+            },
+            hide: function() {
+                setTimeout(function() {
+                    document.body.style.opacity = 1;
+                }, toolbox.loader.timeout);
+            }
         },
         ui: {
             addcss: function(css) {
@@ -65,8 +71,10 @@
 
     var vu = {
         ui: {
-            css: `  .hidden, [data-inside-iframe] header, [data-inside-iframe] footer {display: none!important;}
-                    [data-inside-iframe] .content_l {width: 200px;}`
+            css: `  .hidden, [data-inside-iframe] header, [data-inside-iframe] footer, .watch, .sumer{display: none!important;}
+                    [data-inside-iframe] .content_l {width: 200px;}
+                    .mirror_link{padding-top: 10px; border-top: 1px solid #8d8d8d; margin-top: 10px;}
+                    `
         },
 
         title: function() {
@@ -86,8 +94,18 @@
             if (window.top != window.self) {
                 $('body').attr('data-inside-iframe', true);
             }
-            $('body').attr('data-inside-iframe', true);
-            console.debug(vu.title());
+            vu.links().each(function() {
+                href = new URL($(this).attr('href'));
+                //params = new URLSearchParams(href.search);
+                href.searchParams.set('title', vu.title());
+                console.debug(href);
+
+
+
+
+                $(this).attr('target', '_blank').attr('href', href);
+            });
+            toolbox.loader.hide();
 
         }
 
@@ -145,6 +163,7 @@
 
 
     toolbox.onload = function() {
+        toolbox.loader.show();
 
     };
 
