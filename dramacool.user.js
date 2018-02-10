@@ -85,6 +85,7 @@
                     .watch-drama .plugins2 .facebook{
                         margin-right: 2px!important;
                     }
+                    .plugins2 ul li.direction a{background-color: rgb(0, 171, 236);}
             `,
 
             btnsvr: `<li class="facebook"><span>Select Servers</span></li>`,
