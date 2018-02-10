@@ -89,6 +89,7 @@
 
             btnsvr: `<li class="facebook"><span>Select Servers</span></li>`,
             btnep: `<li class="twitter"><span>Select Episode</span></li>`,
+            btdl: {},
 
             player: {
                 init: function() {
@@ -117,6 +118,17 @@
                     });
                     $('.plugins2 ul').prepend(dramacool.ui.btnep);
                     $('.plugins2 ul').prepend(dramacool.ui.btnsvr);
+                    $('.plugins2 ul li.download a').on('click', function(e) {
+                        e.preventDefault();
+
+                        $('.watch-iframe iframe').attr('src', $(this).attr('href'));
+
+
+                    });
+
+
+
+
 
                 }
             }
