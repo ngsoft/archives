@@ -26,7 +26,6 @@
     var uri = location.pathname;
     var url = location.href;
     if (uri.indexOf('/Special/') !== -1) {
-        document.body.style.opacity = '1';
         return;
     }
     if (url.indexOf('kissasian.com') !== -1) {
@@ -106,11 +105,11 @@
 
 
     var kissasian = {
-        loggedin: false,
+        loggedin: true,
         ui: {
 
             css: `
-                [data-player-enabled] #head, .hidden, div[id*="divAds"], div[style*="fixed;"], iframe:not(.ignored), #videoAd{ display: none!important;}
+                [data-player-enabled] #head, .hidden, div[id*="divAds"], div[style*="fixed;"], iframe:not(.ignored), #videoAd, #btnShowComments{ display: none!important;}
                 .nomargin, .banner, .bigBarContainer{margin: 0!important;}
                 .clear, #container:not(.videoplayer) .clear2{height: 0; max-height: 0;}
                 #vidlink{display: block;text-align: center;font-size: 12pt;margin: 10px 0 20px 0;}
@@ -230,8 +229,8 @@
                     $('.divCloseBut a').click();
                     $('div > span.st_facebook_hcount').parent('div').parent('div').remove();
                     $('#divComments').remove();
-                    //$('div#head').addClass('hidden');
-                    if (!kissasian.loggedin)
+                    $("div.barContent > div > div > div:contains('video is stuttering,')").parent('div').addClass('hidden');
+                    if (kissasian.loggedin == false)
                         return;
                     kissasian.ui.player.getlink();
                 }
@@ -251,19 +250,21 @@
             spinner.show();
         },
         init: function() {
-            toolbox.ui.addcss(kissasian.ui.css);
-            toolbox.loader.show();
+            //fix login button
             if (uri == '/Login') {
-                $('#btnSubmit').attr('type', 'submit').attr('onclick', '');
-                kissasian.ui.show();
+                $('#btnSubmit').hide().parent('div').append('<input type="submit" value="Sign in" />');
                 return;
             }
+            if (uri == '/Register') {
+                return;
+            }
+            toolbox.ui.addcss(kissasian.ui.css);
+            toolbox.loader.show();
 
             //check loggedin
-            if (typeof $('div#head div#topHolderBox a[href*="/Login"]') === 'undefined') {
-                kissasian.loggedin = true;
+            if ($('div#topHolderBox a[href*="/Login"]').length > 0) {
+                kissasian.loggedin = false;
             }
-
 
             if (uri == '/BookmarkList') {
                 kissasian.ui.bks();
@@ -287,7 +288,7 @@
     };
 
     /**
-     * Dropdown mod
+     * Auto Beta player
      */
     var betamode = {
 
@@ -297,15 +298,21 @@
         click: function(e) {
             e.preventDefault();
             if (betamode.checked()) {
-                betamode.checked(false);
+                checked = betamode.checked(false);
                 betamode.disable();
 
             } else {
-                betamode.checked(true);
+                checked = betamode.checked(true);
                 betamode.enable();
             }
             if (kissasian.ui.player.loaded) {
-
+                toolbox.loader.show();
+                s = 'default';
+                if (checked == true)
+                    s = 'beta';
+                params = new URLSearchParams(location.search);
+                params.set('s', s);
+                location.href = `${location.pathname}?${params}`;
             }
 
 
@@ -354,7 +361,7 @@
         init: function() {
             betamode.checkbox = $(betamode.checkbox);
             $('div#menu_box').append(betamode.checkbox);
-            if (kissasian.ui.player.loaded || !kissasian.loggedin) {
+            if (kissasian.ui.player.loaded || kissasian.loggedin == false) {
                 $('div#navsubbar p').append('| ').append(betamode.checkbox);
             }
             checked = betamode.checked();
@@ -365,7 +372,7 @@
 
             betamode.target.each(function() {
                 href = $(this).attr('href');
-                if (href.indexOf('/Drama/') === -1) {
+                if (href.indexOf('/Drama/') === -1 && href.indexOf('/Anime/') === -1) {
                     return;
                 }
                 if (typeof $(this).attr('data-original-link') === 'undefined') {
