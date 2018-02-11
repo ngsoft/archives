@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      4.0.0
+// @version      4.1
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -54,12 +54,16 @@
             }
         },
         ui: {
+            addscript: function(src) {
+                var s = document.createElement('script');
+                s.setAttribute('src', src);
+                document.body.appendChild(s);
+            },
             addcss: function(css) {
                 html = '<style type="text/css"><!-- ' + css + ' --></style>';
                 $('body').append(html);
             }
         },
-
         init: function(fn) {
 
             toolbox.ready(fn);
@@ -75,7 +79,6 @@
                 }
             }, 50);
         },
-
         ready: function(fn) {
             toolbox.load = fn;
             if (document.readyState != 'loading') {
@@ -124,6 +127,22 @@
                 #centerDivVideo{margin-top: 15px;}
                 .bksbutton{text-decoration: underline;}
             `,
+
+            nav: {
+                separator: function() {
+                    if ($('div#navsubbar p a').length > 0) {
+                        $('div#navsubbar p').append('| ');
+                    }
+                },
+                add: function(desc, link) {
+                    html = `<a href="` + link + `">` + desc + `</a>`;
+                    kissasian.ui.nav.separator();
+                    kissasian.ui.nav.addhtml(html);
+                },
+                addhtml: function(html) {
+                    $('div#navsubbar p').append(html);
+                }
+            },
 
             bks: function() {
                 //latest episode (auto hides completed)
@@ -240,7 +259,7 @@
                     $('body').attr('data-player-enabled', true);
                     $('#divContentVideo iframe').addClass('ignored');
                     $('iframe#mVideo').addClass('ignored');
-                    $('.divCloseBut a').click();
+                    //$('.divCloseBut a').click();
                     $('div > span.st_facebook_hcount').parent('div').parent('div').remove();
                     $('#divComments').remove();
                     $("div.barContent > div > div > div:contains('video is stuttering,')").parent('div').addClass('hidden');
@@ -263,6 +282,7 @@
         linkclick: function() {
             spinner.show();
         },
+
         init: function() {
             //fix login button
             if (uri == '/Login') {
@@ -289,6 +309,8 @@
             if (url.match(/\/Drama\//) || url.match(/\/Anime\//)) {
                 kissasian.ui.epl();
             }
+            $('.divCloseBut a').click();
+
             if ($('#centerDivVideo').length > 0 || $('#mVideo').length > 0) {
                 kissasian.ui.player.init();
             }
@@ -377,6 +399,10 @@
         init: function() {
             betamode.checkbox = $(betamode.checkbox);
             //$('div#menu_box').append(betamode.checkbox);
+
+            kissasian.ui.nav.separator();
+
+
             if ($('div#navsubbar p a').length > 0) {
                 $('div#navsubbar p').append('| ');
             }
