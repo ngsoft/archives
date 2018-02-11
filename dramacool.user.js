@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      2.3.0
+// @version      2.4.0
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -84,9 +84,11 @@
 
     var dramacool = {
 
+        drama: true,
+
         ui: {
             css: `
-                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .tab-container .right-tab-1, .show-all, .btn-show-all, .mediaplayer header, .hidden, .plugins2 ul li.favorites{
+                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .tab-container .right-tab-1, .show-all, .btn-show-all, .mediaplayer header, .mediaplayer footer, .hidden, .plugins2 ul li.favorites{
                             display: none !important;
                     }
                     .mediaplayer .content-left{width:100%!important;}
@@ -98,16 +100,22 @@
                     .plugins2 ul li.direction a{background-color: rgb(0, 171, 236);}
             `,
 
-            btnsvr: `<li class="facebook"><span>Select Servers</span></li>`,
-            btnep: `<li class="twitter"><span>Select Episode</span></li>`,
+            btnsvr: `<li class="facebook"><i class="fa fa-server"></i><span>Select Servers</span></li>`,
+            btnep: `<li class="twitter"><i class="fa fa-file-video-o"></i><span>Select Episode</span></li>`,
             btdl: {},
 
             player: {
                 init: function() {
+
+                    if (dramacool.drama == false) {
+                        return dramacool.ui.anime.init();
+                    }
                     $('.container').addClass('mediaplayer');
                     $('.watch-drama .anime_muti_link').addClass('hidden');
                     $('.watch-drama div:contains("Please scroll down to choose")').addClass('hidden');
                     $('ul.all-episode').parents('div.block-tab').addClass('hidden');
+                    $('.plugins2 a.chrome-notify').parents('li').addClass('hidden');
+                    $('.plugins2 .reports').remove();
                     $('.plugins2 .facebook').remove();
                     $('.plugins2 .twitter').remove();
                     dramacool.ui.btnsvr = $(dramacool.ui.btnsvr);
@@ -131,10 +139,58 @@
                     $('.plugins2 ul').prepend(dramacool.ui.btnsvr);
                     $('.plugins2 ul li.download a').on('click', function(e) {
                         e.preventDefault();
-
                         $('.watch-iframe iframe').attr('src', $(this).attr('href'));
+                    });
 
 
+
+
+
+                }
+            },
+            anime: {
+                css: `.popover-favorites, div.content_right, div.header, div.footer {display: none!important;} div.content div.content_left{float: none; width: auto;} .plugins li.facebook span, .plugins li.twitter span{margin-left: 5px;} .content_left .main_body{min-height: 0;}`,
+                hidebtn: function(cls) {
+                    target = $('.video_watch i.' + cls);
+                    if (target.length > 0) {
+                        target.parents('li').addClass('hidden');
+                    }
+                },
+
+                init: function() {
+                    toolbox.ui.addcss(dramacool.ui.anime.css);
+                    toolbar = $('.video_watch .fa-facebook-f').parents('ul');
+
+                    //hide unused btns
+                    dramacool.ui.anime.hidebtn('fa-facebook-f');
+                    dramacool.ui.anime.hidebtn('fa-twitter');
+                    dramacool.ui.anime.hidebtn('fa-heart');
+                    dramacool.ui.anime.hidebtn('fa-comment');
+                    dramacool.ui.anime.hidebtn('fa-exclamation-triangle');
+                    dramacool.ui.anime.hidebtn('fa-chrome');
+
+
+                    //add custom btns
+                    dramacool.ui.btnsvr = $(dramacool.ui.btnsvr);
+                    dramacool.ui.btnep = $(dramacool.ui.btnep);
+                    toolbar.prepend(dramacool.ui.btnep).prepend(dramacool.ui.btnsvr);
+                    $('div[class*="list_episode"]').addClass('hidden');
+
+                    dramacool.ui.btnsvr.off('click').on('click', function() {
+                        target = $('div.list_episode_video');
+                        if (target.hasClass('hidden')) {
+                            target.removeClass('hidden');
+                        } else {
+                            target.addClass('hidden');
+                        }
+                    });
+                    dramacool.ui.btnep.off('click').on('click', function() {
+                        target = $('div.list_episode');
+                        if (target.hasClass('hidden')) {
+                            target.removeClass('hidden');
+                        } else {
+                            target.addClass('hidden');
+                        }
                     });
 
 
@@ -143,10 +199,16 @@
 
                 }
             }
+
         },
 
         init: function() {
+            //anime site detection
+            if (location.host.indexOf('anime') !== -1) {
+                dramacool.drama = false;
+            }
             toolbox.ui.addcss(dramacool.ui.css);
+
 
             toolbox.loader.show();
             if (document.location.href.match(/\-episode\-/))
