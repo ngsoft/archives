@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      3.5.0
-// @description  removes adds + simplify UI
+// @version      4.0.0
+// @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
 // @include     *://*kissanime.*/*
@@ -112,6 +112,7 @@
 
     var kissasian = {
         loggedin: true,
+        mobile: false,
         ui: {
 
             css: `
@@ -182,10 +183,16 @@
                 });
             },
             epl: function() {
+                if (kissasian.mobile == true) {
+                    table = $('ul.list li.episodeSub').parent('ul');
+                    table.html(table.find('li').get().reverse());
+                    return;
+                }
                 $('table.listing tr td').parent('tr').addClass('ep');
                 table = $('table.listing');
                 table.html(table.find('tr').get().reverse());
                 table.prepend(table.find('tr:not(.ep)').get().reverse());
+
             },
             player: {
                 link: '',
@@ -232,6 +239,7 @@
                     kissasian.ui.player.loaded = true;
                     $('body').attr('data-player-enabled', true);
                     $('#divContentVideo iframe').addClass('ignored');
+                    $('iframe#mVideo').addClass('ignored');
                     $('.divCloseBut a').click();
                     $('div > span.st_facebook_hcount').parent('div').parent('div').remove();
                     $('#divComments').remove();
@@ -271,14 +279,17 @@
             if ($('div#topHolderBox a[href*="/Login"]').length > 0) {
                 kissasian.loggedin = false;
             }
+            if ($('div.shifter-page').length > 0) {
+                kissasian.mobile = 1;
+            }
 
             if (uri == '/BookmarkList') {
                 kissasian.ui.bks();
             }
-            if (url.match(/\/Drama\//)) {
+            if (url.match(/\/Drama\//) || url.match(/\/Anime\//)) {
                 kissasian.ui.epl();
             }
-            if ($('#centerDivVideo').length > 0) {
+            if ($('#centerDivVideo').length > 0 || $('#mVideo').length > 0) {
                 kissasian.ui.player.init();
             }
             kissasian.ui.main();
@@ -288,6 +299,7 @@
             $('a[href^="/"').click(kissasian.linkclick);
             $('a[href*="//kissasian"').click(kissasian.linkclick);
             betamode.init();
+
             toolbox.loader.hide();
         }
 
@@ -316,7 +328,7 @@
                 s = 'default';
                 if (checked == true)
                     s = 'beta';
-                page = new URL($(this).attr('href'));
+                page = new URL(location.href);
                 page.searchParams.set('s', s);
                 location.href = page.href;
             }
@@ -345,20 +357,18 @@
         enable: function() {
             betamode.checked(true);
             betamode.target.each(function() {
-                if (typeof $(this).attr('data-original-link') === 'undefined') {
-                    return;
+                link = $(this).attr('data-original-link');
+                link = new URL(link);
+                console.debug(link.searchParams.get('s'));
+                if (link.searchParams.get('s') == null) {
+                    link.searchParams.set('s', 'beta');
                 }
-                href = $(this).attr('data-original-link');
-                href += '&s=beta';
-                $(this).attr('href', href);
+                $(this).attr('href', link.href);
             });
         },
         disable: function() {
             betamode.checked(false);
             betamode.target.each(function() {
-                if (typeof $(this).attr('data-original-link') === 'undefined') {
-                    return;
-                }
                 href = $(this).attr('data-original-link');
                 $(this).attr('href', href);
             });
@@ -366,30 +376,43 @@
 
         init: function() {
             betamode.checkbox = $(betamode.checkbox);
-            $('div#menu_box').append(betamode.checkbox);
-            if (kissasian.ui.player.loaded || kissasian.loggedin == false) {
-                $('div#navsubbar p').append('| ').append(betamode.checkbox);
+            //$('div#menu_box').append(betamode.checkbox);
+            if ($('div#navsubbar p a').length > 0) {
+                $('div#navsubbar p').append('| ');
             }
+            $('div#navsubbar p').append(betamode.checkbox);
+
+            if (kissasian.mobile == true) {
+                $('.shifter-navigation ul').append('<li />');
+                $('.shifter-navigation ul li:last').append(betamode.checkbox);
+            }
+
+
             checked = betamode.checked();
-            betamode.checkbox.on('click', betamode.click);
-            betamode.target = $('a[href*="?id="]');
+            betamode.checkbox.off('click').on('click', betamode.click);
 
-
-
-            betamode.target.each(function() {
+            $('a[href*="?id="]').each(function() {
                 href = $(this).attr('href');
                 if (href.indexOf('/Drama/') === -1 && href.indexOf('/Anime/') === -1) {
                     return;
                 }
                 if (typeof $(this).attr('data-original-link') === 'undefined') {
+                    if (href.indexOf(location.origin) === -1) {
+                        href = location.origin + href;
+                    }
                     $(this).attr('data-original-link', href);
                 }
             });
-
+            betamode.target = $('a[data-original-link]');
             if (checked)
                 betamode.enable();
+
+
         }
     };
+
+
+
 
     /**
      * Mod Cookies
