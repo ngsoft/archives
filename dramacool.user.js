@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      3.0.0
+// @version      3.1.0
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -194,6 +194,15 @@
                         }
                     });
 
+                    //dlbtn
+                    btndl = $('.fa-download').parent('a');
+                    btndl.off('click').on('click', function(e) {
+                        e.preventDefault();
+                        link = new URL($(this).attr('href'));
+                        link.host = 'vidstream.co';
+                        $('div.watch-iframe iframe').first().attr('src', link.href);
+                    });
+
 
 
 
@@ -210,9 +219,6 @@
                 dramacool.drama = false;
             }
             toolbox.ui.addcss(dramacool.ui.css);
-
-
-
             toolbox.loader.show();
             if (document.location.href.match(/\-episode\-/))
                 dramacool.ui.player.init();

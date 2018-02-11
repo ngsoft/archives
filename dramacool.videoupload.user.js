@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Dramacool VideoUpload
 // @namespace    https://github.com/ngsoft
-// @version      1.1.1
+// @version      2.0.0
 // @description  JD Links with custom rule ?title=* + jquery integration
 // @author       daedelus
-// @include     *://videoupload.space/*
+// @include     *://videoupload.*/*
+// @include     *://vidstream.*/*
 // @grant none
 // @require     https://code.jquery.com/jquery-3.2.1.min.js
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.videoupload.user.js
