@@ -43,6 +43,11 @@
             }
         },
         ui: {
+            addscript: function(src) {
+                var s = document.createElement('script');
+                s.setAttribute('src', src);
+                document.body.appendChild(s);
+            },
             addcss: function(css) {
                 html = '<style type="text/css"><!-- ' + css + ' --></style>';
                 $('body').append(html);
@@ -210,11 +215,6 @@
                     [data-inside-iframe] .content_c_bg{margin-top: 90px;}
                     `
         },
-        addScript: function(src) {
-            var s = document.createElement('script');
-            s.setAttribute('src', src);
-            document.body.appendChild(s);
-        },
 
         title: function() {
             params = new URLSearchParams(location.search);
@@ -263,13 +263,9 @@
     toolbox.loader.onhide = spinner.hide;
     toolbox.onload = function() {};
 
-    console.debug(document.location);
-
-
-
     //videouploader
     if (document.location.host.indexOf('vid') !== -1) {
-        vu.addScript('https://code.jquery.com/jquery-3.2.1.min.js');
+        toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
         toolbox.init(vu.init);
         return;
     }
