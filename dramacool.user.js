@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      2.4.0
+// @version      3.0.0
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -13,6 +13,7 @@
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.user.js
 // ==/UserScript==
+
 
 
 (function() {
@@ -203,11 +204,13 @@
         },
 
         init: function() {
+            T8CC = {};
             //anime site detection
             if (location.host.indexOf('anime') !== -1) {
                 dramacool.drama = false;
             }
             toolbox.ui.addcss(dramacool.ui.css);
+
 
 
             toolbox.loader.show();
