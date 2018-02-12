@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      4.1
+// @version      4.2
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -523,6 +523,9 @@
 
             autoserver.server.name = $('select#selectServer option[selected]').first().html().trim();
             server = $('select#selectServer option[selected]').attr('value');
+            if (!server.match(/^http/)) {
+                server = location.origin + server;
+            }
             server = new URL(server);
             autoserver.server.value = server.searchParams.get('s');
 
