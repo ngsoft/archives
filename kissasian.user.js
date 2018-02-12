@@ -89,7 +89,6 @@
 
         }
     };
-
     var spinner = {
 
         html: `<style type="text/css"><!-- div#spinner{display : block;position : fixed;z-index: 100;background-color: #121212; opacity: 0.8; background-repeat : no-repeat;background-position : center;left : 0;bottom : 0;right : 0;  top : 0;} div#spinner img{left : 50%;top : 50%;position : absolute;z-index : 101;width : 32px;height : 32px;margin-left : -16px;margin-top : -16px;} --></style><div id="spinner"><img alt="" class="" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8c3ZnIHdpZHRoPSI0MHB4IiBoZWlnaHQ9IjQwcHgiIHZpZXdCb3g9IjAgMCA0MCA0MCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWw6c3BhY2U9InByZXNlcnZlIiBzdHlsZT0iZmlsbC1ydWxlOmV2ZW5vZGQ7Y2xpcC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEuNDE0MjE7IiB4PSIwcHgiIHk9IjBweCI+CiAgICA8ZGVmcz4KICAgICAgICA8c3R5bGUgdHlwZT0idGV4dC9jc3MiPjwhW0NEQVRBWwogICAgICAgICAgICBALXdlYmtpdC1rZXlmcmFtZXMgc3BpbiB7CiAgICAgICAgICAgICAgZnJvbSB7CiAgICAgICAgICAgICAgICAtd2Via2l0LXRyYW5zZm9ybTogcm90YXRlKDBkZWcpCiAgICAgICAgICAgICAgfQogICAgICAgICAgICAgIHRvIHsKICAgICAgICAgICAgICAgIC13ZWJraXQtdHJhbnNmb3JtOiByb3RhdGUoLTM1OWRlZykKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgICAgQGtleWZyYW1lcyBzcGluIHsKICAgICAgICAgICAgICBmcm9tIHsKICAgICAgICAgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKDBkZWcpCiAgICAgICAgICAgICAgfQogICAgICAgICAgICAgIHRvIHsKICAgICAgICAgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKC0zNTlkZWcpCiAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIHN2ZyB7CiAgICAgICAgICAgICAgICAtd2Via2l0LXRyYW5zZm9ybS1vcmlnaW46IDUwJSA1MCU7CiAgICAgICAgICAgICAgICAtd2Via2l0LWFuaW1hdGlvbjogc3BpbiAxLjVzIGxpbmVhciBpbmZpbml0ZTsKICAgICAgICAgICAgICAgIC13ZWJraXQtYmFja2ZhY2UtdmlzaWJpbGl0eTogaGlkZGVuOwogICAgICAgICAgICAgICAgYW5pbWF0aW9uOiBzcGluIDEuNXMgbGluZWFyIGluZmluaXRlOwogICAgICAgICAgICB9CiAgICAgICAgXV0+PC9zdHlsZT4KICAgIDwvZGVmcz4KICAgIDxnIGlkPSJvdXRlciI+CiAgICAgICAgPGc+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMCwwQzIyLjIwNTgsMCAyMy45OTM5LDEuNzg4MTMgMjMuOTkzOSwzLjk5MzlDMjMuOTkzOSw2LjE5OTY4IDIyLjIwNTgsNy45ODc4MSAyMCw3Ljk4NzgxQzE3Ljc5NDIsNy45ODc4MSAxNi4wMDYxLDYuMTk5NjggMTYuMDA2MSwzLjk5MzlDMTYuMDA2MSwxLjc4ODEzIDE3Ljc5NDIsMCAyMCwwWiIgc3R5bGU9ImZpbGw6YmxhY2s7Ii8+CiAgICAgICAgPC9nPgogICAgICAgIDxnPgogICAgICAgICAgICA8cGF0aCBkPSJNNS44NTc4Niw1Ljg1Nzg2QzcuNDE3NTgsNC4yOTgxNSA5Ljk0NjM4LDQuMjk4MTUgMTEuNTA2MSw1Ljg1Nzg2QzEzLjA2NTgsNy40MTc1OCAxMy4wNjU4LDkuOTQ2MzggMTEuNTA2MSwxMS41MDYxQzkuOTQ2MzgsMTMuMDY1OCA3LjQxNzU4LDEzLjA2NTggNS44NTc4NiwxMS41MDYxQzQuMjk4MTUsOS45NDYzOCA0LjI5ODE1LDcuNDE3NTggNS44NTc4Niw1Ljg1Nzg2WiIgc3R5bGU9ImZpbGw6cmdiKDIxMCwyMTAsMjEwKTsiLz4KICAgICAgICA8L2c+CiAgICAgICAgPGc+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMCwzMi4wMTIyQzIyLjIwNTgsMzIuMDEyMiAyMy45OTM5LDMzLjgwMDMgMjMuOTkzOSwzNi4wMDYxQzIzLjk5MzksMzguMjExOSAyMi4yMDU4LDQwIDIwLDQwQzE3Ljc5NDIsNDAgMTYuMDA2MSwzOC4yMTE5IDE2LjAwNjEsMzYuMDA2MUMxNi4wMDYxLDMzLjgwMDMgMTcuNzk0MiwzMi4wMTIyIDIwLDMyLjAxMjJaIiBzdHlsZT0iZmlsbDpyZ2IoMTMwLDEzMCwxMzApOyIvPgogICAgICAgIDwvZz4KICAgICAgICA8Zz4KICAgICAgICAgICAgPHBhdGggZD0iTTI4LjQ5MzksMjguNDkzOUMzMC4wNTM2LDI2LjkzNDIgMzIuNTgyNCwyNi45MzQyIDM0LjE0MjEsMjguNDkzOUMzNS43MDE5LDMwLjA1MzYgMzUuNzAxOSwzMi41ODI0IDM0LjE0MjEsMzQuMTQyMUMzMi41ODI0LDM1LjcwMTkgMzAuMDUzNiwzNS43MDE5IDI4LjQ5MzksMzQuMTQyMUMyNi45MzQyLDMyLjU4MjQgMjYuOTM0MiwzMC4wNTM2IDI4LjQ5MzksMjguNDkzOVoiIHN0eWxlPSJmaWxsOnJnYigxMDEsMTAxLDEwMSk7Ii8+CiAgICAgICAgPC9nPgogICAgICAgIDxnPgogICAgICAgICAgICA8cGF0aCBkPSJNMy45OTM5LDE2LjAwNjFDNi4xOTk2OCwxNi4wMDYxIDcuOTg3ODEsMTcuNzk0MiA3Ljk4NzgxLDIwQzcuOTg3ODEsMjIuMjA1OCA2LjE5OTY4LDIzLjk5MzkgMy45OTM5LDIzLjk5MzlDMS43ODgxMywyMy45OTM5IDAsMjIuMjA1OCAwLDIwQzAsMTcuNzk0MiAxLjc4ODEzLDE2LjAwNjEgMy45OTM5LDE2LjAwNjFaIiBzdHlsZT0iZmlsbDpyZ2IoMTg3LDE4NywxODcpOyIvPgogICAgICAgIDwvZz4KICAgICAgICA8Zz4KICAgICAgICAgICAgPHBhdGggZD0iTTUuODU3ODYsMjguNDkzOUM3LjQxNzU4LDI2LjkzNDIgOS45NDYzOCwyNi45MzQyIDExLjUwNjEsMjguNDkzOUMxMy4wNjU4LDMwLjA1MzYgMTMuMDY1OCwzMi41ODI0IDExLjUwNjEsMzQuMTQyMUM5Ljk0NjM4LDM1LjcwMTkgNy40MTc1OCwzNS43MDE5IDUuODU3ODYsMzQuMTQyMUM0LjI5ODE1LDMyLjU4MjQgNC4yOTgxNSwzMC4wNTM2IDUuODU3ODYsMjguNDkzOVoiIHN0eWxlPSJmaWxsOnJnYigxNjQsMTY0LDE2NCk7Ii8+CiAgICAgICAgPC9nPgogICAgICAgIDxnPgogICAgICAgICAgICA8cGF0aCBkPSJNMzYuMDA2MSwxNi4wMDYxQzM4LjIxMTksMTYuMDA2MSA0MCwxNy43OTQyIDQwLDIwQzQwLDIyLjIwNTggMzguMjExOSwyMy45OTM5IDM2LjAwNjEsMjMuOTkzOUMzMy44MDAzLDIzLjk5MzkgMzIuMDEyMiwyMi4yMDU4IDMyLjAxMjIsMjBDMzIuMDEyMiwxNy43OTQyIDMzLjgwMDMsMTYuMDA2MSAzNi4wMDYxLDE2LjAwNjFaIiBzdHlsZT0iZmlsbDpyZ2IoNzQsNzQsNzQpOyIvPgogICAgICAgIDwvZz4KICAgICAgICA8Zz4KICAgICAgICAgICAgPHBhdGggZD0iTTI4LjQ5MzksNS44NTc4NkMzMC4wNTM2LDQuMjk4MTUgMzIuNTgyNCw0LjI5ODE1IDM0LjE0MjEsNS44NTc4NkMzNS43MDE5LDcuNDE3NTggMzUuNzAxOSw5Ljk0NjM4IDM0LjE0MjEsMTEuNTA2MUMzMi41ODI0LDEzLjA2NTggMzAuMDUzNiwxMy4wNjU4IDI4LjQ5MzksMTEuNTA2MUMyNi45MzQyLDkuOTQ2MzggMjYuOTM0Miw3LjQxNzU4IDI4LjQ5MzksNS44NTc4NloiIHN0eWxlPSJmaWxsOnJnYig1MCw1MCw1MCk7Ii8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4K" /></div>`,
@@ -107,12 +106,8 @@
             }
         }
     };
-
     toolbox.loader.onshow = spinner.show;
     toolbox.loader.onhide = spinner.hide;
-
-
-
     var kissasian = {
         loggedin: true,
         mobile: false,
@@ -126,8 +121,8 @@
                 .visible{visibility: visible!important;}
                 #centerDivVideo{margin-top: 15px;}
                 .bksbutton{text-decoration: underline;}
+                #navsubbar a img, #navsubbar a input[type="checkbox"]{width:12px; height: 12px;}
             `,
-
             nav: {
                 separator: function() {
                     if ($('div#navsubbar p a').length > 0) {
@@ -145,7 +140,6 @@
                     $('div#navsubbar p').append(html);
                 }
             },
-
             bks: function() {
                 //latest episode (auto hides completed)
 
@@ -213,7 +207,6 @@
                 table = $('table.listing');
                 table.html(table.find('tr').get().reverse());
                 table.prepend(table.find('tr:not(.ep)').get().reverse());
-
             },
             player: {
                 link: '',
@@ -284,7 +277,6 @@
         linkclick: function() {
             spinner.show();
         },
-
         init: function() {
             //fix login button
             if (uri == '/Login') {
@@ -296,7 +288,6 @@
             }
             toolbox.ui.addcss(kissasian.ui.css);
             toolbox.loader.show();
-
             //check loggedin
             if ($('div#topHolderBox a[href*="/Login"]').length > 0) {
                 kissasian.loggedin = false;
@@ -312,7 +303,6 @@
                 kissasian.ui.epl();
             }
             $('.divCloseBut a').click();
-
             if ($('#centerDivVideo').length > 0 || $('#mVideo').length > 0) {
                 kissasian.ui.player.init();
             }
@@ -323,26 +313,24 @@
             $('a[href^="/"').click(kissasian.linkclick);
             $('a[href*="//kissasian"').click(kissasian.linkclick);
             betamode.init();
-
+            autoserver.init();
+            g.init();
             toolbox.loader.hide();
         }
 
     };
-
     /**
      * Auto Beta player
      */
     var betamode = {
-
+        episodepath: '',
         checkbox: `<a href="#" id="betamode"><input type="checkbox" disabled /> Beta Player</a>`,
         target: {},
-
         click: function(e) {
             e.preventDefault();
             if (betamode.checked()) {
                 checked = betamode.checked(false);
                 betamode.disable();
-
             } else {
                 checked = betamode.checked(true);
                 betamode.enable();
@@ -359,7 +347,9 @@
 
 
         },
-
+        change: function() {
+            location.href = $(this).val();
+        },
         checked: function(val = null) {
             if (val == null) {
                 if (typeof Cookies.get('betamode') === 'undefined') {
@@ -383,11 +373,16 @@
             betamode.target.each(function() {
                 link = $(this).attr('data-original-link');
                 link = new URL(link);
-                console.debug(link.searchParams.get('s'));
                 if (link.searchParams.get('s') == null) {
                     link.searchParams.set('s', 'beta');
                 }
                 $(this).attr('href', link.href);
+            });
+            $('select#selectEpisode option').each(function() {
+                link = $(this).attr('data-original-value');
+                link = new URL(link);
+                link.searchParams.set('s', 'beta');
+                $(this).attr('value', link.href);
             });
         },
         disable: function() {
@@ -396,15 +391,17 @@
                 href = $(this).attr('data-original-link');
                 $(this).attr('href', href);
             });
+            $('select#selectEpisode option').each(function() {
+                link = $(this).attr('data-original-value');
+                $(this).attr('value', link);
+            });
         },
-
         init: function() {
             betamode.checkbox = $(betamode.checkbox);
             //$('div#menu_box').append(betamode.checkbox);
 
             kissasian.ui.nav.separator();
             kissasian.ui.nav.addhtml(betamode.checkbox);
-
             if (kissasian.mobile == true) {
                 $('.shifter-navigation ul').append('<li />');
                 $('.shifter-navigation ul li:last').append(betamode.checkbox);
@@ -413,7 +410,6 @@
 
             checked = betamode.checked();
             betamode.checkbox.off('click').on('click', betamode.click);
-
             $('a[href*="?id="]').each(function() {
                 href = $(this).attr('href');
                 if (href.indexOf('/Drama/') === -1 && href.indexOf('/Anime/') === -1) {
@@ -427,23 +423,139 @@
                 }
             });
             betamode.target = $('a[data-original-link]');
+
+            if (kissasian.ui.player.loaded == false) {
+                return;
+            }
+
+            betamode.episodepath = location.origin + location.pathname.match(/\/.*\//)[0];
+            $('select#selectEpisode option').each(function() {
+                $(this).attr('value', betamode.episodepath + $(this).attr('value'));
+                $(this).attr('data-original-value', $(this).attr('value'));
+            });
+
+            $('select#selectEpisode').off('change').on('change', betamode.change);
+
+
             if (checked)
                 betamode.enable();
-
-
         }
     };
+    /**
+     * auto server
+     */
 
-    //google search
+    var autoserver = {
+        checkbox: {},
+        server: {
+            name: '',
+            value: ''
+        },
+        checked: function(val = null) {
+            if (val == null) {
+                if (typeof Cookies.get('autoserver') === 'undefined') {
+                    Cookies.set('autoserver', false, {expires: 14});
+                }
+                val = Cookies.get('autoserver');
+            }
 
-    g = {
+            if (val == 'true' || val == true) {
+                val = true;
+                autoserver.checkbox.find('input').first().attr('checked', val);
+            } else {
+                val = false;
+                autoserver.checkbox.find('input').first().removeAttr('checked');
+            }
+            Cookies.set('autoserver', val, {expires: 14});
+            return val;
+        },
+        enable: function() {
+            betamode.disable();
+            autoserver.checked(true);
 
-        img: `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAA8JJREFUSImlVm1sU1UYfs656227frFGapktUB0THMZMWBRi3NgYJZiIor8MSojEyVgmiWHwg7GYEDQhgSwjcyXoDxsxGT/wA8hGlKnVhIgDBs66TT669WsbG7Td1s97jz9om+6u7I74/rr3fc/7POe8532fewkWaJH2oyYQxQuEQQklHdG833iDAEwuj8wPeqw6FfQfSd4aLEcwwOfGmEbL+KdLAnTpcqde80QzqatLLphg+mSrJXnn367ElT/KwES5TYKai2P8S+v26hsPOGQJptqP26OuSz+wsaBCFnkWEoXKvqVNv6+lMdddkPsS+fx41Uz3uQuIhOljgQOg5uI4jKaOObyZh0mHw8BcXUEh4FVJF3FLbTPcime7OK2+h3A0nErEy0R/4HXh5tWVLJkANT8VV27YtFa3q/4vaW72BJz/9tm4BJwolVBU2U8Zmpo/yNMx+8OO1srEgPsr5crVW3S76vvznYwAgDjYZEn4ejwzp/U0dTucPjOFcuvbTYaGfUfnrY2MUQBIJccPc8J1qnunD2q7GQCgWF/5+/8FBzIlig7XAACEEFQvdoE+s1mkY7bt+RLazsdKRZ5o5IAZY1N7N6mG0gQeU25QYZmY4N/afTdf4lVfqtczDq0cgdXIogAKKQCw5INZPU8VJq8cgJyFo+CB9B3MmTf6aAkh4vzykjEhDUoBgPCLZumIGBu1PCqRycrbQ1NxEIDMJauso4jdtQKAQDh8EV9jPNG/Z1lD2XaPNLGiVLG7QmAmqf+3wdSRYAhZQTTqaCRLQApX/IgHrp2T3BIcSr6B3nEffZV4vwGwXgpUX6N0Sn3tFxMvj4YxS21NWuoG0iXiNOaDfeqNwo5QDXonfQ93FPhz3eErHfvlStHZyTh3IHVWWroni+jJLAFd9on/DGp/vRcLZxeIjOHCnZ8/O3i59Uu0tOQVv9Y+p+UaDfzT7xXNuf7lizG1ZyPvBHLax3Gr09DtdgWHp/xzxM6qM0efKyq5qFUU/kJBIzEhXjKRCNXeHBsoVxaoyeL7DfD5bcgAvrmW+7DBrnbMIgCAtmvOqu89l366H3s8uS6gHMr59zDQX4mqVYqeQ9tU1ZnYnJ5uu3G6ttvjOhecHuOlMTnbatrpat7wWiUIyd5I3qHp+Nu5xD0+3H052Pe8wARZYKO6SKgurjh2oKKuSRqbdypPXP/6Fe+079Oh0MiakUhQLeZ8n3UFhcxmsN6zGazf6RdpP/6o9N1wPowFjT0AnHJ/q0slp1eLIlFreJV3x6ptQyDyvy3/AdRmXxI/xuPJAAAAAElFTkSuQmCC`,
+            if (autoserver.server.value != null) {
+                $('select#selectEpisode option').each(function() {
+                    link = $(this).attr('data-original-value');
+                    link = new URL(link);
+                    link.searchParams.set('s', autoserver.server.value);
+                    $(this).attr('value', link.href);
+                });
+
+                $.each(['#btnPrevious', '#btnNext'], function(i, v) {
+                    if ($(v).length > 0) {
+                        selector = $(v).parent('a');
+                        link = new URL(selector.attr('data-original-link'));
+                        link.searchParams.set('s', autoserver.server.value);
+                        selector.attr('href', link.href);
+                    }
+
+                });
+
+            }
+        },
+        disable: function() {
+            autoserver.checked(false);
+            $('select#selectEpisode option').each(function() {
+                link = $(this).attr('data-original-value');
+                $(this).attr('value', link);
+            });
+            $.each(['#btnPrevious', '#btnNext'], function(i, v) {
+                if ($(v).length > 0) {
+                    selector = $(v).parent('a');
+                    selector.attr('href', selector.attr('data-original-link'));
+                }
+
+            });
+        },
+        click: function(e) {
+            e.preventDefault();
+            if (autoserver.checked()) {
+                autoserver.disable();
+                return;
+            }
+            autoserver.enable();
+        },
 
         init: function() {
+            if (kissasian.ui.player.loaded == false) {
+                return;
+            }
 
+            autoserver.server.name = $('select#selectServer option[selected]').first().html().trim();
+            server = $('select#selectServer option[selected]').attr('value');
+            server = new URL(server);
+            autoserver.server.value = server.searchParams.get('s');
+
+            autoserver.checkbox = kissasian.ui.nav.add(`<input type="checkbox" disabled /> Auto Server : ` + autoserver.server.name, '#');
+            betamode.checkbox.on('click', function(e) {
+                e.preventDefault();
+                autoserver.disable();
+            });
+            autoserver.checkbox.off('click').on('click', autoserver.click);
+
+            if (autoserver.checked())
+                autoserver.enable();
         }
-    }
+    };
+    //google search
+
+    var g = {
+
+        img: `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAAsTAAALEwEAmpwYAAABJlBMVEUAAAAA/wD/AAD//wD/mZmR2pH+kZGfv/+L0KLrnImR2qPumZnvn5+W0qWdu/fwm5Txlo+RzqOav/n0mo+Uwc2Tz6P73Hn72naSuPiZvPjzlpDzmI/zlI6LzZ6SuvWSufjxkomSt/j812v812qHy5rxjoWLs/jyioGAyZOIsveYyY30oHqAyJLxhn6Gr/fwhn16xo7vhHp6xozxgnrxf3d1xIl/rPfvfXRxwId3pvbtcWhiu3rvcGVivHz6yjn5yTlbt3LuZFlYuHHuY1ntYVZRtWtblfTsW1BXkvT4wiLKxk34wjn5wyBdt39Brl1LivNMivNOjPPpTkHqUEM0qFM2qVQ2qVU5qldChfRFiO9nt5igw2XqQzXqRDfqRTfqSDf5tUj7vAVOEheTAAAAVHRSTlMAAQEBBQcHCAsNDg8QIiIkJyowMD5AQ0VQUFVXW2xsbnV2e3yGiJSeoaamp6mpra21tbm6vr/AxcjT3uPl5uzt8PHy8/X2+Pj6+vv7+/z9/v7+/v5SL/eEAAAAu0lEQVQYGU3BCTsCQQCA4Y9ViuS+QpQQlXJtuXLkWGdilsF0zP//E2bnaZ/H+2Il1krljQlC8cN3ZbRPprHGG6rvfggjeqWUuqkenHU+UgQKSnW2BoHlJQLOc6+7xz/zWj+NApvbVpJ1resYnrRWyWp9geFJK8Oc1o8jwK7rum9SLuI8/PoVrAUpm8OwI8RnfgCYuZPyGIhcCiFua0enXz/frSmMsWvR95LGiu2/CsM/nyUUW8kXc5ME/gAPMCh4eza9pQAAAABJRU5ErkJggg==`,
+        init: function() {
+            if (document.location.href.indexOf('id=') !== -1) {
+                return;
+            }
+            if (document.location.href.indexOf('/Drama/') === -1 && document.location.href.indexOf('/Anime/') === -1) {
+                return;
+            }
+
+            title = $('a.bigChar').first().text().trim();
+            html = '<a href="https://google.com/search?q=' + title + '" target="_blank"><img src="' + g.img + '" /> Google Search</a>';
+            kissasian.ui.nav.separator();
+            kissasian.ui.nav.addhtml(html);
+        }
+    };
 
 
 
@@ -460,13 +572,9 @@
             }
         }, 50);
     };
-
     toolbox.onload = function() {};
     toolbox.init(kissasian.init);
-
 })();
-
-
 /**
  * Minified by jsDelivr using UglifyJS v3.1.10.
  * Original file: /npm/js-cookie@2.2.0/src/js.cookie.js
