@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      4.2
+// @version      4.3
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -122,6 +122,7 @@
                 #centerDivVideo{margin-top: 15px;}
                 .bksbutton{text-decoration: underline;}
                 #navsubbar a img, #navsubbar a input[type="checkbox"]{width:12px; height: 12px;}
+                a.bigChar img{width: 20px; height: 20px; margin-right:7px;}
             `,
             nav: {
                 separator: function() {
@@ -518,18 +519,28 @@
 
         init: function() {
             if (kissasian.ui.player.loaded == false) {
-                return;
+                autoserver.checkbox = kissasian.ui.nav.add(`<input type="checkbox" disabled /> Auto Server`, '#');
+            } else {
+                autoserver.server.name = $('select#selectServer option[selected]').first().html().trim();
+                server = $('select#selectServer option[selected]').attr('value');
+                if (!server.match(/^http/)) {
+                    server = location.origin + server;
+                }
+                server = new URL(server);
+                autoserver.server.value = server.searchParams.get('s');
+                autoserver.checkbox = kissasian.ui.nav.add(`<input type="checkbox" disabled /> Auto Server : ` + autoserver.server.name, '#');
+
+                currenturl = new URL(location.href);
+
+                if (currentid = currenturl.searchParams.get('id')) {
+                    $('select#selectEpisode option').removeAttr('selected');
+                    $('select#selectEpisode option[value*="id=' + currentid + '"]').attr('selected', true);
+
+                }
+
             }
 
-            autoserver.server.name = $('select#selectServer option[selected]').first().html().trim();
-            server = $('select#selectServer option[selected]').attr('value');
-            if (!server.match(/^http/)) {
-                server = location.origin + server;
-            }
-            server = new URL(server);
-            autoserver.server.value = server.searchParams.get('s');
 
-            autoserver.checkbox = kissasian.ui.nav.add(`<input type="checkbox" disabled /> Auto Server : ` + autoserver.server.name, '#');
             betamode.checkbox.on('click', function(e) {
                 e.preventDefault();
                 autoserver.disable();
@@ -544,7 +555,7 @@
 
     var g = {
 
-        img: `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAAsTAAALEwEAmpwYAAABJlBMVEUAAAAA/wD/AAD//wD/mZmR2pH+kZGfv/+L0KLrnImR2qPumZnvn5+W0qWdu/fwm5Txlo+RzqOav/n0mo+Uwc2Tz6P73Hn72naSuPiZvPjzlpDzmI/zlI6LzZ6SuvWSufjxkomSt/j812v812qHy5rxjoWLs/jyioGAyZOIsveYyY30oHqAyJLxhn6Gr/fwhn16xo7vhHp6xozxgnrxf3d1xIl/rPfvfXRxwId3pvbtcWhiu3rvcGVivHz6yjn5yTlbt3LuZFlYuHHuY1ntYVZRtWtblfTsW1BXkvT4wiLKxk34wjn5wyBdt39Brl1LivNMivNOjPPpTkHqUEM0qFM2qVQ2qVU5qldChfRFiO9nt5igw2XqQzXqRDfqRTfqSDf5tUj7vAVOEheTAAAAVHRSTlMAAQEBBQcHCAsNDg8QIiIkJyowMD5AQ0VQUFVXW2xsbnV2e3yGiJSeoaamp6mpra21tbm6vr/AxcjT3uPl5uzt8PHy8/X2+Pj6+vv7+/z9/v7+/v5SL/eEAAAAu0lEQVQYGU3BCTsCQQCA4Y9ViuS+QpQQlXJtuXLkWGdilsF0zP//E2bnaZ/H+2Il1krljQlC8cN3ZbRPprHGG6rvfggjeqWUuqkenHU+UgQKSnW2BoHlJQLOc6+7xz/zWj+NApvbVpJ1resYnrRWyWp9geFJK8Oc1o8jwK7rum9SLuI8/PoVrAUpm8OwI8RnfgCYuZPyGIhcCiFua0enXz/frSmMsWvR95LGiu2/CsM/nyUUW8kXc5ME/gAPMCh4eza9pQAAAABJRU5ErkJggg==`,
+        img: `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAAsTAAALEwEAmpwYAAACHFBMVEUAAAD/AAAAf3///39Vqqqqqv//qlWZzP//mZl/v5+fv//+oot/v5TriYnrnImR2qPso5HumZmWufOY1qOc16b1nJOdu/egvffxmoySuPjynZeUz6aaveeb0qb0nZL1mJOU0KL63obxmI/ympL62XmLzZyU0qX723n72XOKzJyPzqDzlI6LzZz0lo70lY2OzqDylYuNzp7zlIuIy5mLzZzyk4uQuPiQt/jykonyjYWIypqMs/eCypb71mX71GPyiX/yioJ+yJPyh3/xhoB5xo2Hsvf61GCGsveFsPeGvcB1w4yCr/b70Vb80VR9rPf80FX70FJ7qffve3H70VbufHN0wonuenH7z1F0w4l8qvfwfHJxwYd4pvZ3qPb8zk5svoNuwYPvdm5qwIHudWnsc2lmu3zvcGXub2Riu3ntal/ta2LtbmNrn/ZguXlmnPVonPXtaF/3xzf6yDdZuHRatnRimvTuY1lgl/TtYFJPs2tStG1blvROtGrqW05KsWRLsGVMsWbqV0vqVkf5whv5wx9Er2BOjvPqUEM7qVlAq11vum7pTD/pTUDpTkHyjk40qFM1qFQ2qVQ2qVU3qVY6q1g7q1k8q1pBrV1ChfRDhfRDhvREhvFEr2NGh/RPkuRYtXpdtmxfo85ntpuXwmnCxE7iwSnqQzXqRDbqRDfqRjXrSDvrSTvrSj3tWj3xfkv4sUv5vAb6wDb7vAX7wRtlQDaiAAAAj3RSTlMAAQICAwMDBQUICAsMDQ0ODg8WGRoaIiMmKCorKy4vNDc3OT09PkpQUlVZW11dXmRoam52d3d4enp+jI6cnJ2goKOkpaamp6msr7S0w8TFxcbIyMjJysrLzM3Nz9DR09bX19zc3+Pl6Onq6urr7Ozs7O/v8fPz8/X29/f4+fn6+/v7/Pz8/f39/v7+/v7+/mQii0sAAAGCSURBVDjLY2AgAcg7J5c1NtUWhFnyYpM2yly+DAZ6gyTQpeXSlqGAHntGFHmD9mXoIEUQSd5iNYb8smw+hLz2Grjwqt4VEEamAEJetBEqW+GkzMjArRfSDdSPbEEURHqNAxtUQCo9C0k/g0ofxN26CCEOPmQfhG9av3LZsuWmuMKPrXnTpo1rlyXiDGCNTUCweZ0STgV2IAWbimDc2HJkYAYU8QUr8IcpyJmBDLyBInFgBW7YFQQSUhAJFPEBKwjArsAPKGILVlCIXYEHUEQdJL90gQJUATsXBOSBFZgDRZhbNm1aMr0/HtXzknNB8jPFQezgDYv7+/snGKMoiAEbUApmK3b1g0CnDpK8NcQJ7hBeNFhB/1RHFqg0p+cssHybEIQvXA9R0V/posrEwKPpVde/aDZIgSvMQK1p/TAwqQNCz583Y0Y+K9xKk6n96GDOwmoxJEfpt2KoKJFB8ZZ0Kqr05FB+9HRhmDERLj0lSQ1b0pG1SSiuaajKjbASISHLAwCGrRNmhWfeqwAAAABJRU5ErkJggg==`,
         init: function() {
             if (document.location.href.indexOf('id=') !== -1) {
                 return;
@@ -554,9 +565,13 @@
             }
 
             title = $('a.bigChar').first().text().trim();
-            html = '<a href="https://google.com/search?q=' + title + '" target="_blank"><img src="' + g.img + '" /> Google Search</a>';
-            kissasian.ui.nav.separator();
-            kissasian.ui.nav.addhtml(html);
+            /*html = '<a href="https://google.com/search?q=' + title + '" target="_blank"><img src="' + g.img + '" /> ' + title + '</a>';
+             kissasian.ui.nav.separator();
+             kissasian.ui.nav.addhtml(html);*/
+            target = link = $('a.bigChar').first().parent('div');
+            link = $('a.bigChar').first().clone();
+            $('a.bigChar').first().remove();
+            target.prepend(link).prepend('<a class="bigChar" target="_blank" href="https://google.com/search?q=' + title + '"><img src="' + g.img + '" />');
         }
     };
 
