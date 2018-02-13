@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      4.4
+// @version      4.5
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -62,6 +62,12 @@
             addcss: function(css) {
                 html = '<style type="text/css"><!-- ' + css + ' --></style>';
                 $('body').append(html);
+            },
+            loadcss: function(cssurl) {
+                var s = document.createElement('link');
+                s.setAttribute('rel', "stylesheet");
+                s.setAttribute('href', cssurl);
+                document.head.appendChild(s);
             }
         },
         init: function(fn) {
