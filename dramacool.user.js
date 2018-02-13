@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Dramacool UI Remaster + Videouploader
+// @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
 // @version      4.2
 // @description  UI Remaster + Videoupload
