@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      4.5
+// @version      4.6
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -239,7 +239,7 @@
                         $('div.content-left div.block-tab ul.tab').first().append(b1);
                         buttons = Cookies.getJSON('userbuttons');
 
-                        if (typeof buttons.b1 !== 'undefined') {
+                        if (typeof buttons !== 'undefined') {
                             dramacool.ui.nav.buttons.b1 = buttons.b1;
                         }
 
@@ -287,7 +287,7 @@
                     if ($('div.block-tab ul.switch-view').length > 0) {
                         buttons = Cookies.getJSON('userbuttons');
 
-                        if (typeof buttons.switch !== 'undefined') {
+                        if (typeof buttons !== 'undefined') {
                             dramacool.ui.nav.buttons.switch = buttons.switch;
                         }
 
