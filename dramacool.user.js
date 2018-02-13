@@ -83,7 +83,7 @@
         drama: true,
         ui: {
             css: `
-                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .tab-container .right-tab-1, .show-all, .btn-show-all, .mediaplayer header, .mediaplayer footer, .hidden, .plugins2 ul li.favorites{
+                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .show-all, .btn-show-all, .mediaplayer header, .mediaplayer footer, .hidden, .plugins2 ul li.favorites{
                             display: none !important;
                     }
                     .mediaplayer .content-left{width:100%!important;}
@@ -193,7 +193,8 @@
                     `,
                 buttons: {
                     b1: 'false',
-                    b2: 'false'
+                    b2: 'false',
+                    switch : 'list-episode-item'
                 },
                 update: function() {
                     Cookies.set('userbuttons', dramacool.ui.nav.buttons, {expires: 14});
@@ -204,42 +205,91 @@
                     if (dramacool.ui.nav.buttons.b1 === 'true') {
                         $('#b1').removeClass('active');
                         dramacool.ui.nav.buttons.b1 = 'false';
-                        $('ul.list-episode-item li').removeClass('hidden');
+                        $('ul[class*="list-episode-item"] li').removeClass('hidden');
                     } else {
                         $('#b1').addClass('active');
                         dramacool.ui.nav.buttons.b1 = 'true';
-                        $('ul.list-episode-item li').addClass('hidden');
-                        $('ul.list-episode-item li[data-subbed]').removeClass('hidden');
+                        $('ul[class*="list-episode-item"] li').addClass('hidden');
+                        $('ul[class*="list-episode-item"] li[data-subbed]').removeClass('hidden');
                     }
                     dramacool.ui.nav.update();
                 },
+                switchview: function() {
+
+                    dramacool.ui.nav.buttons.switch = $(this).attr('data-view');
+
+
+                    dramacool.ui.nav.update();
+
+                },
                 init: function() {
                     toolbox.ui.addcss(dramacool.ui.nav.css);
-                    if ($('ul.list-episode-item li span.ep').length > 0) {
+
+                    /**
+                     * Subs only button
+                     */
+                    if ($('ul[class*="list-episode-item"] li span.ep').length > 0) {
                         b1 = $('<li id="b1" class="userplugin"><span><i class="fa fa-file-text-o" aria-hidden="true"></i> Sub only</span></li>');
                         $('div.content-left div.block-tab ul.tab').append(b1);
-
                         buttons = Cookies.getJSON('userbuttons');
-                        console.debug(buttons);
-                        if (buttons != null) {
-                            dramacool.ui.nav.buttons = buttons;
+
+                        if (typeof buttons.b1 !== 'undefined') {
+                            dramacool.ui.nav.buttons.b1 = buttons.b1;
                         }
 
-                        console.debug(dramacool.ui.nav.buttons);
+
 
                         $('#b1').off('click').on('click', dramacool.ui.nav.b1toogle);
-                        $('ul.list-episode-item li').each(function() {
+                        $('ul[class*="list-episode-item"] li').each(function() {
                             if ($(this).find('span.ep.SUB').length > 0) {
                                 $(this).attr('data-subbed', true);
                             }
+                            if ($(this).find('span.ep.SUB').length > 0) {
+                                $(this).attr('data-subbed', true);
+                            }
+
+                            a = $(this).find('a').first();
+                            if (a.length > 0) {
+
+                                regexp = new RegExp(/^(.*?)\-episode\-([0-9]+)\.html$/i);
+                                href = a.attr('href');
+                                //href = href.replace(/\-episode\-([0-9]+)\.html$/i, '');
+                                if (results = regexp.exec(href)) {
+                                    href = '/drama-detail' + results[1];
+                                    a.attr('href', href);
+                                    a.find('h3.title').removeAttr('onclick').off('click').on('click', function() {
+                                        location = $(this).parent('a').attr('href');
+                                    });
+                                }
+                            }
+
+
+
                         });
+
                         if (dramacool.ui.nav.buttons.b1 === 'true') {
-                            dramacool.ui.nav.buttons.b1 = 'false';
-                            dramacool.ui.nav.b1toogle();
+                            $('ul[class*="list-episode-item"] li').addClass('hidden');
+                            $('ul[class*="list-episode-item"] li[data-subbed]').removeClass('hidden');
                         }
                     }
 
+                    /**
+                     * Auto switch view
+                     */
+                    if ($('div.block-tab ul.switch-view').length > 0) {
+                        buttons = Cookies.getJSON('userbuttons');
 
+                        if (typeof buttons.switch !== 'undefined') {
+                            dramacool.ui.nav.buttons.switch = buttons.switch;
+                        }
+
+                        $('div.block-tab ul.switch-view li').on('click', dramacool.ui.nav.switchview);
+
+                        $('div.block-tab ul.switch-view li').removeClass('selected');
+                        $('div.block-tab ul.switch-view li[data-view="' + dramacool.ui.nav.buttons.switch + '"]').addClass('selected');
+                        $('ul.switch-block').removeClass('list-episode-item').removeClass('list-episode-item-2');
+                        $('ul.switch-block').addClass($('div.block-tab ul.switch-view li.selected').attr('data-view'));
+                    }
                 }
             }
 
@@ -262,10 +312,10 @@
             $('ul.all-episode').html($('ul.all-episode').find('li').css('display', 'inline-block').get().reverse());
             $('.list_episode ul').html($('.list_episode ul').find('li').css('display', 'inline-block').get().reverse());
             $('iframe').parent('div:not(.watch-iframe)').remove();
+            $('nav.menu_top ul.navbar li a:contains("Request")').remove();
 
-            if ($('ul.list-episode-item').length > 0) {
-                dramacool.ui.nav.init();
-            }
+
+            dramacool.ui.nav.init();
             toolbox.loader.hide();
         }
     };
