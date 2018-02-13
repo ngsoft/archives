@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool UI Remaster + Videouploader
 // @namespace    https://github.com/ngsoft
-// @version      4.0.1
+// @version      4.1
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -182,6 +182,65 @@
                         $('div.watch-iframe iframe').first().attr('src', link.href);
                     });
                 }
+            },
+            nav: {
+                css: `
+                        div.content-left div.block-tab ul.tab li span input{vertical-align: middle; width: 12px; height: 12px;}
+
+                        div.content-left div.block-tab ul.tab li.userplugin{color: rgb(62, 194, 207); background-color: #FFF; margin-left: 5px;}
+                        div.content-left div.block-tab ul.tab li.active{color: rgb(253, 184, 19);}
+
+                    `,
+                buttons: {
+                    b1: 'false',
+                    b2: 'false'
+                },
+                update: function() {
+                    Cookies.set('userbuttons', dramacool.ui.nav.buttons, {expires: 14});
+                    console.debug(dramacool.ui.nav.buttons);
+                },
+                b1toogle: function(e) {
+                    console.debug(e);
+                    if (dramacool.ui.nav.buttons.b1 === 'true') {
+                        $('#b1').removeClass('active');
+                        dramacool.ui.nav.buttons.b1 = 'false';
+                        $('ul.list-episode-item li').removeClass('hidden');
+                    } else {
+                        $('#b1').addClass('active');
+                        dramacool.ui.nav.buttons.b1 = 'true';
+                        $('ul.list-episode-item li').addClass('hidden');
+                        $('ul.list-episode-item li[data-subbed]').removeClass('hidden');
+                    }
+                    dramacool.ui.nav.update();
+                },
+                init: function() {
+                    toolbox.ui.addcss(dramacool.ui.nav.css);
+                    if ($('ul.list-episode-item li span.ep').length > 0) {
+                        b1 = $('<li id="b1" class="userplugin"><span><i class="fa fa-file-text-o" aria-hidden="true"></i> Sub only</span></li>');
+                        $('div.content-left div.block-tab ul.tab').append(b1);
+
+                        buttons = Cookies.getJSON('userbuttons');
+                        console.debug(buttons);
+                        if (buttons != null) {
+                            dramacool.ui.nav.buttons = buttons;
+                        }
+
+                        console.debug(dramacool.ui.nav.buttons);
+
+                        $('#b1').off('click').on('click', dramacool.ui.nav.b1toogle);
+                        $('ul.list-episode-item li').each(function() {
+                            if ($(this).find('span.ep.SUB').length > 0) {
+                                $(this).attr('data-subbed', true);
+                            }
+                        });
+                        if (dramacool.ui.nav.buttons.b1 === 'true') {
+                            dramacool.ui.nav.buttons.b1 = 'false';
+                            dramacool.ui.nav.b1toogle();
+                        }
+                    }
+
+
+                }
             }
 
         },
@@ -203,6 +262,10 @@
             $('ul.all-episode').html($('ul.all-episode').find('li').css('display', 'inline-block').get().reverse());
             $('.list_episode ul').html($('.list_episode ul').find('li').css('display', 'inline-block').get().reverse());
             $('iframe').parent('div:not(.watch-iframe)').remove();
+
+            if ($('ul.list-episode-item').length > 0) {
+                dramacool.ui.nav.init();
+            }
             toolbox.loader.hide();
         }
     };
@@ -267,7 +330,10 @@
     };
     toolbox.loader.onshow = spinner.show;
     toolbox.loader.onhide = spinner.hide;
-    toolbox.onload = function() {};
+    toolbox.onload = function() {
+        toolbox.ui.addscript('https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js');
+
+    };
 
     //videouploader
     if (document.location.host.indexOf('vid') !== -1) {
@@ -279,6 +345,15 @@
     if (window.top != window.self) {
         return;
     }
+    toolbox.wait = function() {
+        toolbox.onload();
+        interval = setInterval(function() {
+            if (typeof $ !== 'undefined' && typeof Cookies !== 'undefined') {
+                toolbox.load();
+                clearInterval(interval);
+            }
+        }, 50);
+    };
 
     toolbox.init(dramacool.init);
 })();
