@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      4.8
+// @version      4.8.1
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -418,10 +418,11 @@
         }
     };
 
-    toolbox.loader.onshow = faspinner.show;
-    toolbox.loader.onhide = faspinner.hide;
+
     toolbox.onload = function() {
         toolbox.ui.addscript('https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js');
+        toolbox.loader.onshow = faspinner.show;
+        toolbox.loader.onhide = faspinner.hide;
 
     };
 
