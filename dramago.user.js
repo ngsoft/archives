@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Dramago, Gooddrama, Animewow
+// @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
 // @version      1.0
 // @description  UI Remaster
@@ -7,7 +7,11 @@
 // @include     *://*dramago*/*
 // @include     *://*gooddrama*/*
 // @include     *://*animewow*/*
-// @noframes
+// @include     *://*animetoon*/*
+// @include     *://*video66.*/*
+// @include     *://*easyvideo.*/*
+// @include     *://*playbb.*/*
+// @include     *://*yourupload.*/*
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramago.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/dramago.user.js
@@ -15,9 +19,6 @@
 
 
 (function() {
-    window.adblock = false;
-    window.adblock2 = false;
-    window.turnoff = true;
     window.open = function() {};
     window.eval = function() {};
     app = function($) {
@@ -140,8 +141,8 @@
             player: false,
             ui: {
                 css: `
-                    iframe, div#body div.right_col, div.ad, .hidden, div[id^="BB_SK"], div[id^="bb_sa"],div[id*="rcjsload"], div#Mad, div#M_AD, div#mini-announcement, div.s_right_col, div.l_right_col div#sidebar div#home_sidebar{display: none!important;}
-                    div.s_left_col, div#body div.left_col{float: none!important; width: auto!important;}
+                    [id*="comments"],iframe, div#body > div.right_col, div.ad, .hidden, div[id^="BB_SK"], div[id^="bb_sa"],div[id*="rcjsload"], div#Mad, div#M_AD, div#mini-announcement, div.s_right_col, div.l_right_col div#sidebar div#home_sidebar{display: none!important;}
+                    div.s_left_col, div#body > div.left_col{float: none!important; width: auto!important;}
                     #options_bar, #genre_list{text-align: center;}
                 body{background: none!important;}
                 #streams iframe{display: block!important;}
@@ -157,9 +158,13 @@
                 player: {
                     init: function() {
                         console.debug('player loaded');
+                        /*
 
-
-
+                         $('#streams div.vmargin').each(function() {
+                         if ($(this).find('iframe[src*="yucache"]').length < 1) {
+                         $(this).addClass('hidden');
+                         }
+                         });*/
                     }
                 }
             },
@@ -189,22 +194,51 @@
             }
         };
 
+        var vids = {
+            loaded: false,
+            ui: {
+                css: `
+                        .sharetools-overlay, .hidden, #box_0{display: none!important;}
+                `
+            },
+            init: function() {
+
+                vids.loaded = true;
+                console.debug('Vid UI loaded for ' + document.location.host);
+                toolbox.ui.addcss(vids.ui.css);
+
+                window.onclick = function() {};
+                document.onclick = function() {};
+                document.body.onclick = function() {};
+
+            }
+        };
+
 
         /**
          * Script start
          */
 
 
-
-
-        toolbox.loader.onshow = faspinner.show;
-        toolbox.loader.onhide = faspinner.hide;
-        faspinner.loadfont();
-        dramago.init();
-
+        if (document.location.origin.indexOf('drama') !== -1 || document.location.origin.indexOf('anime') !== -1) {
+            toolbox.loader.onshow = faspinner.show;
+            toolbox.loader.onhide = faspinner.hide;
+            faspinner.loadfont();
+            $(document).ready(dramago.init);
+            return;
+        }
+        $(document).ready(vids.init);
     };
 
+    if (window.top != window.self) {
+        if (document.location.origin.indexOf('drama') !== -1 || document.location.origin.indexOf('anime') !== -1) {
+            return;
+        }
+    }
 
+
+    var max = 500;
+    var t = 0;
     appinterval = setInterval(function() {
         if (typeof jQuery !== 'undefined') {
             clearInterval(appinterval);
@@ -212,6 +246,12 @@
             return;
         }
         console.debug('jQuery not defined');
+        t++;
+        if (t === max) {
+            console.debug('jQuery not defined (timeout, stopping script)');
+            clearInterval(appinterval);
+            return;
+        }
     }, 100);
 
 })();
