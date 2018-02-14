@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      4.7
+// @version      4.8
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -196,7 +196,7 @@
                         latest.completed.removeClass('hidden');
                         latest.uncomplete.removeClass('hidden');
                     }
-                }).click();
+                });
                 //status (auto hides watched)
                 var st = {
                     button: $("th:contains('Status')"),
