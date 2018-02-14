@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      4.6
+// @version      4.7
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -41,6 +41,10 @@
      */
 
     var toolbox = {
+        //runonce (prevent loop execution on error)
+        exec: false,
+        //interval for jquery check
+        interval: 50,
 
         loader: {
             timeout: 1500,
@@ -64,22 +68,24 @@
         },
         ui: {
             addscript: function(src) {
-                var s = document.createElement('script');
+                s = document.createElement('script');
                 s.setAttribute('src', src);
                 document.body.appendChild(s);
             },
             addcss: function(css) {
-                html = '<style type="text/css"><!-- ' + css + ' --></style>';
-                $('body').append(html);
+                s = document.createElement('style');
+                s.setAttribute('type', "text/css");
+                s.appendChild(document.createTextNode('<!-- ' + css + ' -->'));
+                document.body.appendChild(s);
             },
             loadcss: function(cssurl) {
-                var s = document.createElement('link');
+                s = document.createElement('link');
                 s.setAttribute('rel', "stylesheet");
                 s.setAttribute('href', cssurl);
                 document.head.appendChild(s);
             }
         },
-        init: function(fn) {
+        init: function(fn, interval = 50) {
 
             toolbox.ready(fn);
         },
@@ -88,11 +94,16 @@
         wait: function() {
             toolbox.onload();
             interval = setInterval(function() {
-                if (typeof $ !== 'undefined') {
-                    toolbox.load();
-                    clearInterval(interval);
+                if (typeof jQuery !== 'undefined') {
+                    if (toolbox.exec === false) {
+                        clearInterval(interval);
+                        (function($) {
+                            $(document).ready(toolbox.load);
+                            toolbox.exec = true;
+                        })(jQuery);
+                    }
                 }
-            }, 50);
+            }, toolbox.interval);
         },
         ready: function(fn) {
             toolbox.load = fn;
@@ -598,13 +609,19 @@
      * Mod Cookies
      */
     toolbox.wait = function() {
+
         toolbox.onload();
         interval = setInterval(function() {
-            if (typeof $ !== 'undefined' && typeof Cookies !== 'undefined') {
-                toolbox.load();
-                clearInterval(interval);
+            if (typeof jQuery !== 'undefined' && typeof Cookies !== 'undefined') {
+                if (toolbox.exec === false) {
+                    clearInterval(interval);
+                    (function($) {
+                        $(document).ready(toolbox.load);
+                        toolbox.exec = true;
+                    })(jQuery);
+                }
             }
-        }, 50);
+        }, toolbox.interval);
     };
     toolbox.onload = function() {
         toolbox.ui.addscript('https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js');
