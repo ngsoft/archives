@@ -7,17 +7,28 @@
 // @include     *://*dramago*/*
 // @include     *://*gooddrama*/*
 // @include     *://*animewow*/*
+// @noframes
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramago.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/dramago.user.js
 // ==/UserScript==
 
 (function() {
+    window.adblock = false;
+    window.adblock2 = false;
+    window.turnoff = true;
+    window.open = function() {};
+    window.eval = function() {};
+
     /**
      * Userscript library
      */
 
     var toolbox = {
+        //runonce (prevent loop execution on error)
+        exec: false,
+        //interval for jquery check
+        interval: 50,
 
         loader: {
             timeout: 1500,
@@ -41,22 +52,24 @@
         },
         ui: {
             addscript: function(src) {
-                var s = document.createElement('script');
+                s = document.createElement('script');
                 s.setAttribute('src', src);
                 document.body.appendChild(s);
             },
             addcss: function(css) {
-                html = '<style type="text/css"><!-- ' + css + ' --></style>';
-                $('body').append(html);
+                s = document.createElement('style');
+                s.setAttribute('type', "text/css");
+                s.appendChild(document.createTextNode('<!-- ' + css + ' -->'));
+                document.body.appendChild(s);
             },
             loadcss: function(cssurl) {
-                var s = document.createElement('link');
+                s = document.createElement('link');
                 s.setAttribute('rel', "stylesheet");
                 s.setAttribute('href', cssurl);
                 document.head.appendChild(s);
             }
         },
-        init: function(fn) {
+        init: function(fn, interval = 50) {
 
             toolbox.ready(fn);
         },
@@ -65,11 +78,16 @@
         wait: function() {
             toolbox.onload();
             interval = setInterval(function() {
-                if (typeof $ !== 'undefined') {
-                    toolbox.load();
-                    clearInterval(interval);
+                if (typeof jQuery !== 'undefined') {
+                    if (toolbox.exec === false) {
+                        clearInterval(interval);
+                        (function($) {
+                            $(document).ready(toolbox.load);
+                            toolbox.exec = true;
+                        })(jQuery);
+                    }
                 }
-            }, 50);
+            }, toolbox.interval);
         },
         ready: function(fn) {
             toolbox.load = fn;
@@ -106,6 +124,33 @@
         }
     };
 
+
+
+
+    /**
+     * Sites Mods
+     */
+
+    var dramago = {
+        ui: {
+            css: `
+                    .hidden, div[id^="BB_SK"]{display: none!important;}
+            `
+        },
+
+        init: function() {
+            toolbox.ui.addcss(dramago.ui.css);
+            console.debug("User script started");
+
+
+        }
+    };
+
+
+    /**
+     * Script start
+     */
+
     toolbox.loader.onshow = faspinner.show;
     toolbox.loader.onhide = faspinner.hide;
 
@@ -116,15 +161,5 @@
     };
 
     toolbox.init(dramago.init);
-
-
-
-
-
-
-
-
-
-
 
 })();
