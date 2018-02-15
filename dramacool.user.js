@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      5.1
+// @version      5.2
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -442,6 +442,9 @@
     };
 
 
+    /**
+     * Font Awesome Spinner
+     */
     var faspinner = {
 
         css: `div#spinner{display : block;position : fixed;z-index: 100;background-color: #121212; opacity: 0.8; background-repeat : no-repeat;background-position : center;left : 0;bottom : 0;right : 0;  top : 0;} div#spinner i{font-size: 32px; color: #EFEFEF; left : 50%;top : 50%;position : absolute;z-index : 101;width : 32px;height : 32px;margin-left : -16px;margin-top : -16px;}`,
@@ -466,6 +469,30 @@
         }
     };
 
+    /**
+     * @link https://www.pexels.com/blog/css-only-loaders/ CSS Only Loaders
+     */
+    var cssloader = {
+        css: `.cssloader{margin:50px;height:28px;width:28px;animation:rotate .8s infinite linear;border:8px solid #fff;border-right-color:transparent;border-radius:50%}@keyframes rotate{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}div#spinner{display : block;position : fixed;z-index: 100;background-color: #000; opacity: 0.8; background-repeat : no-repeat;background-position : center;left : 0;bottom : 0;right : 0;  top : 0;}div#spinner > div{z-index : 101;position: absolute; top: 50%; left:50%; margin: -14px 0 0 -14px; opacity:1; color: #fff;}`,
+
+        show: function() {
+            if (typeof cssloader.loader === 'undefined') {
+                toolbox.ui.addcss(cssloader.css);
+                cssloader.loader = document.createElement('div');
+                cssloader.loader.setAttribute('id', 'spinner');
+                loader = document.createElement('div');
+                loader.setAttribute('class', 'cssloader');
+                cssloader.loader.appendChild(loader);
+
+            }
+            document.body.appendChild(cssloader.loader);
+        },
+        hide: function() {
+            document.body.removeChild(cssloader.loader);
+
+        }
+    };
+
 
     toolbox.onload = function() {
         toolbox.cookies.init();
@@ -476,8 +503,13 @@
 
     //videouploader
     if (document.location.host.indexOf('vid') !== -1) {
-        toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
-        faspinner.loadfont();
+
+        toolbox.onload = function() {
+            toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
+            toolbox.loader.onshow = cssloader.show;
+            toolbox.loader.onhide = cssloader.hide;
+
+        };
         toolbox.init(vu.init);
         return;
     }

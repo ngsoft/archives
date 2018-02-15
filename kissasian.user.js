@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.0
+// @version      5.0.1
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -635,6 +635,7 @@
 
         show: function() {
             if (typeof cssloader.loader === 'undefined') {
+                toolbox.ui.addcss(cssloader.css);
                 cssloader.loader = document.createElement('div');
                 cssloader.loader.setAttribute('id', 'spinner');
                 loader = document.createElement('div');
@@ -673,7 +674,6 @@
     };
     toolbox.onload = function() {
         toolbox.cookies.init();
-        toolbox.ui.addcss(cssloader.css);
         toolbox.loader.onshow = cssloader.show;
         toolbox.loader.onhide = cssloader.hide;
     };
