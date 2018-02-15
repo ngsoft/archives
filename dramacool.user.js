@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      4.9.1
+// @version      5.0
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -72,6 +72,41 @@
                 s.setAttribute('rel', "stylesheet");
                 s.setAttribute('href', cssurl);
                 document.head.appendChild(s);
+            }
+        },
+        cookies: {
+            ready: false,
+            expire: 14,
+            data: {},
+            get: function(name, value = null) {
+                if (toolbox.cookies.ready === false) {
+                    return value;
+                }
+                if (typeof toolbox.cookies.data[name] === 'undefined') {
+                    toolbox.cookies.data[name] = value;
+                    get = Cookies.get(name);
+                    if (typeof get !== 'undefined') {
+                        toolbox.cookies.data[name] = get;
+                    }
+                }
+                return toolbox.cookies.data[name];
+            },
+            set: function(name, value) {
+                toolbox.cookies.data[name] = value;
+                if (toolbox.cookies.ready === false) {
+                    return;
+                }
+                Cookies.set(name, value, {expires: toolbox.cookies.expire});
+            },
+
+            init: function() {
+                toolbox.ui.addscript('https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js');
+                waitforcookies = setInterval(function() {
+                    if (typeof Cookies !== 'undefined') {
+                        clearInterval(waitforcookies);
+                        toolbox.cookies.ready = true;
+                    }
+                }, toolbox.interval);
             }
         },
         init: function(fn, interval = 50) {
@@ -212,51 +247,26 @@
             nav: {
                 css: `
                         div.content-left div.block-tab ul.tab li span input{vertical-align: middle; width: 12px; height: 12px;}
-
                         div.content-left div.block-tab ul.tab li.userplugin{color: rgb(62, 194, 207); background-color: #FFF; margin-left: 5px;}
                         div.content-left div.block-tab ul.tab li.active{color: rgb(253, 184, 19);}
 
                     `,
-                buttons: {
-                    b1: 'false',
-                    switch : 'list-episode-item'
-                },
-                update: function() {
-                    $.each(dramacool.ui.nav.buttons, function(name, val) {
-                        Cookies.set(name, val, {expires: 14});
-                    });
-                },
-                getstored: function(name) {
-                    if (typeof dramacool.ui.nav.buttons[name] === 'undefined') {
-                        return null;
-                    }
-                    get = Cookies.get(name);
-                    if (typeof get === 'undefined') {
-                        return dramacool.ui.nav.buttons[name];
-                    }
-                    return get;
-                },
                 b1toogle: function(e) {
                     console.debug(e);
-                    if (dramacool.ui.nav.buttons.b1 === 'true') {
+                    if (toolbox.cookies.get('b1') === 'true') {
                         $('#b1').removeClass('active');
-                        dramacool.ui.nav.buttons.b1 = 'false';
+                        toolbox.cookies.set('b1', 'false');
                         $('ul[class*="list-episode-item"] li').removeClass('hidden');
                     } else {
                         $('#b1').addClass('active');
-                        dramacool.ui.nav.buttons.b1 = 'true';
+                        toolbox.cookies.set('b1', 'true');
                         $('ul[class*="list-episode-item"] li').addClass('hidden');
                         $('ul[class*="list-episode-item"] li[data-subbed]').removeClass('hidden');
                     }
-                    dramacool.ui.nav.update();
+                    //dramacool.ui.nav.update();
                 },
                 switchview: function() {
-
-                    dramacool.ui.nav.buttons.switch = $(this).attr('data-view');
-
-
-                    dramacool.ui.nav.update();
-
+                    toolbox.cookies.set('switch', $(this).attr('data-view'));
                 },
                 init: function() {
                     toolbox.ui.addcss(dramacool.ui.nav.css);
@@ -268,9 +278,6 @@
                     if ($('ul[class*="list-episode-item"] li span.ep').length > 0) {
                         b1 = $('<li id="b1" class="userplugin"><span><i class="fa fa-file-text-o" aria-hidden="true"></i> Sub only</span></li>');
                         $('div.content-left div.block-tab ul.tab').first().append(b1);
-
-                        dramacool.ui.nav.buttons.b1 = dramacool.ui.nav.getstored('b1');
-
                         $('#b1').off('click').on('click', dramacool.ui.nav.b1toogle);
                         $('ul[class*="list-episode-item"] li').each(function() {
                             if ($(this).find('span.ep.SUB').length > 0) {
@@ -279,10 +286,8 @@
                             if ($(this).find('span.ep.SUB').length > 0) {
                                 $(this).attr('data-subbed', true);
                             }
-
                             a = $(this).find('a').first();
                             if (a.length > 0) {
-
                                 regexp = new RegExp(/^(.*?)\-episode\-([0-9]+)\.html$/i);
                                 href = a.attr('href');
                                 if (results = regexp.exec(href)) {
@@ -295,10 +300,7 @@
 
 
                         });
-
-
-
-                        if (dramacool.ui.nav.buttons.b1 === 'true') {
+                        if (toolbox.cookies.get('b1') === 'true') {
                             $('ul[class*="list-episode-item"] li').addClass('hidden');
                             $('ul[class*="list-episode-item"] li[data-subbed]').removeClass('hidden');
                             $('#b1').addClass('active');
@@ -325,23 +327,19 @@
                         });
 
                         if ($('div.nav_tab_global div.datagrild_nav a.active').length > 0) {
-
-                            dramacool.ui.nav.buttons.switch = $('div.nav_tab_global div.datagrild_nav a.active').attr('data-tab');
-
-                            dramacool.ui.nav.buttons.switch = dramacool.ui.nav.getstored('switch');
-
+                            toolbox.cookies.get('switch', $('div.nav_tab_global div.datagrild_nav a.active').attr('data-tab'));
                             $('div.nav_tab_global div.datagrild_nav a').each(function() {
                                 $(this).removeClass('active');
                                 $('.content_episode.datagrild').removeClass($(this).attr('data-tab'));
-                                if ($(this).attr('data-tab') === dramacool.ui.nav.buttons.switch) {
+
+                                if ($(this).attr('data-tab') === toolbox.cookies.get('switch')) {
                                     $(this).addClass('active');
                                     $('.content_episode.datagrild').addClass($(this).attr('data-tab'));
                                 }
 
                                 $(this).on('click', function(e) {
                                     e.preventDefault();
-                                    dramacool.ui.nav.buttons.switch = $(this).attr('data-tab');
-                                    dramacool.ui.nav.update();
+                                    toolbox.cookies.set('switch', $(this).attr('data-tab'));
 
                                 });
 
@@ -349,26 +347,15 @@
 
                         }
 
-
-
-
-
                     }
-
-
-
 
                     /**
                      * Auto switch view
                      */
                     if ($('div.block-tab ul.switch-view').length > 0) {
-
-                        dramacool.ui.nav.buttons.switch = dramacool.ui.nav.getstored('switch');
-
                         $('div.block-tab ul.switch-view li').on('click', dramacool.ui.nav.switchview);
-
                         $('div.block-tab ul.switch-view li').removeClass('selected');
-                        $('div.block-tab ul.switch-view li[data-view="' + dramacool.ui.nav.buttons.switch + '"]').addClass('selected');
+                        $('div.block-tab ul.switch-view li[data-view="' + toolbox.cookies.get('switch', 'list-episode-item') + '"]').addClass('selected');
                         $('ul.switch-block').removeClass('list-episode-item').removeClass('list-episode-item-2');
                         $('ul.switch-block').addClass($('div.block-tab ul.switch-view li.selected').attr('data-view'));
                     }
@@ -447,7 +434,6 @@
                 if (href.origin.indexOf('openload') !== -1) {
                     href.pathname = href.pathname.replace('/f/', '/embed/');
                 }
-                //params = new URLSearchParams(href.search);
                 href.searchParams.set('title', vu.title());
                 $(this).attr('target', '_blank').attr('href', href);
             });
@@ -482,7 +468,7 @@
 
 
     toolbox.onload = function() {
-        toolbox.ui.addscript('https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js');
+        toolbox.cookies.init();
         toolbox.loader.onshow = faspinner.show;
         toolbox.loader.onhide = faspinner.hide;
 
@@ -504,7 +490,7 @@
 
         toolbox.onload();
         interval = setInterval(function() {
-            if (typeof jQuery !== 'undefined' && typeof Cookies !== 'undefined') {
+            if (typeof jQuery !== 'undefined' && toolbox.cookies.ready === true) {
                 if (toolbox.exec === false) {
                     clearInterval(interval);
                     (function($) {
