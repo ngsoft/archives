@@ -449,8 +449,6 @@
             return $('#main .mirror_link div.dowload a');
         },
         init: function() {
-            toolbox.loader.show();
-            toolbox.ui.addcss(vu.ui.css);
             if (window.top != window.self) {
                 $('body').attr('data-inside-iframe', true);
             }
@@ -540,13 +538,11 @@
 
     //videouploader
     if (document.location.host.indexOf('vid') !== -1) {
-
-        toolbox.onload = function() {
-            toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
-            toolbox.loader.onshow = cssloader.show;
-            toolbox.loader.onhide = cssloader.hide;
-
-        };
+        toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
+        toolbox.loader.onshow = cssloader.show;
+        toolbox.loader.onhide = cssloader.hide;
+        toolbox.loader.show();
+        toolbox.ui.addcss(vu.ui.css);
         toolbox.init(vu.init);
         return;
     }
