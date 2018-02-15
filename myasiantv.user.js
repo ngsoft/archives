@@ -5,15 +5,15 @@
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*myasiantv*/*
+// @noframes
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/myasiantv.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/myasiantv.user.js
 // ==/UserScript==
 
+window.open = function() {};
+window.eval = function() {};
 (function() {
-
-
-
     /**
      * Userscript library
      */
@@ -156,22 +156,50 @@
 
     var atv = {
         ui: {
-            css: `
-                        .hidden {display: none!important);
-                    `
+            css: `a.closeads, a.report, .comment, #disqus_thread, #geniee_overlay, .PubAdAI, .trc_related_container, .av-right, .hidden {display: none!important;}`
         },
 
         init: function() {
             console.debug('User Script Started');
+            $('#player > iframe').addClass('ignored');
+            $('iframe:not(.ignored)').remove();
+            $('div.sound').remove();
+
+            $('ul.list-episode').each(function() {
+                $this = $(this);
+                if ($(this).find('a.paging').length > 0) {
+                    $(this).find('a.paging').on('click', function(e) {
+                        e.preventDefault();
+                        setTimeout(function() {
+                            $this.html($this.find('li').get().reverse());
+                        }, 500);
+
+                    }).click();
+                    return;
+                }
+                $(this).html($(this).find('li').get().reverse());
+            });
 
 
+
+
+            toolbox.loader.setevents();
+            toolbox.loader.hide();
         }
     };
 
+
+
+
     toolbox.onload = function() {
-        toolbox.loader.onshow = cssloader.show;
-        toolbox.loader.onhide = cssloader.hide;
+        el = document.getElementById('disqus_thread');
+        el.remove();
+
     };
+    toolbox.loader.onshow = cssloader.show;
+    toolbox.loader.onhide = cssloader.hide;
+    toolbox.loader.show();
+    toolbox.ui.addcss(atv.ui.css);
     toolbox.init(atv.init);
 
 
