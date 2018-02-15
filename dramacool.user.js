@@ -330,19 +330,44 @@
                             toolbox.cookies.get('switch', $('div.nav_tab_global div.datagrild_nav a.active').attr('data-tab'));
                             $('div.nav_tab_global div.datagrild_nav a').each(function() {
                                 $(this).removeClass('active');
-                                $('.content_episode.datagrild').removeClass($(this).attr('data-tab'));
+                                $('.content_episode').removeClass($(this).attr('data-tab'));
 
                                 if ($(this).attr('data-tab') === toolbox.cookies.get('switch')) {
                                     $(this).addClass('active');
-                                    $('.content_episode.datagrild').addClass($(this).attr('data-tab'));
+
+                                    $('.content_episode').each(function() {
+                                        if ($(this).find('.thumb_anime_hor').length > 0) {
+                                            $(this).addClass('datagrild');
+                                        }
+                                    }).addClass($(this).attr('data-tab'));
+
+
                                 }
 
-                                $(this).on('click', function(e) {
+                                $('.nav-tabs.intro a').off('click').on('click', function(e) {
                                     e.preventDefault();
-                                    toolbox.cookies.set('switch', $(this).attr('data-tab'));
+                                    $('.nav-tabs.intro a').removeClass('active');
+                                    $(this).addClass('active');
+                                    var str = $(this).attr('data-tab');
 
+                                    tab = $('.content_episode.' + str);
+                                    if (tab.length > 0) {
+                                        if (tab.find('.thumb_anime_hor').length > 0) {
+                                            $('.datagrild_nav').show();
+                                        } else {
+                                            $('.datagrild_nav').hide();
+                                        }
+                                        $('.content_episode').hide();
+                                        tab.show();
+                                    }
                                 });
 
+                            });
+
+                            $('.datagrild_nav').on('hide', function() {
+                                setTimeout(function() {
+                                    $('.datagrild_nav').show();
+                                }, 1000);
                             });
 
                         }
@@ -378,7 +403,7 @@
             $('.watch-drama > iframe').remove();
             $("ul.tab li:contains('Ads')").removeClass('selected').hide();
             $('.content_right ul.nav-tabs').each(function() {
-                hidebtn = $(this).find('a[data-tab="ads"]');
+                hidebtn = $(this).find('a:contains("Ads")');
                 if (hidebtn.length > 0) {
                     hidebtn.removeClass('active');
                     hidebtn.parent('li').addClass('hidden');
