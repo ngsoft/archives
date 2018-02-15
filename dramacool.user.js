@@ -435,6 +435,11 @@
         title: function() {
             params = new URLSearchParams(location.search);
             title = params.get('title');
+            if (title === null) {
+                title = $('.sumer_l li').first().text();
+                return title;
+            }
+
             title = title.replace(':', ' ', title);
             title = title.trim();
             title += '.mp4';
@@ -452,6 +457,9 @@
             vu.links().each(function() {
 
                 link = $(this).attr('href');
+                if (typeof link === 'undefined') {
+                    return;
+                }
                 if (link.match(/^\/\//)) {
                     link = 'https:' + link;
                 }
