@@ -463,6 +463,9 @@
                 href.searchParams.set('title', vu.title());
                 $(this).attr('target', '_blank').attr('href', href);
             });
+            window.onclick = function() {};
+            document.onclick = function() {};
+            document.body.onclick = function() {};
             toolbox.loader.hide();
         }
     };
