@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MyAsian.TV
 // @namespace    https://github.com/ngsoft
-// @version      5.2
+// @version      1.2
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*myasiantv*/*
@@ -156,14 +156,18 @@ window.eval = function() {};
 
     var atv = {
         ui: {
-            css: `a.closeads, a.report, .comment, #disqus_thread, #geniee_overlay, .PubAdAI, .trc_related_container, .av-right, .hidden {display: none!important;}`
+            css: `  [data-player-enabled] div.play > i,[data-player-enabled] #content > .content-right, [data-player-enabled] #content > .content-line-2, div.play div.share, .addthis_toolbox, #content > .episode-new, .movie-random, a.closeads, a.report, .comment, #disqus_thread, #geniee_overlay, .PubAdAI, .trc_related_container, .av-right, .hidden {display: none!important;}
+                    [data-player-enabled] #listep > h3, [data-player-enabled] #listep >ul , [data-player-enabled] #content > .content-left{float: none; width: auto;}`
         },
 
         init: function() {
             console.debug('User Script Started');
-            $('#player > iframe').addClass('ignored');
+            $('#player > iframe').each(function() {
+                $(this).addClass('ignored');
+                $('body').attr('data-player-enabled', true);
+            });
             $('iframe:not(.ignored)').remove();
-            $('div.sound').remove();
+            //$('div.sound').remove();
 
             $('ul.list-episode').each(function() {
                 $this = $(this);
@@ -172,18 +176,35 @@ window.eval = function() {};
                         e.preventDefault();
                         setTimeout(function() {
                             $this.html($this.find('li').get().reverse());
-                        }, 500);
+                        }, 1000);
 
                     }).click();
                     return;
                 }
                 $(this).html($(this).find('li').get().reverse());
             });
-
-
-
-
             toolbox.loader.setevents();
+
+            $('ul.pagination a').on('click', toolbox.loader.hide);
+
+            if ($('#player > iframe').length > 0 && $('div#listep').length > 0) {
+                el = $('<a id="eptoogle" class="download" href="#">Select Episode</a>');
+                $('div.play div.button').prepend(el);
+                el.on('click', function(e) {
+                    e.preventDefault();
+                    if ($('div#listep').hasClass('hidden')) {
+                        $('div#listep').removeClass('hidden');
+                        return;
+                    }
+                    $('div#listep').addClass('hidden');
+
+                });
+                $('div#listep').addClass('hidden');
+
+            }
+
+
+
             toolbox.loader.hide();
         }
     };
@@ -192,12 +213,20 @@ window.eval = function() {};
 
 
     toolbox.onload = function() {
-        el = document.getElementById('disqus_thread');
-        el.remove();
+        if (el = document.getElementById('disqus_thread')) {
+            el.remove();
+        }
+        el = document.getElementsByClassName('sound');
+        if (el.length > 0) {
+            for (var i = 0; i < el.length; i++) {
+                el[i].remove();
+            }
+        }
 
     };
     toolbox.loader.onshow = cssloader.show;
     toolbox.loader.onhide = cssloader.hide;
+    toolbox.loader.timeout = 200;
     toolbox.loader.show();
     toolbox.ui.addcss(atv.ui.css);
     toolbox.init(atv.init);
