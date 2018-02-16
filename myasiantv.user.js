@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         MyAsian.TV
 // @namespace    https://github.com/ngsoft
-// @version      1.2
+// @version      1.4
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*myasiantv*/*
+// @include     *://dramabus.*/*
 // @noframes
 // @grant none
+// @run-at      document-start
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/myasiantv.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/myasiantv.user.js
 // ==/UserScript==
@@ -111,6 +113,7 @@ window.eval = function() {};
                     if (toolbox.exec === false) {
                         clearInterval(interval);
                         (function($) {
+                            //toolbox.load();
                             $(document).ready(toolbox.load);
                             toolbox.exec = true;
                         })(jQuery);
@@ -156,38 +159,20 @@ window.eval = function() {};
 
     var atv = {
         ui: {
-            css: `  [data-player-enabled] div.play > i,[data-player-enabled] #content > .content-right, [data-player-enabled] #content > .content-line-2, div.play div.share, .addthis_toolbox, #content > .episode-new, .movie-random, a.closeads, a.report, .comment, #disqus_thread, #geniee_overlay, .PubAdAI, .trc_related_container, .av-right, .hidden {display: none!important;}
-                    [data-player-enabled] #listep > h3, [data-player-enabled] #listep >ul , [data-player-enabled] #content > .content-left{float: none; width: auto;}`
+            css: `  .as, [data-player-enabled] div.play > i,[data-player-enabled] #content > .content-right, [data-player-enabled] #content > .content-line-2, div.play div.share, .addthis_toolbox, #content > .episode-new, .movie-random, a.closeads, a.report, .comment, #disqus_thread, #geniee_overlay, .PubAdAI, .trc_related_container, .av-right, .hidden {display: none!important;}
+                    [data-player-enabled] #listep > h3, [data-player-enabled] #listep >ul , [data-player-enabled] #content > .content-left{float: none; width: auto;}
+                    div#mediaplayer{z-index: 50;}`
         },
 
         init: function() {
             console.debug('User Script Started');
-            $('#player > iframe').each(function() {
-                $(this).addClass('ignored');
-                $('body').attr('data-player-enabled', true);
-            });
-            $('iframe:not(.ignored)').remove();
-            //$('div.sound').remove();
 
-            $('ul.list-episode').each(function() {
-                $this = $(this);
-                if ($(this).find('a.paging').length > 0) {
-                    $(this).find('a.paging').on('click', function(e) {
-                        e.preventDefault();
-                        setTimeout(function() {
-                            $this.html($this.find('li').get().reverse());
-                        }, 1000);
-
-                    }).click();
-                    return;
-                }
-                $(this).html($(this).find('li').get().reverse());
-            });
             toolbox.loader.setevents();
 
             $('ul.pagination a').on('click', toolbox.loader.hide);
 
             if ($('#player > iframe').length > 0 && $('div#listep').length > 0) {
+                $('body').attr('data-player-enabled', true);
                 el = $('<a id="eptoogle" class="download" href="#">Select Episode</a>');
                 $('div.play div.button').prepend(el);
                 el.on('click', function(e) {
@@ -197,11 +182,13 @@ window.eval = function() {};
                         return;
                     }
                     $('div#listep').addClass('hidden');
-
                 });
                 $('div#listep').addClass('hidden');
-
             }
+
+            $('#player > iframe').addClass('ignored');
+            $('#mediaplayer > iframe').addClass('ignored');
+            $('iframe:not(.ignored)').remove();
 
 
 
@@ -209,10 +196,12 @@ window.eval = function() {};
         }
     };
 
-
-
-
     toolbox.onload = function() {
+        toolbox.loader.onshow = cssloader.show;
+        toolbox.loader.onhide = cssloader.hide;
+        toolbox.loader.timeout = 200;
+        toolbox.ui.addcss(atv.ui.css);
+        toolbox.loader.show();
         if (el = document.getElementById('disqus_thread')) {
             el.remove();
         }
@@ -222,13 +211,24 @@ window.eval = function() {};
                 el[i].remove();
             }
         }
-
     };
-    toolbox.loader.onshow = cssloader.show;
-    toolbox.loader.onhide = cssloader.hide;
-    toolbox.loader.timeout = 200;
-    toolbox.loader.show();
-    toolbox.ui.addcss(atv.ui.css);
+
+    toolbox.wait = function() {
+        toolbox.onload();
+        interval = setInterval(function() {
+            if (typeof jQuery !== 'undefined') {
+                if (toolbox.exec === false) {
+                    clearInterval(interval);
+                    toolbox.exec = true;
+                    (function($) {
+                        toolbox.load();
+                    })(jQuery);
+                }
+            }
+        }, toolbox.interval);
+    };
+
+
     toolbox.init(atv.init);
 
 
