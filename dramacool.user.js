@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      5.3
+// @version      5.4
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -289,13 +289,14 @@
                             }
                             a = $(this).find('a').first();
                             if (a.length > 0) {
-                                regexp = new RegExp(/^(.*?)\-episode\-([0-9]+)\.html$/i);
+                                a.find('h3.title').removeAttr('onclick').off('click');
+                                a.find('span.ep').attr('data-link', a.attr('href')).on('click', function(e) {
+                                    e.preventDefault();
+                                    location.href = $(this).attr('data-link');
+                                });
                                 href = a.attr('href');
-                                if (results = regexp.exec(href)) {
-                                    href = '/drama-detail' + results[1];
-                                    a.attr('href', href);
-                                    a.find('h3.title').removeAttr('onclick').off('click');
-                                }
+                                href = '/drama-detail' + href.replace(/\-episode\-([0-9]+)\.html$/i, '');
+                                a.attr('href', href);
                             }
 
 
@@ -394,8 +395,7 @@
             if (location.host.indexOf('anime') !== -1) {
                 dramacool.drama = false;
             }
-            toolbox.ui.addcss(dramacool.ui.css);
-            toolbox.loader.show();
+
             if (document.location.href.match(/\-episode\-/))
                 dramacool.ui.player.init();
             $('.ads-outsite').remove();
@@ -483,23 +483,24 @@
     var faspinner = {
 
         css: `div#spinner{display : block;position : fixed;z-index: 100;background-color: #121212; opacity: 0.8; background-repeat : no-repeat;background-position : center;left : 0;bottom : 0;right : 0;  top : 0;} div#spinner i{font-size: 32px; color: #EFEFEF; left : 50%;top : 50%;position : absolute;z-index : 101;width : 32px;height : 32px;margin-left : -16px;margin-top : -16px;}`,
-
-        html: `<div id="spinner"><i class="fa fa-spinner fa-pulse fa-3x fa-fw" aria-hidden="true"></i></div>`,
         loadfont: function() {
             toolbox.ui.loadcss('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
         },
         show: function() {
-            if ($('div#spinner').length > 0)
-            {
-                $('div#spinner').show();
-                return;
+            if (typeof faspinner.loader === 'undefined') {
+                toolbox.ui.addcss(faspinner.css);
+                faspinner.loader = document.createElement('div');
+                faspinner.loader.setAttribute('id', 'spinner');
+                i = document.createElement('i');
+                i.setAttribute('class', 'fa fa-spinner fa-pulse fa-3x fa-fw');
+                i.setAttribute('aria-hidden', 'true');
+                faspinner.loader.appendChild(i);
             }
-            toolbox.ui.addcss(faspinner.css);
-            $('body').append(faspinner.html);
+            document.body.appendChild(faspinner.loader);
         },
         hide: function() {
-            if ($('div#spinner').length > 0) {
-                $('div#spinner').hide();
+            if (typeof faspinner.loader !== 'undefined') {
+                document.body.removeChild(faspinner.loader);
             }
         }
     };
@@ -529,12 +530,7 @@
     };
 
 
-    toolbox.onload = function() {
-        toolbox.cookies.init();
-        toolbox.loader.onshow = faspinner.show;
-        toolbox.loader.onhide = faspinner.hide;
 
-    };
 
     //videouploader
     if (document.location.host.indexOf('vid') !== -1) {
@@ -566,6 +562,14 @@
             }
         }, toolbox.interval);
     };
+
+
+
+    toolbox.cookies.init();
+    toolbox.loader.onshow = faspinner.show;
+    toolbox.loader.onhide = faspinner.hide;
+    toolbox.loader.show();
+    toolbox.ui.addcss(dramacool.ui.css);
 
     toolbox.init(dramacool.init);
 })();
