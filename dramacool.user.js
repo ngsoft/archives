@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      5.4
+// @version      5.5
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -145,7 +145,7 @@
         drama: true,
         ui: {
             css: `
-                    div.header ul.auth, div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .show-all, .btn-show-all, .mediaplayer header, .mediaplayer footer, .hidden, .plugins2 ul li.favorites{
+                    div.header ul.auth, div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .show-all, .btn-show-all, .mediaplayer header, .mediaplayer footer, .hidden{
                             display: none !important;
                     }
                     .mediaplayer .content-left{width:100%!important;}
@@ -416,7 +416,7 @@
             $('.list_episode ul').html($('.list_episode ul').find('li').css('display', 'inline-block').get().reverse());
             $('iframe').parent('div:not(.watch-iframe)').remove();
             $('nav.menu_top ul.navbar li a:contains("Request")').remove();
-            $('nav.menu_top ul.navbar li a:contains("Login")').remove();
+            //$('nav.menu_top ul.navbar li a:contains("Login")').remove();
             dramacool.ui.nav.init();
             toolbox.loader.setevents();
             toolbox.loader.hide();
