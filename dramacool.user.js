@@ -10,7 +10,7 @@
 // @include     *://*myanimeseries*/*
 // @include     *://videoupload.*/*
 // @include     *://vidstream.*/*
-// @include     *://azvideo.*/*
+// @include     *://azvideo.*/file/*
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.user.js
