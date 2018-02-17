@@ -227,6 +227,12 @@ window.eval = function() {};
         }, toolbox.interval);
     };
 
+    if (document.location.host.indexOf('dramabus') !== -1) {
+        toolbox.loader.show = function() {};
+        toolbox.loader.hide = function() {};
+        toolbox.loader.setevents = function() {};
+    }
+
 
     toolbox.init(atv.init);
 
