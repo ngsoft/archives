@@ -1,14 +1,13 @@
 // ==UserScript==
 // @name         MyAsian.TV
 // @namespace    https://github.com/ngsoft
-// @version      1.4
+// @version      1.5
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*myasiantv*/*
 // @include     *://dramabus.*/*
 // @noframes
 // @grant none
-// @run-at      document-start
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/myasiantv.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/myasiantv.user.js
 // ==/UserScript==
