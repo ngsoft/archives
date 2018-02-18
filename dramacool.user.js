@@ -197,7 +197,7 @@
                 }
             },
             anime: {
-                css: `.popover-favorites, div.content_right, {display: none!important;} div.content div.content_left{float: none; width: auto;} .plugins li.facebook span, .plugins li.twitter span{margin-left: 5px;} .content_left .main_body{min-height: 0;}`,
+                css: `.popover-favorites, div.content_right{display: none!important;} div.content div.content_left{float: none; width: auto;} .plugins li.facebook span, .plugins li.twitter span{margin-left: 5px;} .content_left .main_body{min-height: 0;}`,
                 hidebtn: function(cls) {
                     target = $('.video_watch i.' + cls);
                     if (target.length > 0) {
