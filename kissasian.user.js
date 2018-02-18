@@ -690,9 +690,17 @@
 
     toolbox.onload = function() {
 
-        if (document.querySelector('img[alt = "KissCartoon"]') !== null) {
+        if (document.querySelector('img[alt = "KissCartoon"]') !== null || document.querySelector('img[alt = "jadopado"]') !== null) {
             console.debug('Running man, ignoring script execution');
             toolbox.load = function() {};
+            toolbox.exec = true;
+            return;
+        }
+
+        if (document.getElementById('containerRoot') === null) {
+            console.debug('No Container root, stopping script execution');
+            toolbox.load = function() {};
+            toolbox.exec = true;
             return;
         }
 
