@@ -552,9 +552,13 @@
     }
 
     toolbox.wait = function() {
-
         toolbox.onload();
+
         interval = setInterval(function() {
+            if (toolbox.exec === true) {
+                clearInterval(interval);
+                return;
+            }
             if (typeof jQuery !== 'undefined' && toolbox.cookies.ready === true) {
                 if (toolbox.exec === false) {
                     clearInterval(interval);

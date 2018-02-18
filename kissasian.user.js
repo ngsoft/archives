@@ -667,10 +667,15 @@
     /**
      * Mod Cookies
      */
-    toolbox.wait = function() {
 
+    toolbox.wait = function() {
         toolbox.onload();
+
         interval = setInterval(function() {
+            if (toolbox.exec === true) {
+                clearInterval(interval);
+                return;
+            }
             if (typeof jQuery !== 'undefined' && toolbox.cookies.ready === true) {
                 if (toolbox.exec === false) {
                     clearInterval(interval);
@@ -678,13 +683,11 @@
                         $(document).ready(toolbox.load);
                         toolbox.exec = true;
                     })(jQuery);
-                } else {
-                    clearInterval(interval);
-                    return;
                 }
             }
         }, toolbox.interval);
     };
+
     toolbox.onload = function() {
 
         if (document.querySelector('img[alt = "KissCartoon"]') !== null) {
