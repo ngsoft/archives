@@ -111,7 +111,7 @@
             }
         },
         init: function(fn, interval = 50) {
-
+            toolbox.interval = interval;
             toolbox.ready(fn);
         },
         onload: function() {},
