@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.0.1
+// @version      5.1
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -25,6 +25,7 @@
 
     var uri = location.pathname;
     var url = location.href;
+
     if (uri.indexOf('/Special/') !== -1) {
         return;
     }
@@ -121,14 +122,19 @@
             }
         },
         init: function(fn, interval = 50) {
-
+            toolbox.interval = interval;
             toolbox.ready(fn);
         },
         onload: function() {},
         load: function() {},
         wait: function() {
             toolbox.onload();
+
             interval = setInterval(function() {
+                if (toolbox.exec === true) {
+                    clearInterval(interval);
+                    return;
+                }
                 if (typeof jQuery !== 'undefined') {
                     if (toolbox.exec === false) {
                         clearInterval(interval);
@@ -342,16 +348,20 @@
             }
         },
         init: function() {
+
+            console.debug('User Script Started');
+
             //fix login button
             if (uri == '/Login') {
                 $('#btnSubmit').hide().parent('div').append('<input type="submit" value="Sign in" />');
+                toolbox.loader.hide();
                 return;
             }
             if (uri == '/Register') {
+                toolbox.loader.hide();
                 return;
             }
-            toolbox.ui.addcss(kissasian.ui.css);
-            toolbox.loader.show();
+
             //check loggedin
             if ($('div#topHolderBox a[href*="/Login"]').length > 0) {
                 kissasian.loggedin = false;
@@ -668,14 +678,27 @@
                         $(document).ready(toolbox.load);
                         toolbox.exec = true;
                     })(jQuery);
+                } else {
+                    clearInterval(interval);
+                    return;
                 }
             }
         }, toolbox.interval);
     };
     toolbox.onload = function() {
+
+        if (document.querySelector('img[alt = "KissCartoon"]') !== null) {
+            console.debug('Running man, ignoring script execution');
+            toolbox.load = function() {};
+            return;
+        }
+
         toolbox.cookies.init();
         toolbox.loader.onshow = cssloader.show;
         toolbox.loader.onhide = cssloader.hide;
+        toolbox.loader.show();
+        toolbox.ui.addcss(kissasian.ui.css);
+
     };
     toolbox.init(kissasian.init);
 })();
