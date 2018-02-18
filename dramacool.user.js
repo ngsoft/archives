@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      5.6
+// @version      5.7
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*/*
@@ -364,12 +364,8 @@
                                     }
                                 });
 
-                            });
-
-                            $('.datagrild_nav').on('hide', function() {
-                                setTimeout(function() {
-                                    $('.datagrild_nav').show();
-                                }, 1000);
+                            }).on('click', function() {
+                                toolbox.cookies.set('switch', $(this).attr('data-tab'));
                             });
 
                         }
@@ -534,11 +530,14 @@
 
     //videouploader
     if (document.location.host.indexOf('vid') !== -1) {
-        toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
-        toolbox.loader.onshow = cssloader.show;
-        toolbox.loader.onhide = cssloader.hide;
-        toolbox.loader.show();
-        toolbox.ui.addcss(vu.ui.css);
+
+        toolbox.onload = function() {
+            toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
+            toolbox.loader.onshow = cssloader.show;
+            toolbox.loader.onhide = cssloader.hide;
+            toolbox.loader.show();
+            toolbox.ui.addcss(vu.ui.css);
+        };
         toolbox.init(vu.init);
         return;
     }
@@ -563,13 +562,13 @@
         }, toolbox.interval);
     };
 
-
-
-    toolbox.cookies.init();
-    toolbox.loader.onshow = faspinner.show;
-    toolbox.loader.onhide = faspinner.hide;
-    toolbox.loader.show();
-    toolbox.ui.addcss(dramacool.ui.css);
+    toolbox.onload = function() {
+        toolbox.cookies.init();
+        toolbox.loader.onshow = cssloader.show;
+        toolbox.loader.onhide = cssloader.hide;
+        toolbox.loader.show();
+        toolbox.ui.addcss(dramacool.ui.css);
+    };
 
     toolbox.init(dramacool.init);
 })();
