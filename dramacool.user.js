@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      5.8.1
+// @version      5.8.2
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -16,15 +16,13 @@
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.user.js
 // ==/UserScript==
 
-
+window.open = function() {};
+window.eval = function() {};
 
 (function() {
     window.adblock = false;
     window.adblock2 = false;
     window.turnoff = true;
-    window.open = function() {};
-    window.eval = function() {};
-
 
     /**
      * Userscript library
