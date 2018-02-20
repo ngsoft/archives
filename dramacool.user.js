@@ -550,37 +550,35 @@ window.eval = function() {};
     if (window.top != window.self) {
         return;
     }
+    /*
+     toolbox.wait = function() {
+     toolbox.onload();
 
-    toolbox.wait = function() {
-        toolbox.onload();
-
-        interval = setInterval(function() {
-            if (toolbox.exec === true) {
-                clearInterval(interval);
-                return;
-            }
-            if (typeof jQuery !== 'undefined' && toolbox.cookies.ready === true) {
-                if (toolbox.exec === false) {
-                    clearInterval(interval);
-                    (function($) {
-                        $(document).ready(toolbox.load);
-                        toolbox.exec = true;
-                    })(jQuery);
-                }
-            }
-        }, toolbox.interval);
-    };
-
+     interval = setInterval(function() {
+     if (toolbox.exec === true) {
+     clearInterval(interval);
+     return;
+     }
+     if (typeof jQuery !== 'undefined' && toolbox.cookies.ready === true) {
+     if (toolbox.exec === false) {
+     clearInterval(interval);
+     (function($) {
+     $(document).ready(toolbox.load);
+     toolbox.exec = true;
+     })(jQuery);
+     }
+     }
+     }, toolbox.interval);
+     };
+     */
     toolbox.onload = function() {
         toolbox.loader.onshow = cssloader.show;
         toolbox.loader.onhide = cssloader.hide;
         toolbox.loader.show();
         toolbox.ui.addcss(dramacool.ui.css);
+        toolbox.cookies.onready = dramacool.init;
     };
 
-    toolbox.init(function() {
-        toolbox.cookies.onready = dramacool.init;
-        toolbox.cookies.init();
-    });
+    toolbox.init(toolbox.cookies.init);
 })();
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.3
+// @version      5.4
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -109,13 +109,14 @@ window.eval = function() {};
                 }
                 Cookies.set(name, value, {expires: toolbox.cookies.expire});
             },
-
+            onready: function() {},
             init: function() {
                 toolbox.ui.addscript('https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js');
                 waitforcookies = setInterval(function() {
                     if (typeof Cookies !== 'undefined') {
                         clearInterval(waitforcookies);
                         toolbox.cookies.ready = true;
+                        toolbox.cookies.onready();
                     }
                 }, toolbox.interval);
             }
@@ -660,33 +661,6 @@ window.eval = function() {};
         }
     };
 
-
-
-
-    /**
-     * Mod Cookies
-     */
-
-    toolbox.wait = function() {
-        toolbox.onload();
-
-        interval = setInterval(function() {
-            if (toolbox.exec === true) {
-                clearInterval(interval);
-                return;
-            }
-            if (typeof jQuery !== 'undefined' && toolbox.cookies.ready === true) {
-                if (toolbox.exec === false) {
-                    clearInterval(interval);
-                    (function($) {
-                        $(document).ready(toolbox.load);
-                        toolbox.exec = true;
-                    })(jQuery);
-                }
-            }
-        }, toolbox.interval);
-    };
-
     toolbox.onload = function() {
 
         if (document.querySelector('img[alt = "KissCartoon"]') !== null || document.querySelector('img[alt = "jadopado"]') !== null) {
@@ -703,12 +677,12 @@ window.eval = function() {};
             return;
         }
 
-        toolbox.cookies.init();
         toolbox.loader.onshow = cssloader.show;
         toolbox.loader.onhide = cssloader.hide;
         toolbox.loader.show();
         toolbox.ui.addcss(kissasian.ui.css);
+        toolbox.cookies.onready = kissasian.init;
 
     };
-    toolbox.init(kissasian.init);
+    toolbox.init(toolbox.cookies.init);
 })();
