@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      5.9
+// @version      5.9.1
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -97,13 +97,14 @@ window.eval = function() {};
                 }
                 Cookies.set(name, value, {expires: toolbox.cookies.expire});
             },
-
+            onready: function() {},
             init: function() {
                 toolbox.ui.addscript('https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js');
                 waitforcookies = setInterval(function() {
                     if (typeof Cookies !== 'undefined') {
                         clearInterval(waitforcookies);
                         toolbox.cookies.ready = true;
+                        toolbox.cookies.onready();
                     }
                 }, toolbox.interval);
             }
