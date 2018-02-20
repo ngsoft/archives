@@ -572,13 +572,15 @@ window.eval = function() {};
     };
 
     toolbox.onload = function() {
-        toolbox.cookies.init();
         toolbox.loader.onshow = cssloader.show;
         toolbox.loader.onhide = cssloader.hide;
         toolbox.loader.show();
         toolbox.ui.addcss(dramacool.ui.css);
     };
 
-    toolbox.init(dramacool.init);
+    toolbox.init(function() {
+        toolbox.cookies.onready = dramacool.init;
+        toolbox.cookies.init();
+    });
 })();
 
