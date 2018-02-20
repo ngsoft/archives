@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.2.1
+// @version      5.3
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -25,7 +25,7 @@ window.eval = function() {};
     var uri = location.pathname;
     var url = location.href;
 
-    if (uri.indexOf('/Special/') !== -1) {
+    if (uri.indexOf('/Special/') !== -1 && url.indexOf('kissasian') !== -1) {
         return;
     }
     if (url.indexOf('kissasian.com') !== -1) {
