@@ -556,6 +556,7 @@ window.eval = function() {};
         toolbox.cookies.onready = dramacool.init;
     };
 
+
     toolbox.init(toolbox.cookies.init);
 })();
 
