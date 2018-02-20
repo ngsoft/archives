@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MyAsian.TV
 // @namespace    https://github.com/ngsoft
-// @version      1.5
+// @version      1.6
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*myasiantv*/*
@@ -158,9 +158,11 @@ window.eval = function() {};
 
     var atv = {
         ui: {
-            css: `  .as, [data-player-enabled] div.play > i,[data-player-enabled] #content > .content-right, [data-player-enabled] #content > .content-line-2, div.play div.share, .addthis_toolbox, #content > .episode-new, .movie-random, a.closeads, a.report, .comment, #disqus_thread, #geniee_overlay, .PubAdAI, .trc_related_container, .av-right, .hidden {display: none!important;}
+            css: `  div#content-left > div.menu > ul.view, .as, [data-player-enabled] div.play > i,[data-player-enabled] #content > .content-right, [data-player-enabled] #content > .content-line-2, div.play div.share, .addthis_toolbox, #content > .episode-new, .movie-random, a.closeads, a.report, .comment, #disqus_thread, #geniee_overlay, .PubAdAI, .trc_related_container, .av-right, .hidden {display: none!important;}
                     [data-player-enabled] #listep > h3, [data-player-enabled] #listep >ul , [data-player-enabled] #content > .content-left{float: none; width: auto;}
-                    div#mediaplayer{z-index: 50;}`
+                    div#mediaplayer{z-index: 50;}
+                    div#content-left > div.menu > ul.view > li.current {border-right: 0;}
+                `
         },
 
         init: function() {
@@ -188,6 +190,24 @@ window.eval = function() {};
             $('#player > iframe').addClass('ignored');
             $('#mediaplayer > iframe').addClass('ignored');
             $('iframe:not(.ignored)').remove();
+
+            $('div#content-left > div.menu > ul.view > li').each(function() {
+                $(this).off("click");
+                $(this).find('a').on('click', function(e) {
+                    e.preventDefault();
+                    $(this).parents('ul.view').find('a').removeClass('current');
+                    $(this).addClass('current');
+
+                });
+            });
+
+            $('div#content-left > div.menu > ul.tab > li:has(a.m2)').click();
+            $('div#content-left > div.episode-new.lastest > ul.list.lastest a').each(function() {
+                link = $(this).attr('href');
+                link = link.replace(/episode\-(.*?)$/, '');
+                $(this).attr('href', link);
+            });
+
 
 
 
