@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramanice UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      3.0
+// @version      3.0.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*dramanice.*/*
