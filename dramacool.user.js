@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.0
+// @version      6.0.1
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -550,7 +550,7 @@ window.eval = function() {};
 
     toolbox.onload = function() {
 
-        if (document.querySelector('ul[class = "char-list"]') === null) {
+        if (document.querySelector('ul[class = "char-list"]') === null && document.querySelector('[class = "list_search"]') === null) {
             console.debug('No Container root, stopping script execution');
             toolbox.load = function() {};
             toolbox.exec = true;
