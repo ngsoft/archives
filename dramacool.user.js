@@ -550,7 +550,7 @@ window.eval = function() {};
 
     toolbox.onload = function() {
 
-        if (document.querySelector('ul[class = "char-list"]') === null && document.querySelector('[class = "list_search"]') === null) {
+        if (document.querySelector('footer') === null) {
             console.debug('No Container root, stopping script execution');
             toolbox.load = function() {};
             toolbox.exec = true;
