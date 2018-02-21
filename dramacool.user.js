@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      5.9.2
+// @version      6.0
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -149,7 +149,7 @@ window.eval = function() {};
         drama: true,
         ui: {
             css: `
-                    div.header ul.auth, div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .slide_mobilde, .content-right .fanpage, .show-all, .btn-show-all, .hidden{
+                    div.header ul.auth, div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .content-right .fanpage, .show-all, .btn-show-all, .hidden{
                             display: none !important;
                     }
                     .mediaplayer .content-left{width:100%!important;}
@@ -399,7 +399,7 @@ window.eval = function() {};
             if (document.location.href.match(/\-episode\-/))
                 dramacool.ui.player.init();
             $('.ads-outsite').remove();
-            $('#disqus_thread').remove();
+            //$('#disqus_thread').remove();
             $('.block-watch').find('div').first().remove();
             $('.watch-drama > iframe').remove();
             $("ul.tab li:contains('Ads')").removeClass('selected').hide();
@@ -549,11 +549,23 @@ window.eval = function() {};
     }
 
     toolbox.onload = function() {
+
+        if (document.querySelector('ul[class = "char-list"]') === null) {
+            console.debug('No Container root, stopping script execution');
+            toolbox.load = function() {};
+            toolbox.exec = true;
+            return;
+        }
+
         toolbox.loader.onshow = cssloader.show;
         toolbox.loader.onhide = cssloader.hide;
         toolbox.loader.show();
         toolbox.ui.addcss(dramacool.ui.css);
         toolbox.cookies.onready = dramacool.init;
+        if (el = document.getElementById('disqus_thread')) {
+            el.remove();
+        }
+
     };
 
 
