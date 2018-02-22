@@ -1,16 +1,23 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      1.1
+// @version      1.2
 // @description  UI Remaster
 // @author       daedelus
-// @include     *://*dramago.*/*
+// @include     *://*.dramago.*/*
 // @include     *://*gooddrama.*/*
 // @include     *://*animewow.*/*
 // @include     *://*animetoon.*/*
 // @include     *://*animeplus.*/*
 // @include     *://*.gogoanime.to/*
+// @include     *://videozoo.me/videojs/*
+// @include     *://playpanda.net/embed.php?*
+// @include     *://play44.net/*
+// @include     *://www.easyvideo.me/*
+// @include     *://easyvideo.me/*
+// @include     *://video66.org/*
 // @exclude     *://www.gogoanime.to/*
+// @exclude     *://*.*/ads/*
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramago.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/dramago.user.js
@@ -20,12 +27,6 @@ window.open = function() {};
 window.eval = function() {};
 
 (function() {
-
-    if (document.location.host.indexOf('www.gogoanime') !== -1) {
-        return;
-    }
-
-
 
     /**
      * Userscript library
@@ -168,33 +169,6 @@ window.eval = function() {};
     };
 
     /**
-     * @link https://www.pexels.com/blog/css-only-loaders/ CSS Only Loaders
-     */
-    var cssloader = {
-        css: `.cssloader{margin:50px;height:28px;width:28px;animation:rotate .8s infinite linear;border:8px solid #fff;border-right-color:transparent;border-radius:50%}@keyframes rotate{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}div#spinner{display : block;position : fixed;z-index: 100;background-color: #000; opacity: 0.8; background-repeat : no-repeat;background-position : center;left : 0;bottom : 0;right : 0;  top : 0;}div#spinner > div{z-index : 101;position: absolute; top: 50%; left:50%; margin: -14px 0 0 -14px; opacity:1; color: #fff;}`,
-
-        show: function() {
-            if (typeof cssloader.loader === 'undefined') {
-                toolbox.ui.addcss(cssloader.css);
-                cssloader.loader = document.createElement('div');
-                cssloader.loader.setAttribute('id', 'spinner');
-                loader = document.createElement('div');
-                loader.setAttribute('class', 'cssloader');
-                cssloader.loader.appendChild(loader);
-
-            }
-            document.body.appendChild(cssloader.loader);
-        },
-        hide: function() {
-            document.body.removeChild(cssloader.loader);
-
-        }
-    };
-
-
-
-
-    /**
      * Sites Mods
      */
 
@@ -205,7 +179,6 @@ window.eval = function() {};
                     [id*="comments"],iframe, div#body > div.right_col, div.ad, .hidden, div[id^="BB_SK"], div[id^="bb_sa"],div[id*="rcjsload"], div#Mad, div#M_AD, div#mini-announcement, div.s_right_col, div.l_right_col div#sidebar div#home_sidebar{display: none!important;}
                     div.s_left_col, div#body > div.left_col{float: none!important; width: auto!important;}
                     #options_bar, #genre_list{text-align: center;}
-                body{background: none!important;}
                 #streams iframe{display: block!important;}
 
             `,
@@ -231,26 +204,7 @@ window.eval = function() {};
         },
 
         init: function() {
-            console.debug("User script dramago started for " + document.location.href);
-
-            if ($('div#streams').length > 0) {
-                dramago.player = true;
-            }
-
-            dramago.ui.epl();
-
-            if (dramago.player) {
-                dramago.ui.player.init();
-            }
-
-
-
-
-            toolbox.loader.setevents();
-            toolbox.loader.hide();
-
-
-
+            //no need for jquery there
         }
     };
 
@@ -258,52 +212,79 @@ window.eval = function() {};
         loaded: false,
         ui: {
             css: `
-                        .sharetools-overlay, .hidden, #box_0, div.safeuploada-filter{display: none!important;}
+                        .jhasvdjhas, .sharetools-overlay, .hidden, #box_0, div.safeuploada-filter{display: none!important;}
                         div#realdl{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999; background-color: #000; padding: .5em 0;}
                         div#realdl a{color: #fff; text-decoration: none;}
                 `
         },
         addlink: function() {
-            console.debug('user script adding download link');
-            realdl = document.createElement('div');
-            realdl.setAttribute('id', 'realdl');
-            a = document.createElement('a');
-            a.setAttribute('href', '');
-            a.text = 'DIRECT PLAY';
-            realdl.appendChild(a);
-            document.body.appendChild(realdl);
-            $('div#realdl a').attr('href', $('video.jw-video').attr('src'));
+            if ($('div#realdl').length < 1) {
+                console.debug('user script adding download link');
+                realdl = document.createElement('div');
+                realdl.setAttribute('id', 'realdl');
+                a = document.createElement('a');
+                a.setAttribute('href', '');
+                a.text = 'DIRECT PLAY';
+                realdl.appendChild(a);
+                document.body.appendChild(realdl);
+            }
 
-            $('video.jw-video').on('loadeddata', function(e) {
-                $('div#realdl a').attr('href', $(this).attr('src'));
-            }).on('play', function(e) {
-                $('div#realdl').addClass('hidden');
-                $('div#realdl a').attr('href', $(this).attr('src'));
-            }).on('pause', function(e) {
-                $('div#realdl').removeClass('hidden');
-                $('div#realdl a').attr('href', $(this).attr('src'));
+
+        },
+        onload: function() {
+            toolbox.load = vids.init;
+            toolbox.exec = false;
+        },
+        getscriptvideolink: function() {
+            $('script:contains("var player")').each(function() {
+                script = $(this).text();
+                regex = new RegExp(/file: \"http(.*?)\",/);
+                results = regex.exec(script);
+                if (results !== null) {
+                    href = 'http' + results[1];
+                    vids.addlink();
+                    $('div#realdl a').attr('href', href);
+                }
+
             });
-
-
-
-
 
         },
         init: function() {
             console.debug("User script vids started for " + document.location.href);
-
             vids.loaded = true;
             toolbox.ui.addcss(vids.ui.css);
             window.onclick = function() {};
             document.onclick = function() {};
             document.body.onclick = function() {};
 
+            if ($('div#flowplayer').length > 0) {
+                return;
+            }
+            vids.getscriptvideolink();
             interval = setInterval(function() {
-                if ($('video.jw-video').length > 0) {
+
+                if ($('div:contains("Setup Timeout Error")').length > 0) {
+                    clearInterval(interval);
+                    console.debug('vid userscript error : Setup Timeout Error, halting script');
+                    return;
+                }
+
+                if ($('video').length > 0) {
                     clearInterval(interval);
                     //removeAd();
                     vids.addlink();
-                    $('video.jw-video').trigger('pause');
+                    $('video').on('loadeddata', function(e) {
+                        $('div#realdl a').attr('href', $(this).attr('src'));
+                    }).on('play', function() {
+                        $('div#realdl').addClass('hidden');
+                        $('div#realdl a').attr('href', $(this).attr('src'));
+                    }).on('pause', function() {
+                        $('div#realdl').removeClass('hidden');
+                        $('div#realdl a').attr('href', $(this).attr('src'));
+                    }).each(function() {
+                        vids.addlink();
+                        $('div#realdl a').attr('href', $(this).attr('src'));
+                    });
                 }
             }, 50);
 
@@ -316,37 +297,44 @@ window.eval = function() {};
      * Script start
      */
 
-
-    toolbox.loader.onshow = cssloader.show;
-    toolbox.loader.hide = cssloader.hide;
-    //toolbox.autoloadjquery = true;
-
-
     toolbox.onload = function() {
 
-        if (document.querySelector('div[id="body"]') === null) {
+        if (document.getElementById('body') === null) {
 
-            if (document.querySelector('div[id="myvid"]') !== null) {
+            if (document.querySelector('div[id="myvid"]') !== null || document.querySelector('div[id="flowplayer"]') !== null) {
                 console.debug('detected div#myvid in ' + document.location.href + ', using video script.');
-                toolbox.load = vids.init;
+                vids.onload();
                 return;
             }
 
-            console.debug('No Container root, stopping script execution');
-            toolbox.exec = true;
+            console.debug('No Container root, stopping script execution ("' + document.location.href + '")');
             return;
         }
         if (window.top !== window.self) {
             console.debug('inside iframe, halting script execution');
-            toolbox.exec = true;
             return;
         }
-        console.debug('User script loading "https://code.jquery.com/jquery-3.2.1.min.js"');
-        toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
-        toolbox.loader.show();
+
+        console.debug("User script dramago started for " + document.location.href);
         toolbox.ui.addcss(dramago.ui.css);
+
+        if (el = document.getElementById('disqus_thread')) {
+            el.remove();
+        }
+
+        list_iframe = document.getElementsByTagName('iframe');
+        if (list_iframe.length > 0) {
+            for (var i = 0; i < list_iframe.length; i++) {
+                iframe = list_iframe[i];
+                if (iframe.src.indexOf('/ads/') !== -1) {
+                    iframe.remove();
+                }
+            }
+        }
+
     };
 
+    toolbox.exec = true;
     toolbox.init(dramago.init);
 
 })();

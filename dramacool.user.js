@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.0.2
+// @version      6.0.3
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -33,6 +33,10 @@ window.eval = function() {};
         exec: false,
         //interval for jquery check
         interval: 50,
+        //exec on jquery $(document).ready() ?
+        ondocumentready: true,
+        //auto load jquery
+        autoloadjquery: false,
 
         loader: {
             timeout: 1500,
@@ -97,8 +101,12 @@ window.eval = function() {};
                 }
                 Cookies.set(name, value, {expires: toolbox.cookies.expire});
             },
+            remove: function(name) {
+                Cookies.remove(name);
+            },
             onready: function() {},
             init: function() {
+                console.debug('User script loading "https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"');
                 toolbox.ui.addscript('https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js');
                 waitforcookies = setInterval(function() {
                     if (typeof Cookies !== 'undefined') {
@@ -116,6 +124,10 @@ window.eval = function() {};
         onload: function() {},
         load: function() {},
         wait: function() {
+            if (toolbox.autoloadjquery !== false) {
+                console.debug('User script loading "https://code.jquery.com/jquery-3.2.1.min.js"');
+                toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
+            }
             toolbox.onload();
             if (toolbox.exec === true) {
                 return;
@@ -129,7 +141,12 @@ window.eval = function() {};
                     if (toolbox.exec === false) {
                         clearInterval(interval);
                         (function($) {
-                            $(document).ready(toolbox.load);
+                            if (toolbox.ondocumentready === false) {
+                                toolbox.load();
+                            } else {
+                                console.debug('User script waiting for $(document).ready()');
+                                $(document).ready(toolbox.load);
+                            }
                             toolbox.exec = true;
                         })(jQuery);
                     }
