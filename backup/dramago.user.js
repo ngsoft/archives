@@ -15,7 +15,7 @@
 // @include     *://*yourupload.*/*
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramago.user.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/dramago.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/backup/master/dramago.user.js
 // ==/UserScript==
 
 
