@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      1.2
+// @version      1.3
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -232,6 +232,7 @@ window.eval = function() {};
 
         },
         onload: function() {
+            toolbox.ui.addcss(vids.ui.css);
             toolbox.load = vids.init;
             toolbox.exec = false;
         },
@@ -252,7 +253,6 @@ window.eval = function() {};
         init: function() {
             console.debug("User script vids started for " + document.location.href);
             vids.loaded = true;
-            toolbox.ui.addcss(vids.ui.css);
             window.onclick = function() {};
             document.onclick = function() {};
             document.body.onclick = function() {};
