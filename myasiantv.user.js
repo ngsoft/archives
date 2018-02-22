@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         MyAsian.TV
 // @namespace    https://github.com/ngsoft
-// @version      1.6
+// @version      1.7
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*myasiantv*/*
 // @include     *://dramabus.*/*
+// @include     *://myasian.tv/*
 // @noframes
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/myasiantv.user.js
@@ -15,6 +16,7 @@
 window.open = function() {};
 window.eval = function() {};
 (function() {
+
     /**
      * Userscript library
      */
@@ -88,31 +90,36 @@ window.eval = function() {};
                 }
                 Cookies.set(name, value, {expires: toolbox.cookies.expire});
             },
-
+            onready: function() {},
             init: function() {
                 toolbox.ui.addscript('https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js');
                 waitforcookies = setInterval(function() {
                     if (typeof Cookies !== 'undefined') {
                         clearInterval(waitforcookies);
                         toolbox.cookies.ready = true;
+                        toolbox.cookies.onready();
                     }
                 }, toolbox.interval);
             }
         },
         init: function(fn, interval = 50) {
-
+            toolbox.interval = interval;
             toolbox.ready(fn);
         },
         onload: function() {},
         load: function() {},
         wait: function() {
             toolbox.onload();
+
             interval = setInterval(function() {
+                if (toolbox.exec === true) {
+                    clearInterval(interval);
+                    return;
+                }
                 if (typeof jQuery !== 'undefined') {
                     if (toolbox.exec === false) {
                         clearInterval(interval);
                         (function($) {
-                            //toolbox.load();
                             $(document).ready(toolbox.load);
                             toolbox.exec = true;
                         })(jQuery);
@@ -216,6 +223,16 @@ window.eval = function() {};
     };
 
     toolbox.onload = function() {
+
+        if (document.location.host === 'myasian.tv') {
+            document.location.href = document.location.href.replace('myasian.tv', 'myasiantv.se');
+            toolbox.exec = true;
+            toolbox.load = function() {};
+            return;
+        }
+
+
+
         toolbox.loader.onshow = cssloader.show;
         toolbox.loader.onhide = cssloader.hide;
         toolbox.loader.timeout = 200;
@@ -232,20 +249,6 @@ window.eval = function() {};
         }
     };
 
-    toolbox.wait = function() {
-        toolbox.onload();
-        interval = setInterval(function() {
-            if (typeof jQuery !== 'undefined') {
-                if (toolbox.exec === false) {
-                    clearInterval(interval);
-                    toolbox.exec = true;
-                    (function($) {
-                        toolbox.load();
-                    })(jQuery);
-                }
-            }
-        }, toolbox.interval);
-    };
 
     if (document.location.host.indexOf('dramabus') !== -1) {
         toolbox.loader.show = function() {};
