@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.5.1
+// @version      5.5.2
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -130,7 +130,9 @@ window.eval = function() {};
         load: function() {},
         wait: function() {
             toolbox.onload();
-
+            if (toolbox.exec === true) {
+                return;
+            }
             interval = setInterval(function() {
                 if (toolbox.exec === true) {
                     clearInterval(interval);

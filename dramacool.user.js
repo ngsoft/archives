@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.0.1
+// @version      6.0.2
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -117,7 +117,9 @@ window.eval = function() {};
         load: function() {},
         wait: function() {
             toolbox.onload();
-
+            if (toolbox.exec === true) {
+                return;
+            }
             interval = setInterval(function() {
                 if (toolbox.exec === true) {
                     clearInterval(interval);
