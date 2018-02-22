@@ -182,25 +182,30 @@ window.eval = function() {};
     var fd = {
         css: `
                 .hidden{display: none!important;}
-                iframe[src*="/adv/"], div[class*="ad"]{display: none!important;}
+                iframe:not(#videoembed), div[class*="ad"]{display: none!important;}
             `,
         init: function() {
             console.debug('user script started for ' + location.href);
-            toolbox.loader.setevents();
-            toolbox.loader.hide();
             window.onclick = function() {};
             document.onclick = function() {};
             document.body.onclick = function() {};
+            $('iframe:not(#videoembed)').remove();
 
         }
     };
 
-    toolbox.loader.onshow = cssloader.show;
-    toolbox.loader.onhide = cssloader.hide;
-    toolbox.loader.timeout = 50;
     toolbox.onload = function() {
+        if (document.getElementById('menu') === null) {
+            console.debug('No Container root, stopping script execution ("' + document.location.href + '")');
+            toolbox.exec = true;
+            return;
+        }
+
+
         toolbox.ui.addcss(fd.css);
-        toolbox.loader.show();
+        if (el = document.getElementById('disqus_thread')) {
+            el.remove();
+        }
     };
 
 
