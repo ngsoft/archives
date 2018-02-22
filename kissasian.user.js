@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.4
+// @version      5.5
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -530,6 +530,7 @@ window.eval = function() {};
             } else {
                 val = false;
                 autoserver.checkbox.find('input').first().removeAttr('checked');
+                Cookies.remove('lastserver');
             }
             toolbox.cookies.set('automode', val);
             return val;
@@ -555,7 +556,6 @@ window.eval = function() {};
                     }
 
                 });
-
             }
         },
         disable: function() {
@@ -585,6 +585,7 @@ window.eval = function() {};
             if (kissasian.ui.player.loaded == false) {
                 autoserver.checkbox = kissasian.ui.nav.add(`<input type="checkbox" disabled /> Auto Server`, '#');
             } else {
+
                 autoserver.server.name = $('select#selectServer option[selected]').first().html().trim();
                 server = $('select#selectServer option[selected]').attr('value');
                 if (!server.match(/^http/)) {
@@ -601,7 +602,6 @@ window.eval = function() {};
                     $('select#selectEpisode option[value*="id=' + currentid + '"]').attr('selected', true);
 
                 }
-
             }
 
 
@@ -611,8 +611,30 @@ window.eval = function() {};
             });
             autoserver.checkbox.off('click').on('click', autoserver.click);
 
-            if (autoserver.checked())
+            if (autoserver.checked()) {
+                lastserver = toolbox.cookies.get('lastserver');
+                if (lastserver !== null) {
+                    server = $('select#selectServer option[value*="s=' + lastserver + '"]');
+                    if (server.length > 0) {
+                        if ($('select#selectServer option[value*="s=' + lastserver + '"][selected]').length < 1) {
+                            location.href = server.attr('value');
+                            return;
+                        }
+
+
+                    }
+                }
                 autoserver.enable();
+                if (kissasian.ui.player.loaded !== false) {
+                    toolbox.cookies.set('lastserver', autoserver.server.value);
+                }
+            }
+
+            $('select#selectServer').off('change').removeAttr('onchange').on('change', function() {
+                Cookies.remove('lastserver');
+                location.href = this.value;
+            });
+
         }
     };
     //google search
