@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         fastdrama.co
 // @namespace    https://github.com/ngsoft
-// @version      1.0
-// @description  removes adds + simplify UI + Mobile mode
+// @version      1.1
+// @description  simplify UI
 // @author       daedelus
 // @include     *://fastdrama.co/*
 // @noframes
