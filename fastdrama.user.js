@@ -154,31 +154,6 @@ window.eval = function() {};
         }
     };
 
-    /**
-     * @link https://www.pexels.com/blog/css-only-loaders/ CSS Only Loaders
-     */
-    var cssloader = {
-        css: `.cssloader{margin:50px;height:28px;width:28px;animation:rotate .8s infinite linear;border:8px solid #fff;border-right-color:transparent;border-radius:50%}@keyframes rotate{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}div#spinner{display : block;position : fixed;z-index: 100;background-color: #000; opacity: 0.8; background-repeat : no-repeat;background-position : center;left : 0;bottom : 0;right : 0;  top : 0;}div#spinner > div{z-index : 101;position: absolute; top: 50%; left:50%; margin: -14px 0 0 -14px; opacity:1; color: #fff;}`,
-
-        show: function() {
-            if (typeof cssloader.loader === 'undefined') {
-                toolbox.ui.addcss(cssloader.css);
-                cssloader.loader = document.createElement('div');
-                cssloader.loader.setAttribute('id', 'spinner');
-                loader = document.createElement('div');
-                loader.setAttribute('class', 'cssloader');
-                cssloader.loader.appendChild(loader);
-
-            }
-            document.body.appendChild(cssloader.loader);
-        },
-        hide: function() {
-            document.body.removeChild(cssloader.loader);
-
-        }
-    };
-
-
     var fd = {
         css: `
                 .hidden{display: none!important;}
@@ -189,7 +164,30 @@ window.eval = function() {};
             window.onclick = function() {};
             document.onclick = function() {};
             document.body.onclick = function() {};
-            $('iframe:not(#videoembed)').remove();
+
+            $('div.tabcontent a[href*="/watch-online/"]').each(function() {
+                image = $(this).parent('div.image');
+                if (image.length > 0) {
+                    image.find('span.status').on('click', function(e) {
+                        e.preventDefault();
+                        href = $(this).parent('div.image').find('a[data-original]').first().attr('data-original');
+                        if (href.length > 0) {
+                            document.location.href = href;
+                        }
+                    });
+                }
+                href = $(this).attr('href');
+                $(this).attr('data-original', href);
+                href = href.replace('/watch-online/', '/');
+                href = href.replace(/\/episode\-([0-9]+)/, '');
+                $(this).attr('href', href);
+
+
+            });
+
+            setTimeout(function() {
+                $('iframe:not(#videoembed)').remove();
+            }, 5000);
 
         }
     };
