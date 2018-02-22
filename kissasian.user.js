@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.5
+// @version      5.5.1
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
 // @include     *://*kissanime.*/*
+// @include     *://*kissmanga.*/*
 // @noframes
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/kissasian.user.js
@@ -469,6 +470,9 @@ window.eval = function() {};
             });
         },
         init: function() {
+            if (location.origin.indexOf('anime') === -1 && location.origin.indexOf('asian') === -1) {
+                return;
+            }
             betamode.checkbox = $(betamode.checkbox);
             kissasian.ui.nav.separator();
             kissasian.ui.nav.addhtml(betamode.checkbox);
@@ -582,6 +586,9 @@ window.eval = function() {};
         },
 
         init: function() {
+            if (location.origin.indexOf('anime') === -1 && location.origin.indexOf('asian') === -1) {
+                return;
+            }
             if (kissasian.ui.player.loaded == false) {
                 autoserver.checkbox = kissasian.ui.nav.add(`<input type="checkbox" disabled /> Auto Server`, '#');
             } else {
