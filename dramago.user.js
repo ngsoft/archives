@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      1.5
+// @version      1.6
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -19,6 +19,7 @@
 // @include     *://video66.org/*
 // @include     *://playbb.me/*
 // @include     *://www.yourupload.com/*
+// @include     *://www.bitvid.sx/embed/*
 // @exclude     *://www.gogoanime.to/*
 // @exclude     *://*.*/ads/*
 // @grant none
@@ -225,7 +226,7 @@ window.eval = function() {};
         loaded: false,
         ui: {
             css: `
-                        .jhasvdjhas, .sharetools-overlay, .hidden, #box_0, div.safeuploada-filter{display: none!important;}
+                        #adv1, .jhasvdjhas, .sharetools-overlay, .hidden, #box_0, div.safeuploada-filter{display: none!important;}
                         div#realdl{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999; background-color: #000; padding: .5em 0;}
                         div#realdl a{color: #fff; text-decoration: none;}
                 `
@@ -314,7 +315,7 @@ window.eval = function() {};
 
         if (document.getElementById('page') === null) {
 
-            if (document.querySelector('div[id="myvid"]') !== null || document.querySelector('div[id="flowplayer"]') !== null || (document.location.host.indexOf('yourupload') !== -1 && document.getElementById('player') !== null)) {
+            if (document.querySelector('div[id="myvid"]') !== null || document.querySelector('div[id="flowplayer"]') !== null || (document.location.host.indexOf('yourupload') !== -1 && document.getElementById('player') !== null) || (document.location.host.indexOf('bitvid.sx') !== -1 && document.getElementById('player') !== null)) {
 
                 console.debug('detected div#myvid in ' + document.location.href + ', using video script.');
                 vids.onload();
