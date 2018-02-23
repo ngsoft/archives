@@ -6,6 +6,7 @@
 // @author       daedelus
 // @include     *://*.dramago.*/*
 // @include     *://*gooddrama.*/*
+// @include     *://*goodanime.*/*
 // @include     *://*animewow.*/*
 // @include     *://*animetoon.*/*
 // @include     *://*animeplus.*/*
@@ -176,38 +177,43 @@ window.eval = function() {};
         player: false,
         ui: {
             css: `
-                    [id*="comments"],iframe, div#body > div.right_col, div.ad, .hidden, div[id^="BB_SK"], div[id^="bb_sa"],div[id*="rcjsload"], div#Mad, div#M_AD, div#mini-announcement, div.s_right_col, div.l_right_col div#sidebar div#home_sidebar{display: none!important;}
+                    .premiumdll, div#eps_blocks, [id*="comments"],iframe, div#body > div.right_col, div.ad, .hidden, div[id^="BB_SK"], div[id^="bb_sa"],div[id*="rcjsload"], div#Mad, div#M_AD, div#mini-announcement, div.s_right_col, div.l_right_col div#sidebar div#home_sidebar{display: none!important;}
                     div.s_left_col, div#body > div.left_col{float: none!important; width: auto!important;}
                     #options_bar, #genre_list{text-align: center;}
-                #streams iframe{display: block!important;}
+                #streams iframe, iframe.ignored {display: block!important;}
 
-            `,
-            epl: function() {
-                if ($('div#videos').length > 0) {
-                    $('div#videos ul').html($('div#videos ul > li').get().reverse());
-                    $('ul.pagination li button').on('click', toolbox.loader.show);
-                    $('ul.pagination li button.selected').off('click');
-                }
-            },
-            player: {
-                init: function() {
-                    console.debug('player loaded');
-                    /*
-
-                     $('#streams div.vmargin').each(function() {
-                     if ($(this).find('iframe[src*="yucache"]').length < 1) {
-                     $(this).addClass('hidden');
-                     }
-                     });*/
-                }
-            }
+            `
         },
 
         init: function() {
             //no need for jquery there
+            console.debug('user script dramago jquery content loaded');
+
+            setTimeout(function() {
+                console.debug("removing unrequired iframes");
+                $('div#streams iframe').addClass('ignored');
+                $('div.postcontent > p > iframe').addClass('ignored');
+                $('iframe:not(.ignored)').remove();
+            }, 5000);
+
             $('div.box').each(function() {
-                if ($(this).find('h2:contains("Recent Manga Releases")').length > 0) {
-                    $(this).addClass('hidden');
+                if ($(this).parents('#container').length > 0) {
+                    return;
+                }
+                title = $(this).find('h2').first();
+                if (title.length > 0) {
+                    title.on('click', function() {
+                        el = $(this).parent('.box').find('div').first();
+
+                        if (el.data('visible') !== true) {
+                            el.slideDown().data('visible', true);
+                            return;
+                        }
+                        el.slideUp().data('visible', false);
+                        //el.addClass('hidden');
+                    });
+
+                    $(this).find('div').first().hide().data('visible', false);
                 }
             });
         }
@@ -304,7 +310,7 @@ window.eval = function() {};
 
     toolbox.onload = function() {
 
-        if (document.getElementById('body') === null) {
+        if (document.getElementById('page') === null) {
 
             if (document.querySelector('div[id="myvid"]') !== null || document.querySelector('div[id="flowplayer"]') !== null) {
                 console.debug('detected div#myvid in ' + document.location.href + ', using video script.');
@@ -324,20 +330,17 @@ window.eval = function() {};
 
         console.debug("User script dramago started for " + document.location.href);
         toolbox.ui.addcss(dramago.ui.css);
+        //toolbox.ui.loadcss('https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css');
+
+        toolbox.autoloadjquery = true;
 
         if (el = document.getElementById('disqus_thread')) {
             el.remove();
         }
 
-        list_iframe = document.getElementsByTagName('iframe');
-        if (list_iframe.length > 0) {
-            for (var i = 0; i < list_iframe.length; i++) {
-                iframe = list_iframe[i];
-                if (iframe.src.indexOf('/ads/') !== -1) {
-                    iframe.remove();
-                }
-            }
-        }
+
+
+
 
     };
 
