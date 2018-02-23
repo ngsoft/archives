@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      1.4
+// @version      1.5
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -17,6 +17,8 @@
 // @include     *://www.easyvideo.me/*
 // @include     *://easyvideo.me/*
 // @include     *://video66.org/*
+// @include     *://playbb.me/*
+// @include     *://www.yourupload.com/*
 // @exclude     *://www.gogoanime.to/*
 // @exclude     *://*.*/ads/*
 // @grant none
@@ -312,7 +314,8 @@ window.eval = function() {};
 
         if (document.getElementById('page') === null) {
 
-            if (document.querySelector('div[id="myvid"]') !== null || document.querySelector('div[id="flowplayer"]') !== null) {
+            if (document.querySelector('div[id="myvid"]') !== null || document.querySelector('div[id="flowplayer"]') !== null || (document.location.host.indexOf('yourupload') !== -1 && document.getElementById('player') !== null)) {
+
                 console.debug('detected div#myvid in ' + document.location.href + ', using video script.');
                 vids.onload();
                 return;
