@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      1.3
+// @version      1.4
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -128,11 +128,11 @@ window.eval = function() {};
         onload: function() {},
         load: function() {},
         wait: function() {
+            toolbox.onload();
             if (toolbox.autoloadjquery !== false) {
                 console.debug('User script loading "https://code.jquery.com/jquery-3.2.1.min.js"');
                 toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
             }
-            toolbox.onload();
             if (toolbox.exec === true) {
                 return;
             }
@@ -205,6 +205,11 @@ window.eval = function() {};
 
         init: function() {
             //no need for jquery there
+            $('div.box').each(function() {
+                if ($(this).find('h2:contains("Recent Manga Releases")').length > 0) {
+                    $(this).addClass('hidden');
+                }
+            });
         }
     };
 
@@ -308,10 +313,12 @@ window.eval = function() {};
             }
 
             console.debug('No Container root, stopping script execution ("' + document.location.href + '")');
+            toolbox.exec = true;
             return;
         }
         if (window.top !== window.self) {
             console.debug('inside iframe, halting script execution');
+            toolbox.exec = true;
             return;
         }
 
@@ -334,7 +341,7 @@ window.eval = function() {};
 
     };
 
-    toolbox.exec = true;
+
     toolbox.init(dramago.init);
 
 })();

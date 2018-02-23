@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.0.3
+// @version      6.1
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -124,11 +124,11 @@ window.eval = function() {};
         onload: function() {},
         load: function() {},
         wait: function() {
+            toolbox.onload();
             if (toolbox.autoloadjquery !== false) {
                 console.debug('User script loading "https://code.jquery.com/jquery-3.2.1.min.js"');
                 toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
             }
-            toolbox.onload();
             if (toolbox.exec === true) {
                 return;
             }

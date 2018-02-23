@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.5.3
+// @version      5.6
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -137,11 +137,11 @@ window.eval = function() {};
         onload: function() {},
         load: function() {},
         wait: function() {
+            toolbox.onload();
             if (toolbox.autoloadjquery !== false) {
                 console.debug('User script loading "https://code.jquery.com/jquery-3.2.1.min.js"');
                 toolbox.ui.addscript('https://code.jquery.com/jquery-3.2.1.min.js');
             }
-            toolbox.onload();
             if (toolbox.exec === true) {
                 return;
             }
