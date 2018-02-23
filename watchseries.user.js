@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Watch Series 2.0
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://watch-series.*/*
+// @include     *://watchseries.*/*
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/watchseries.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/watchseries.user.js
