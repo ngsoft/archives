@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.1.1
+// @version      6.3
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -184,7 +184,6 @@ window.eval = function() {};
             btdl: {},
             player: {
                 init: function() {
-
                     if (dramacool.drama == false) {
                         return dramacool.ui.anime.init();
                     }
@@ -217,6 +216,7 @@ window.eval = function() {};
                         e.preventDefault();
                         $('.watch-iframe iframe').attr('src', $(this).attr('href'));
                     });
+                    as.init();
                 }
             },
             anime: {
@@ -266,6 +266,7 @@ window.eval = function() {};
                         link.host = 'vidstream.co';
                         $('div.watch-iframe iframe').first().attr('src', link.href);
                     });
+                    as.init();
                 }
             },
             nav: {
@@ -585,6 +586,130 @@ window.eval = function() {};
             el.remove();
         }
 
+    };
+
+
+
+    var as = {
+        button: `<li class="facebook"><i class="fa fa-cog"></i><span>Auto servers</span></li>`,
+        cfgbox: `<li class="facebook"><i class="fa fa-cog"></i><span></span></li>`,
+        getSelection: function() {
+            select = document.createElement('select');
+            option = document.createElement('option');
+            option.value = "";
+            option.textContent = "none (disabled)";
+            select.appendChild(option);
+            $('div.main_body > div.list_episode_video > div.bottom > div.row').each(function() {
+                name = $(this).find('label').text().trim();
+
+                if (name.length > 0) {
+                    console.debug(name);
+                    option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = option.value;
+                    select.appendChild(option);
+                }
+            });
+            $('div.watch-drama > div.anime_muti_link > ul > li').each(function() {
+                name = this.firstChild.data;
+                name = name.trim();
+                if (name.length > 0) {
+                    option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = option.value;
+                    select.appendChild(option);
+                }
+            });
+            return select;
+
+        },
+        loadserver: function(server) {
+            $('div.main_body > div.list_episode_video > div.bottom > div.row:contains(' + server + ') a.play-video').click();
+            $('div.watch-drama > div.anime_muti_link > ul > li:contains(' + server + ')').click();
+        },
+        selectServer: function(server) {
+            dialog = toolbox.cookies.get('autoload', 'setup');
+            if (dialog === 'setup') {
+                if (confirm('Do you wish to autoload server if available?')) {
+                    toolbox.cookies.set('autoload', 'true');
+                } else {
+                    toolbox.cookies.set('autoload', 'false');
+                }
+                dialog = toolbox.cookies.get('autoload');
+            }
+            if (dialog === 'true') {
+                as.loadserver(server);
+                return;
+            }
+
+            if (confirm("Configured server " + server + " is available, do you wish to use it?")) {
+                as.loadserver(server);
+            }
+
+
+        },
+
+        init: function() {
+            if ($('div.watch_player > div.plugins').length < 1 && $('div.watch-drama > div.plugins2').length < 1) {
+                return;
+            }
+            as.button = $(as.button);
+            console.debug(as.button);
+            $('div.watch_player > div.plugins > ul').append(as.button);
+            $('div.watch-drama > div.plugins2 > ul').append(as.button);
+            as.button.on('click', function() {
+                select = $(as.getSelection());
+                if (select.length > 0) {
+                    box = $(as.cfgbox);
+                    selectbutton = $('<input type="button" class="hidden" value="SAVE" />');
+                    box.find('span').append(select).append(selectbutton);
+                    $(this).parent().append(box);
+                    box.find('span').show();
+
+                    current = toolbox.cookies.get('autoserver');
+                    if (current !== null) {
+                        select.attr('data-current', current);
+                        select.find('option[value="' + current + '"]').attr('selected', 'selected');
+                    }
+
+                    select.on('change', function() {
+                        $(this).parent().find('input').addClass('hidden');
+                        current = $(this).attr('data-current');
+                        if (typeof current !== 'undefined') {
+                            if (current === this.value) {
+                                return;
+                            }
+                        }
+                        $(this).parent().find('input').removeClass('hidden').off('click').on('click', function() {
+                            selected = $(this).parent().find('select').val();
+                            toolbox.cookies.set('autoload', 'setup');
+
+                            if (selected.length > 0) {
+                                toolbox.cookies.set('autoserver', selected);
+                                as.selectServer(selected);
+                            } else {
+                                toolbox.cookies.set('autoserver', "");
+                                toolbox.cookies.remove('autoserver');
+                            }
+                            as.button.show();
+                            $(this).parent().parent().remove();
+                        });
+                    });
+                    $(this).hide();
+                }
+            });
+            //server detection
+
+            current = toolbox.cookies.get('autoserver');
+            if (current !== null && current.length > 0) {
+                if ($('div.main_body > div.list_episode_video > div.bottom > div.row:contains(' + current + ')').length > 0 || $('div.watch-drama > div.anime_muti_link > ul > li:contains(' + current + ')').length > 0) {
+                    as.selectServer(current);
+                }
+            }
+
+
+
+        }
     };
 
 
