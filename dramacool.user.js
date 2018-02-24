@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.1
+// @version      6.1.1
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -437,7 +437,7 @@ window.eval = function() {};
             $('nav.menu_top ul.navbar li a:contains("Request")').remove();
             //$('nav.menu_top ul.navbar li a:contains("Login")').remove();
             dramacool.ui.nav.init();
-            toolbox.loader.setevents();
+            //toolbox.loader.setevents();
             toolbox.loader.hide();
         }
     };

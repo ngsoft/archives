@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.6
+// @version      5.6.1
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -406,9 +406,9 @@ window.eval = function() {};
             betamode.init();
             autoserver.init();
             g.init();
-            toolbox.loader.setevents();
-            $('a[href^="Drama/"]').click(toolbox.loader.show);
-            $('a[href^="Anime/"]').click(toolbox.loader.show);
+            /*toolbox.loader.setevents();
+             $('a[href^="Drama/"]').click(toolbox.loader.show);
+             $('a[href^="Anime/"]').click(toolbox.loader.show);*/
             toolbox.loader.hide();
         }
 
