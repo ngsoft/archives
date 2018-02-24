@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.3.1
+// @version      6.4.1
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -591,11 +591,15 @@ window.eval = function() {};
 
 
     var as = {
+        css: `
+        @media only screen and (min-width: 970px) {.select-wrapper {overflow: hidden;vertical-align: middle;display: inline-block;position: relative;width: 215px;height: 30px;padding: 0 25px 0 0;margin: 0;border: 1px solid #0D5995;overflow: hidden;}.select-wrapper > select {position: absolute;left: 0;top: 0;opacity : 0;width: 240px;height: 30px;padding: 5px 0;border: none;background: transparent !important;-webkit-appearance: none;}.select-wrapper > span {display: block;width: 210px;height: 30px;line-height: 30px;padding: 0 0 0 5px;background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAHCAYAAADj/NY7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAKBJREFUeNpiLE0OrmdgYDAA4oauOWsuMhAJylJC4oFUAhBPAOrbiE0NCxALAHEACAM1LIBa8pCAoQ1ArADEH6AYK2D8//8/SIM/kL0AahEDlI1iCZqhIHAA5HJ8DgEbDtXMDzU0ACoHctEEIL4ANdQASRxk8URCQQc3HMmF6L5ABhugrv1ITLxgGI7HFwm4Io4kw9F8AbKggFjXIgOAAAMA3CxItwk+WuUAAAAASUVORK5CYII=') no-repeat right center transparent;}.select-wrapper, .select-wrapper > select, .select-wrapper > span, .select-wrapper > [type="button"]{height: 24px; background-color: #fff; color: #0D5995; line-height: 24px; width:140px;}.select-wrapper > select {padding: 2px 0; width: 165px;}.select-wrapper > span{width: 135px; }.select-wrapper > [type="button"]{padding-bottom: 5px;position: absolute; top:0; right:0;z-index: 50; text-decoration: underline; border: none; width: auto;vertical-align: middle;display: block; line-height: 20px;}}
+                `,
         button: `<li class="facebook"><i class="fa fa-cog"></i><span>Auto servers</span></li>`,
-        cfgbox: `<li class="facebook"><i class="fa fa-cog"></i><span></span></li>`,
+        cfgbox: `<li class="facebook"><i class="fa fa-cog"></i><span class="select-wrapper"></span></li>`,
         getSelection: function() {
             select = document.createElement('select');
             option = document.createElement('option');
+            option.setAttribute('selected', 'selected');
             option.value = "";
             option.textContent = "none (disabled)";
             select.appendChild(option);
@@ -653,6 +657,7 @@ window.eval = function() {};
             if ($('div.watch_player > div.plugins').length < 1 && $('div.watch-drama > div.plugins2').length < 1) {
                 return;
             }
+            toolbox.ui.addcss(as.css);
             as.button = $(as.button);
             console.debug(as.button);
             $('div.watch_player > div.plugins > ul').last().append(as.button);
@@ -661,14 +666,20 @@ window.eval = function() {};
                 select = $(as.getSelection());
                 if (select.length > 0) {
                     box = $(as.cfgbox);
-                    selectbutton = $('<input type="button" class="hidden" value="SAVE" />');
+                    selectbutton = $('<input type="button" class="hidden" value="save" />');
                     box.find('span').append(select).append(selectbutton);
                     $(this).parent().append(box);
                     box.find('span').show();
 
+                    box.find('i').on('click', function() {
+                        as.button.show();
+                        $(this).parent().remove();
+                    });
+
                     current = toolbox.cookies.get('autoserver');
-                    if (current !== null) {
+                    if (current !== null && current.length > 0) {
                         select.attr('data-current', current);
+                        select.find('option').removeAttr('selected');
                         select.find('option[value="' + current + '"]').attr('selected', 'selected');
                     }
 
@@ -694,6 +705,18 @@ window.eval = function() {};
                             as.button.show();
                             $(this).parent().parent().remove();
                         });
+                    });
+
+                    $('.select-wrapper select').each(function() {
+                        txt = $(this).find('option[selected]').text();
+                        span = document.createElement('span');
+                        span.textContent = txt;
+                        $(this).after(span);
+                    });
+
+                    $('.select-wrapper select').off('click').click(function(event) {
+                        $(this).siblings('span').remove();
+                        $(this).after('<span>' + $('option:selected', this).text() + '</span>');
                     });
                     $(this).hide();
                 }
