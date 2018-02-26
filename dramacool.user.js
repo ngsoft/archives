@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.5.5
+// @version      6.5.7
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -728,7 +728,7 @@ window.eval = function() {};
                 li.fav .fa-bookmark{display: none;}
                 ul.list-episode-item > li.fav .fa-bookmark, .datagrild > ul.items > li.fav .fa-bookmark{width: 24px; height: 24px; color: rgb(253, 184, 19); position: absolute; top: -10px; right: -12px; z-index: 50; font-size: 24px; display: block;transform: scale(1, -1);}
                 li.fav {position: relative;}
-                datagrild.hor li.fav .fa-bookmark{display: none;}
+                .datagrild.hor .fa-bookmark{display: none!important;}
 
             `,
         widget: {
