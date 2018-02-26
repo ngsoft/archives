@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.5
+// @version      6.5.1
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -118,7 +118,7 @@ window.eval = function() {};
                     //save all
                     if (name === null) {
                         Object.keys(toolbox.cookies.data).map(function(key, index) {
-                            toolbox.cookies.set(key, toolbox.cookies.data[key])
+                            toolbox.cookies.set(key, toolbox.cookies.data[key]);
                         });
                     } else if (typeof toolbox.cookies.data[name] !== 'undefined') {
                         toolbox.cookies.set(name, toolbox.cookies.data[name]);
@@ -661,7 +661,7 @@ window.eval = function() {};
                         as.selectServer(selected);
                     } else {
                         toolbox.cookies.remove('autoserver');
-                        alertify.message('Autoserver plugin disabled.')
+                        alertify.message('Autoserver plugin disabled.');
                     }
                 });
                 $(this).find('button.ajs-cancel').html('Cancel');
@@ -821,7 +821,9 @@ window.eval = function() {};
             if (Object.keys(fav.list).length > 0) {
                 toolbox.ui.addcss(fav.css);
                 fav.findtargets();
+                return;
             }
+            fav.sync();
         }
     };
     /**
@@ -938,7 +940,8 @@ window.eval = function() {};
         toolbox.loader.onhide = cssloader.hide;
         toolbox.loader.show();
         toolbox.ui.addcss(dramacool.ui.css);
-        if (el = document.getElementById('disqus_thread')) {
+        el = document.getElementById('disqus_thread');
+        if (el !== null) {
             el.remove();
         }
 
