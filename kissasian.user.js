@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.6.1
+// @version      5.6.2
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -50,7 +50,6 @@ window.eval = function() {};
         ondocumentready: true,
         //auto load jquery
         autoloadjquery: false,
-
         loader: {
             timeout: 1500,
             show: function() {
@@ -107,15 +106,43 @@ window.eval = function() {};
                 }
                 return toolbox.cookies.data[name];
             },
+            getobj: function(name, value = {}) {
+                if (toolbox.cookies.ready === false) {
+                    return value;
+                }
+                if (typeof toolbox.cookies.data[name] === 'undefined') {
+                    toolbox.cookies.data[name] = value;
+                    get = Cookies.getJSON(name);
+                    if (typeof get === 'object') {
+                        toolbox.cookies.data[name] = get;
+                    }
+                }
+                return toolbox.cookies.data[name];
+            },
             set: function(name, value) {
-                toolbox.cookies.data[name] = value;
                 if (toolbox.cookies.ready === false) {
                     return;
                 }
+                toolbox.cookies.data[name] = value;
                 Cookies.set(name, value, {expires: toolbox.cookies.expire});
             },
             remove: function(name) {
+                toolbox.cookies.data[name] = null;
+                delete toolbox.cookies.data[name];
                 Cookies.remove(name);
+            },
+            save: function(name = null) {
+                if (typeof toolbox.cookies.data === 'object') {
+                    //save all
+                    if (name === null) {
+                        Object.keys(toolbox.cookies.data).map(function(key, index) {
+                            toolbox.cookies.set(key, toolbox.cookies.data[key])
+                        });
+                    } else if (typeof toolbox.cookies.data[name] !== 'undefined') {
+                        toolbox.cookies.set(name, toolbox.cookies.data[name]);
+                    }
+            }
+
             },
             onready: function() {},
             init: function() {
@@ -130,7 +157,7 @@ window.eval = function() {};
                 }, toolbox.interval);
             }
         },
-        init: function(fn, interval = 50) {
+        init: function(fn = null, interval = 50) {
             toolbox.interval = interval;
             toolbox.ready(fn);
         },
@@ -166,13 +193,15 @@ window.eval = function() {};
                 }
             }, toolbox.interval);
         },
-        ready: function(fn) {
-            toolbox.load = fn;
+        ready: function(fn = null) {
+            if (typeof fn === 'function') {
+                toolbox.load = fn;
+            }
             if (document.readyState != 'loading') {
                 toolbox.wait();
             } else {
                 document.addEventListener('DOMContentLoaded', toolbox.wait);
-            }
+        }
 
         }
     };

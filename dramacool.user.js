@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.4.1
+// @version      6.5
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -18,12 +18,7 @@
 
 window.open = function() {};
 window.eval = function() {};
-
 (function() {
-    window.adblock = false;
-    window.adblock2 = false;
-    window.turnoff = true;
-
     /**
      * Userscript library
      */
@@ -37,7 +32,6 @@ window.eval = function() {};
         ondocumentready: true,
         //auto load jquery
         autoloadjquery: false,
-
         loader: {
             timeout: 1500,
             show: function() {
@@ -94,15 +88,43 @@ window.eval = function() {};
                 }
                 return toolbox.cookies.data[name];
             },
+            getobj: function(name, value = {}) {
+                if (toolbox.cookies.ready === false) {
+                    return value;
+                }
+                if (typeof toolbox.cookies.data[name] === 'undefined') {
+                    toolbox.cookies.data[name] = value;
+                    get = Cookies.getJSON(name);
+                    if (typeof get === 'object') {
+                        toolbox.cookies.data[name] = get;
+                    }
+                }
+                return toolbox.cookies.data[name];
+            },
             set: function(name, value) {
-                toolbox.cookies.data[name] = value;
                 if (toolbox.cookies.ready === false) {
                     return;
                 }
+                toolbox.cookies.data[name] = value;
                 Cookies.set(name, value, {expires: toolbox.cookies.expire});
             },
             remove: function(name) {
+                toolbox.cookies.data[name] = null;
+                delete toolbox.cookies.data[name];
                 Cookies.remove(name);
+            },
+            save: function(name = null) {
+                if (typeof toolbox.cookies.data === 'object') {
+                    //save all
+                    if (name === null) {
+                        Object.keys(toolbox.cookies.data).map(function(key, index) {
+                            toolbox.cookies.set(key, toolbox.cookies.data[key])
+                        });
+                    } else if (typeof toolbox.cookies.data[name] !== 'undefined') {
+                        toolbox.cookies.set(name, toolbox.cookies.data[name]);
+                    }
+            }
+
             },
             onready: function() {},
             init: function() {
@@ -117,7 +139,7 @@ window.eval = function() {};
                 }, toolbox.interval);
             }
         },
-        init: function(fn, interval = 50) {
+        init: function(fn = null, interval = 50) {
             toolbox.interval = interval;
             toolbox.ready(fn);
         },
@@ -153,13 +175,15 @@ window.eval = function() {};
                 }
             }, toolbox.interval);
         },
-        ready: function(fn) {
-            toolbox.load = fn;
+        ready: function(fn = null) {
+            if (typeof fn === 'function') {
+                toolbox.load = fn;
+            }
             if (document.readyState != 'loading') {
                 toolbox.wait();
             } else {
                 document.addEventListener('DOMContentLoaded', toolbox.wait);
-            }
+        }
 
         }
     };
@@ -168,7 +192,7 @@ window.eval = function() {};
         drama: true,
         ui: {
             css: `
-                    div.header ul.auth, div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .content-right .fanpage, .show-all, .btn-show-all, .hidden{
+                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .content-right .fanpage, .show-all, .btn-show-all, .hidden{
                             display: none !important;
                     }
                     .mediaplayer .content-left{width:100%!important;}
@@ -178,6 +202,7 @@ window.eval = function() {};
                         margin-right: 2px!important;
                     }
                     .plugins2 ul li.direction a{background-color: rgb(0, 171, 236);}
+                    button.ajs-button.ajs-ok{float:right;}
             `,
             btnsvr: `<li class="facebook"><i class="fa fa-server"></i><span>Select Servers</span></li>`,
             btnep: `<li class="twitter"><i class="fa fa-file-video-o"></i><span>Select Episode</span></li>`,
@@ -233,7 +258,6 @@ window.eval = function() {};
                     //hide unused btns
                     dramacool.ui.anime.hidebtn('fa-facebook-f');
                     dramacool.ui.anime.hidebtn('fa-twitter');
-                    dramacool.ui.anime.hidebtn('fa-heart');
                     dramacool.ui.anime.hidebtn('fa-comment');
                     dramacool.ui.anime.hidebtn('fa-exclamation-triangle');
                     dramacool.ui.anime.hidebtn('fa-chrome');
@@ -295,7 +319,6 @@ window.eval = function() {};
                 },
                 init: function() {
                     toolbox.ui.addcss(dramacool.ui.nav.css);
-
                     /**
                      * Subs only button
                      * dramacool
@@ -344,57 +367,51 @@ window.eval = function() {};
                                 e.preventDefault();
                                 location.href = $(this).attr('data-link');
                             });
-
                             href = document.location.origin + $(this).attr('href');
                             link = new URL(href);
                             link.pathname = link.pathname.replace('/watch/', '/anime/');
                             link.pathname = link.pathname.replace(/\-episode\-([0-9]+)\.html$/i, '.html');
                             $(this).attr('href', link.href);
                         });
-
-                        if ($('div.nav_tab_global div.datagrild_nav a.active').length > 0) {
-                            toolbox.cookies.get('switch', $('div.nav_tab_global div.datagrild_nav a.active').attr('data-tab'));
-                            $('div.nav_tab_global div.datagrild_nav a').each(function() {
-                                $(this).removeClass('active');
-                                $('.content_episode').removeClass($(this).attr('data-tab'));
-
-                                if ($(this).attr('data-tab') === toolbox.cookies.get('switch')) {
-                                    $(this).addClass('active');
-
-                                    $('.content_episode').each(function() {
-                                        if ($(this).find('.thumb_anime_hor').length > 0) {
-                                            $(this).addClass('datagrild');
-                                        }
-                                    }).addClass($(this).attr('data-tab'));
-
-
-                                }
-
-                                $('.nav-tabs.intro a').off('click').on('click', function(e) {
-                                    e.preventDefault();
-                                    $('.nav-tabs.intro a').removeClass('active');
-                                    $(this).addClass('active');
-                                    var str = $(this).attr('data-tab');
-
-                                    tab = $('.content_episode.' + str);
-                                    if (tab.length > 0) {
-                                        if (tab.find('.thumb_anime_hor').length > 0) {
-                                            $('.datagrild_nav').show();
-                                        } else {
-                                            $('.datagrild_nav').hide();
-                                        }
-                                        $('.content_episode').hide();
-                                        tab.show();
-                                    }
-                                });
-
-                            }).on('click', function() {
-                                toolbox.cookies.set('switch', $(this).attr('data-tab'));
-                            });
-
-                        }
-
                     }
+
+                    if ($('div.nav_tab_global div.datagrild_nav a.active').length > 0) {
+                        toolbox.cookies.get('switch', $('div.nav_tab_global div.datagrild_nav a.active').attr('data-tab'));
+                        $('div.nav_tab_global div.datagrild_nav a').each(function() {
+                            $(this).removeClass('active');
+                            console.debug($(this));
+                            $('.content_episode').removeClass($(this).attr('data-tab'));
+                            if ($(this).attr('data-tab') === toolbox.cookies.get('switch')) {
+                                $(this).addClass('active');
+                                $('.content_episode').each(function() {
+                                    if ($(this).find('.thumb_anime_hor').length > 0) {
+                                        $(this).addClass('datagrild');
+                                    }
+                                }).addClass($(this).attr('data-tab'));
+                            }
+
+                            $('.nav-tabs.intro a').off('click').on('click', function(e) {
+                                e.preventDefault();
+                                $('.nav-tabs.intro a').removeClass('active');
+                                $(this).addClass('active');
+                                var str = $(this).attr('data-tab');
+                                tab = $('.content_episode.' + str);
+                                if (tab.length > 0) {
+                                    if (tab.find('.thumb_anime_hor').length > 0) {
+                                        $('.datagrild_nav').show();
+                                    } else {
+                                        $('.datagrild_nav').hide();
+                                    }
+                                    $('.content_episode').hide();
+                                    tab.show();
+                                }
+                            });
+                        }).on('click', function() {
+                            toolbox.cookies.set('switch', $(this).attr('data-tab'));
+                        });
+                    }
+
+
 
                     /**
                      * Auto switch view
@@ -438,6 +455,7 @@ window.eval = function() {};
             $('nav.menu_top ul.navbar li a:contains("Request")').remove();
             //$('nav.menu_top ul.navbar li a:contains("Login")').remove();
             dramacool.ui.nav.init();
+            fav.init();
             //toolbox.loader.setevents();
             toolbox.loader.hide();
         }
@@ -452,7 +470,6 @@ window.eval = function() {};
                     [data-inside-iframe] .content_c_bg{margin-top: 90px;}
                     `
         },
-
         title: function() {
             params = new URLSearchParams(location.search);
             title = params.get('title');
@@ -496,8 +513,6 @@ window.eval = function() {};
             toolbox.loader.hide();
         }
     };
-
-
     /**
      * Font Awesome Spinner
      */
@@ -525,13 +540,11 @@ window.eval = function() {};
             }
         }
     };
-
     /**
      * @link https://www.pexels.com/blog/css-only-loaders/ CSS Only Loaders
      */
     var cssloader = {
         css: `.cssloader{margin:50px;height:28px;width:28px;animation:rotate .8s infinite linear;border:8px solid #fff;border-right-color:transparent;border-radius:50%}@keyframes rotate{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}div#spinner{display : block;position : fixed;z-index: 100;background-color: #000; opacity: 0.8; background-repeat : no-repeat;background-position : center;left : 0;bottom : 0;right : 0;  top : 0;}div#spinner > div{z-index : 101;position: absolute; top: 50%; left:50%; margin: -14px 0 0 -14px; opacity:1; color: #fff;}`,
-
         show: function() {
             if (typeof cssloader.loader === 'undefined') {
                 toolbox.ui.addcss(cssloader.css);
@@ -540,16 +553,360 @@ window.eval = function() {};
                 loader = document.createElement('div');
                 loader.setAttribute('class', 'cssloader');
                 cssloader.loader.appendChild(loader);
-
             }
             document.body.appendChild(cssloader.loader);
         },
         hide: function() {
             document.body.removeChild(cssloader.loader);
+        }
+    };
+
+    /**
+     * Autoserver Plugin
+     */
+    var as = {
+        css: `  .select-wrapper {overflow: hidden;vertical-align: middle;display: inline-block;position: relative;width: 215px;height: 30px;padding: 0 16px 0 0;margin: 0;border: 1px solid #0D5995;overflow: hidden;background: no-repeat right center transparent;}.select-wrapper > select {position: absolute;left: 0;top: 0;opacity : 0;width: 240px;height: 30px;padding: 5px 0;border: none;background: transparent !important;-webkit-appearance: none;}.select-wrapper > span {display: block;width: 210px;height: 30px;line-height: 30px;padding: 0 0 0 5px;}.select-wrapper, .select-wrapper > select, .select-wrapper > span, .select-wrapper > [type="button"]{height: 24px; background-color: #fff; color: #0D5995; line-height: 24px; width:140px;}.select-wrapper > select {padding: 2px 0; width: 165px;}.select-wrapper > span{width: 135px; }.select-wrapper .fa{width: 16px; height: 16px; position: absolute; top: 50%; right: 0; margin-top: -8px;z-index: 50;}
+        `,
+        button: `<li class="facebook"><i class="fa fa-cog"></i><span>Auto servers</span></li>`,
+        cfgbox: `<li class="facebook"><i class="fa fa-cog"></i><span class="select-wrapper"></span></li>`,
+        getSelection: function() {
+            select = document.createElement('select');
+            option = document.createElement('option');
+            option.setAttribute('selected', 'selected');
+            option.value = "";
+            option.textContent = "none (disabled)";
+            select.appendChild(option);
+            $('div.main_body > div.list_episode_video > div.bottom > div.row').each(function() {
+                name = $(this).find('label').text().trim();
+                if (name.length > 0) {
+                    console.debug(name);
+                    option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = option.value;
+                    select.appendChild(option);
+                }
+            });
+            $('div.watch-drama > div.anime_muti_link > ul > li').each(function() {
+                name = this.firstChild.data;
+                name = name.trim();
+                if (name.length > 0) {
+                    option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = option.value;
+                    select.appendChild(option);
+                }
+            });
+            return select;
+        },
+        loadserver: function(server) {
+            alertify.message('Autoloading server : ' + server);
+            $('div.main_body > div.list_episode_video > div.bottom > div.row:contains(' + server + ') a.play-video').click();
+            $('div.watch-drama > div.anime_muti_link > ul > li:contains(' + server + ')').click();
+        },
+        selectServer: function(server) {
+            dialog = toolbox.cookies.get('autoload', 'setup');
+            if (dialog === 'setup') {
+                alertify.confirm('User Script : Autoserver', 'Do you wish to autoload server if available?', function() {
+                    toolbox.cookies.set('autoload', 'true');
+                    as.selectServer(server);
+                }, function() {
+                    setTimeout(function() {
+                        toolbox.cookies.set('autoload', 'false');
+                        as.selectServer(server);
+                    }, 1000);
+                });
+                return;
+            }
+            if (dialog === 'true') {
+                as.loadserver(server);
+                return;
+            }
+            alertify.confirm('User Script : Autoserver', "Configured server " + server + " is available, do you wish to use it?", function() {
+                as.loadserver(server);
+            }, function() {
+
+            });
+        },
+        prompt: function() {
+            $('div.alertify').remove();
+            form = document.createElement('form');
+            form.setAttribute('class', 'form-server-selection');
+            label = document.createElement('label');
+            label.textContent = 'Please Select your server :';
+            form.appendChild(label);
+            select = as.getSelection();
+            select.setAttribute('class', 'server-selection');
+            div = document.createElement('div');
+            div.setAttribute('class', 'select-wrapper');
+            i = document.createElement('i');
+            i.setAttribute('class', "fa fa-caret-down");
+            i.setAttribute("aria-hidden", "true");
+            div.appendChild(select);
+            div.appendChild(i);
+            form.appendChild(div);
+            alertify.prompt(form, '');
+
+            //override alertify events
+            current = toolbox.cookies.get('autoserver');
+
+            $('.form-server-selection').parents('div.ajs-dialog:first').each(function() {
+                $(this).find('.ajs-input').addClass('hidden');
+                $(this).find('div.ajs-header').html('Userscript : Server Selection');
+
+                $(this).find('button.ajs-ok').html('Save Changes').addClass('hidden').on('click', function() {
+                    selected = $(this).parents('div.ajs-dialog:first').find('select.server-selection').val();
+                    toolbox.cookies.set('autoload', 'setup');
+                    if (selected.length > 0) {
+                        toolbox.cookies.set('autoserver', selected);
+                        as.selectServer(selected);
+                    } else {
+                        toolbox.cookies.remove('autoserver');
+                        alertify.message('Autoserver plugin disabled.')
+                    }
+                });
+                $(this).find('button.ajs-cancel').html('Cancel');
+                $(this).find('select.server-selection').each(function() {
+                    if (current !== null && current.length > 0) {
+                        $(this).attr('data-current', current);
+                        $(this).find('option').removeAttr('selected');
+                        $(this).find('option[value="' + current + '"]').attr('selected', 'selected');
+                    }
+
+                }).on('change', function() {
+                    $(this).parents('div.ajs-dialog:first').find('button.ajs-ok').addClass('hidden');
+                    if (this.value !== $(this).attr('data-current')) {
+                        $(this).parents('div.ajs-dialog:first').find('button.ajs-ok').removeClass('hidden');
+                    }
+                });
+
+            });
+
+
+
+            $('.select-wrapper select').each(function() {
+                txt = $(this).find('option[selected]').text();
+                span = document.createElement('span');
+                span.textContent = txt;
+                $(this).after(span);
+            });
+            $('.select-wrapper select').off('click').click(function(event) {
+                $(this).siblings('span').remove();
+                $(this).after('<span>' + $('option:selected', this).text() + '</span>');
+            });
+
+
+
+        },
+        init: function() {
+            if ($('div.watch_player > div.plugins').length < 1 && $('div.watch-drama > div.plugins2').length < 1) {
+                return;
+            }
+            toolbox.ui.addcss(as.css);
+            as.button = $(as.button);
+            console.debug(as.button);
+            $('div.watch_player > div.plugins > ul').last().append(as.button);
+            $('div.watch-drama > div.plugins2 > ul').append(as.button);
+            as.button.on('click', as.prompt);
+
+            //server detection
+            current = toolbox.cookies.get('autoserver');
+            if (current !== null && current.length > 0) {
+                if ($('div.main_body > div.list_episode_video > div.bottom > div.row:contains(' + current + ')').length > 0 || $('div.watch-drama > div.anime_muti_link > ul > li:contains(' + current + ')').length > 0) {
+                    as.selectServer(current);
+                }
+            }
+
+
 
         }
     };
 
+    /**
+     * Favorites Plugin
+     */
+    var fav = {
+        css: `
+                .content_episode > ul.items > li.fav, ul[class*="list-episode-item"] > li.fav{border: 1px solid rgb(253, 184, 19);}
+                .main_body ul.list a[href*="/anime/"].fav{color: rgb(253, 184, 19);}
+                ul.list-episode-item > li.fav{margin: 4px;}
+            `,
+        widget: {
+            element: `<li><a href="javascript:void(0);">Synch Fav</a></li>`,
+            init: function() {
+                fav.widget.element = $(fav.widget.element);
+                //drama
+                $('ul.navbar > li.user > ul.sub-nav > li:first').after(fav.widget.element);
+                //anime
+                $('div.header > ul.auth > li.user > div.nav_down_up > ul > li:first').after(fav.widget.element);
+                fav.widget.element.find('a').off('click').on('click', fav.sync);
+                $('div[class*="plugins"] li.favorites').on('click', function() {
+                    setTimeout(fav.sync, 2000);
+                });
+            }
+        },
+        list: {
+
+        },
+        sync: function() {
+            $.ajax({url: document.location.origin + '/user/bookmark', cache: false}).done(function(data) {
+                /*
+                 $.ajaxSetup({cache: false});
+                 $.get(document.location.origin + '/user/bookmark', function(data) {*/
+                fav.list = {};
+                $(data).find('div.bookmark table tr').each(function() {
+                    a = $(this).find('td:first a');
+                    if (a.length > 0) {
+                        fav.list[a.text().trim()] = a.attr('href');
+                    }
+                });
+                alertify.message('Favorites sync complete.');
+                if (Object.keys(fav.list).length > 0) {
+                    toolbox.cookies.set('favlist', fav.list);
+                    alertify.message("Successfully added " + Object.keys(fav.list).length + " favorites.");
+                    fav.findtargets();
+                    /*window.alert("Successfully added " + Object.keys(fav.list).length + " favorites.");
+                     fav.findtargets();*/
+                    return;
+                }
+
+                alertify.message('No Favorites set.');
+            });
+            $(this).parents('.nav_down_up').toggle();
+        },
+        findtargets: function() {
+            $('.fav').removeClass('fav');
+            Object.keys(fav.list).map(function(key) {
+                var val = fav.list[key];
+                //anime
+                $('.content_episode > ul.items > li a[href*="' + val + '"]').each(function() {
+                    console.debug(this);
+                    $(this).parents('li:first').addClass('fav');
+                });
+                $('.main_body ul.list a[href*="/anime/"][href*="' + val + '"]').addClass('fav');
+                //drama
+                $('ul[class*="list-episode-item"] > li > a[href*="' + val + '"]').each(function() {
+                    $(this).parent().addClass('fav');
+                });
+            });
+        },
+        event: function() {
+            favlist = {};
+            $('div.bookmark table tr').each(function() {
+                console.debug($(this));
+                a = $(this).find('td:first a');
+                if (a.length > 0) {
+                    favlist[a.text().trim()] = a.attr('href');
+                }
+            });
+            if (JSON.stringify(favlist) !== JSON.stringify(fav.list)) {
+                fav.list = favlist;
+                toolbox.cookies.set('favlist', fav.list);
+                console.debug(fav.list);
+                alertify.message('Favorites sync complete.');
+            }
+        },
+        init: function() {
+            if (typeof Cookies.get('auth') === 'undefined') {
+                return;
+            }
+            fav.widget.init();
+            fav.list = toolbox.cookies.getobj('favlist');
+            if (document.location.pathname === '/user/bookmark') {
+                $('div.bookmark table').on('click', function() {
+                    setTimeout(fav.event, 2000);
+                });
+                //$('td.trash').on('click', $('div.bookmark table').click);
+                return;
+            }
+            if (Object.keys(fav.list).length > 0) {
+                toolbox.ui.addcss(fav.css);
+                fav.findtargets();
+            }
+        }
+    };
+    /**
+     * @link http://alertifyjs.com
+     */
+    notify = {
+        settings: {
+            // dialogs defaults
+            autoReset: true,
+            basic: false,
+            closable: false,
+            closableByDimmer: true,
+            frameless: false,
+            maintainFocus: true, // <== global default not per instance, applies to all dialogs
+            maximizable: true,
+            modal: true,
+            movable: true,
+            moveBounded: false,
+            overflow: true,
+            padding: true,
+            pinnable: true,
+            pinned: true,
+            preventBodyShift: false, // <== global default not per instance, applies to all dialogs
+            resizable: true,
+            startMaximized: false,
+            transition: 'pulse',
+
+            // notifier defaults
+            notifier: {
+                // auto-dismiss wait time (in seconds)
+                delay: 5,
+                // default position
+                position: 'bottom-right',
+                // adds a close button to notifier messages
+                closeButton: false
+            },
+
+            // language resources
+            glossary: {
+                // dialogs default title
+                title: 'Userscript',
+                // ok button text
+                ok: 'Yes',
+                // cancel button text
+                cancel: 'No'
+            },
+            // theme settings
+            theme: {
+                // class name attached to prompt dialog input textbox.
+                input: 'ajs-input',
+                // class name attached to ok button
+                ok: 'ajs-ok',
+                // class name attached to cancel button
+                cancel: 'ajs-cancel'
+            }
+
+        },
+        ready: false,
+        onready: function() {},
+        loadsettings: function() {
+            alertify.defaults = notify.settings;
+
+        },
+        init: function(fn = null) {
+            if (notify.ready !== false) {
+                return;
+            }
+            toolbox.ui.loadcss('https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/css/alertify.min.css');
+            toolbox.ui.loadcss('https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/css/themes/default.min.css');
+            toolbox.ui.addscript('https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/alertify.min.js');
+            if (typeof (fn) === 'function') {
+                notify.onready = fn;
+            }
+
+            ninterval = setInterval(function() {
+                if (typeof alertify !== 'undefined') {
+                    clearInterval(ninterval);
+                    notify.ready = true;
+                    notify.loadsettings();
+                    notify.onready();
+                }
+            }, toolbox.interval);
+        }
+    }
+    ;
     //videouploader
     if (document.location.host.indexOf('vid') !== -1) {
 
@@ -581,161 +938,14 @@ window.eval = function() {};
         toolbox.loader.onhide = cssloader.hide;
         toolbox.loader.show();
         toolbox.ui.addcss(dramacool.ui.css);
-        toolbox.cookies.onready = dramacool.init;
         if (el = document.getElementById('disqus_thread')) {
             el.remove();
         }
 
+        //toolbox.cookies.onready = dramacool.init;
+        toolbox.cookies.onready = notify.init;
+        notify.onready = dramacool.init;
     };
-
-
-
-    var as = {
-        css: `
-        @media only screen and (min-width: 970px) {.select-wrapper {overflow: hidden;vertical-align: middle;display: inline-block;position: relative;width: 215px;height: 30px;padding: 0 25px 0 0;margin: 0;border: 1px solid #0D5995;overflow: hidden;}.select-wrapper > select {position: absolute;left: 0;top: 0;opacity : 0;width: 240px;height: 30px;padding: 5px 0;border: none;background: transparent !important;-webkit-appearance: none;}.select-wrapper > span {display: block;width: 210px;height: 30px;line-height: 30px;padding: 0 0 0 5px;background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAHCAYAAADj/NY7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAKBJREFUeNpiLE0OrmdgYDAA4oauOWsuMhAJylJC4oFUAhBPAOrbiE0NCxALAHEACAM1LIBa8pCAoQ1ArADEH6AYK2D8//8/SIM/kL0AahEDlI1iCZqhIHAA5HJ8DgEbDtXMDzU0ACoHctEEIL4ANdQASRxk8URCQQc3HMmF6L5ABhugrv1ITLxgGI7HFwm4Io4kw9F8AbKggFjXIgOAAAMA3CxItwk+WuUAAAAASUVORK5CYII=') no-repeat right center transparent;}.select-wrapper, .select-wrapper > select, .select-wrapper > span, .select-wrapper > [type="button"]{height: 24px; background-color: #fff; color: #0D5995; line-height: 24px; width:140px;}.select-wrapper > select {padding: 2px 0; width: 165px;}.select-wrapper > span{width: 135px; }.select-wrapper > [type="button"]{padding-bottom: 5px;position: absolute; top:0; right:0;z-index: 50; text-decoration: underline; border: none; width: auto;vertical-align: middle;display: block; line-height: 20px;}}
-                `,
-        button: `<li class="facebook"><i class="fa fa-cog"></i><span>Auto servers</span></li>`,
-        cfgbox: `<li class="facebook"><i class="fa fa-cog"></i><span class="select-wrapper"></span></li>`,
-        getSelection: function() {
-            select = document.createElement('select');
-            option = document.createElement('option');
-            option.setAttribute('selected', 'selected');
-            option.value = "";
-            option.textContent = "none (disabled)";
-            select.appendChild(option);
-            $('div.main_body > div.list_episode_video > div.bottom > div.row').each(function() {
-                name = $(this).find('label').text().trim();
-
-                if (name.length > 0) {
-                    console.debug(name);
-                    option = document.createElement('option');
-                    option.value = name;
-                    option.textContent = option.value;
-                    select.appendChild(option);
-                }
-            });
-            $('div.watch-drama > div.anime_muti_link > ul > li').each(function() {
-                name = this.firstChild.data;
-                name = name.trim();
-                if (name.length > 0) {
-                    option = document.createElement('option');
-                    option.value = name;
-                    option.textContent = option.value;
-                    select.appendChild(option);
-                }
-            });
-            return select;
-
-        },
-        loadserver: function(server) {
-            $('div.main_body > div.list_episode_video > div.bottom > div.row:contains(' + server + ') a.play-video').click();
-            $('div.watch-drama > div.anime_muti_link > ul > li:contains(' + server + ')').click();
-        },
-        selectServer: function(server) {
-            dialog = toolbox.cookies.get('autoload', 'setup');
-            if (dialog === 'setup') {
-                if (confirm('Do you wish to autoload server if available?')) {
-                    toolbox.cookies.set('autoload', 'true');
-                } else {
-                    toolbox.cookies.set('autoload', 'false');
-                }
-                dialog = toolbox.cookies.get('autoload');
-            }
-            if (dialog === 'true') {
-                as.loadserver(server);
-                return;
-            }
-
-            if (confirm("Configured server " + server + " is available, do you wish to use it?")) {
-                as.loadserver(server);
-            }
-
-
-        },
-
-        init: function() {
-            if ($('div.watch_player > div.plugins').length < 1 && $('div.watch-drama > div.plugins2').length < 1) {
-                return;
-            }
-            toolbox.ui.addcss(as.css);
-            as.button = $(as.button);
-            console.debug(as.button);
-            $('div.watch_player > div.plugins > ul').last().append(as.button);
-            $('div.watch-drama > div.plugins2 > ul').append(as.button);
-            as.button.on('click', function() {
-                select = $(as.getSelection());
-                if (select.length > 0) {
-                    box = $(as.cfgbox);
-                    selectbutton = $('<input type="button" class="hidden" value="save" />');
-                    box.find('span').append(select).append(selectbutton);
-                    $(this).parent().append(box);
-                    box.find('span').show();
-
-                    box.find('i').on('click', function() {
-                        as.button.show();
-                        $(this).parent().remove();
-                    });
-
-                    current = toolbox.cookies.get('autoserver');
-                    if (current !== null && current.length > 0) {
-                        select.attr('data-current', current);
-                        select.find('option').removeAttr('selected');
-                        select.find('option[value="' + current + '"]').attr('selected', 'selected');
-                    }
-
-                    select.on('change', function() {
-                        $(this).parent().find('input').addClass('hidden');
-                        current = $(this).attr('data-current');
-                        if (typeof current !== 'undefined') {
-                            if (current === this.value) {
-                                return;
-                            }
-                        }
-                        $(this).parent().find('input').removeClass('hidden').off('click').on('click', function() {
-                            selected = $(this).parent().find('select').val();
-                            toolbox.cookies.set('autoload', 'setup');
-
-                            if (selected.length > 0) {
-                                toolbox.cookies.set('autoserver', selected);
-                                as.selectServer(selected);
-                            } else {
-                                toolbox.cookies.set('autoserver', "");
-                                toolbox.cookies.remove('autoserver');
-                            }
-                            as.button.show();
-                            $(this).parent().parent().remove();
-                        });
-                    });
-
-                    $('.select-wrapper select').each(function() {
-                        txt = $(this).find('option[selected]').text();
-                        span = document.createElement('span');
-                        span.textContent = txt;
-                        $(this).after(span);
-                    });
-
-                    $('.select-wrapper select').off('click').click(function(event) {
-                        $(this).siblings('span').remove();
-                        $(this).after('<span>' + $('option:selected', this).text() + '</span>');
-                    });
-                    $(this).hide();
-                }
-            });
-            //server detection
-
-            current = toolbox.cookies.get('autoserver');
-            if (current !== null && current.length > 0) {
-                if ($('div.main_body > div.list_episode_video > div.bottom > div.row:contains(' + current + ')').length > 0 || $('div.watch-drama > div.anime_muti_link > ul > li:contains(' + current + ')').length > 0) {
-                    as.selectServer(current);
-                }
-            }
-
-
-
-        }
-    };
-
-
     toolbox.init(toolbox.cookies.init);
 })();
 
