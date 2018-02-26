@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.6.2
+// @version      5.6.3
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -737,6 +737,89 @@ window.eval = function() {};
         }
     };
 
+    /**
+     * @link http://alertifyjs.com
+     */
+    notify = {
+        settings: {
+            // dialogs defaults
+            autoReset: true,
+            basic: false,
+            closable: false,
+            closableByDimmer: true,
+            frameless: false,
+            maintainFocus: true, // <== global default not per instance, applies to all dialogs
+            maximizable: true,
+            modal: true,
+            movable: true,
+            moveBounded: false,
+            overflow: true,
+            padding: true,
+            pinnable: true,
+            pinned: true,
+            preventBodyShift: false, // <== global default not per instance, applies to all dialogs
+            resizable: true,
+            startMaximized: false,
+            transition: 'pulse',
+
+            // notifier defaults
+            notifier: {
+                // auto-dismiss wait time (in seconds)
+                delay: 5,
+                // default position
+                position: 'bottom-right',
+                // adds a close button to notifier messages
+                closeButton: false
+            },
+
+            // language resources
+            glossary: {
+                // dialogs default title
+                title: 'Userscript',
+                // ok button text
+                ok: 'Yes',
+                // cancel button text
+                cancel: 'No'
+            },
+            // theme settings
+            theme: {
+                // class name attached to prompt dialog input textbox.
+                input: 'ajs-input',
+                // class name attached to ok button
+                ok: 'ajs-ok',
+                // class name attached to cancel button
+                cancel: 'ajs-cancel'
+            }
+
+        },
+        ready: false,
+        onready: function() {},
+        loadsettings: function() {
+            alertify.defaults = notify.settings;
+
+        },
+        init: function(fn = null) {
+            if (notify.ready !== false) {
+                return;
+            }
+            toolbox.ui.loadcss('https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/css/alertify.min.css');
+            toolbox.ui.loadcss('https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/css/themes/default.min.css');
+            toolbox.ui.addscript('https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/alertify.min.js');
+            if (typeof (fn) === 'function') {
+                notify.onready = fn;
+            }
+
+            ninterval = setInterval(function() {
+                if (typeof alertify !== 'undefined') {
+                    clearInterval(ninterval);
+                    notify.ready = true;
+                    notify.loadsettings();
+                    notify.onready();
+                }
+            }, toolbox.interval);
+        }
+    };
+
     toolbox.onload = function() {
 
         if (document.querySelector('img[alt = "KissCartoon"]') !== null || document.querySelector('img[alt = "jadopado"]') !== null) {
@@ -757,7 +840,9 @@ window.eval = function() {};
         toolbox.loader.onhide = cssloader.hide;
         toolbox.loader.show();
         toolbox.ui.addcss(kissasian.ui.css);
-        toolbox.cookies.onready = kissasian.init;
+        //toolbox.cookies.onready = kissasian.init;
+        toolbox.cookies.onready = notify.init;
+        notify.onready = kissasian.init;
 
     };
     toolbox.init(toolbox.cookies.init);
