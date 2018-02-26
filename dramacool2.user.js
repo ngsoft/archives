@@ -23,7 +23,7 @@ window.eval = function() {};
 
 
     function ToolBox(args = {}) {
-//private properties
+        //private properties
         var callback = function() {};
         var defaults = {
             debug: false,
@@ -367,8 +367,6 @@ window.eval = function() {};
         if (public.debug) {
             console.debug('User script : debug mode enabled.');
         }
-
-
         return public;
     }
 
@@ -377,9 +375,7 @@ window.eval = function() {};
 
     function CSSLoader() {
         var css = `.cssloader{margin:50px;height:28px;width:28px;animation:rotate .8s infinite linear;border:8px solid #fff;border-right-color:transparent;border-radius:50%}@keyframes rotate{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}div#spinner{display : block;position : fixed;z-index: 100;background-color: #000; opacity: 0.8; background-repeat : no-repeat;background-position : center;left : 0;bottom : 0;right : 0;  top : 0;}div#spinner > div{z-index : 101;position: absolute; top: 50%; left:50%; margin: -14px 0 0 -14px; opacity:1; color: #fff;}`;
-
         var el = null;
-
         this.show = function() {
             if (el === null) {
                 toolbox.ui.addcss(css);
@@ -463,19 +459,16 @@ window.eval = function() {};
         };
         var ready = false;
         callback = function() {};
-
         function loadsettings() {
             if (ready) {
                 alertify.defaults = settings;
             }
         }
-
         function loadresources() {
             toolbox.ui.loadcss('https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/css/alertify.min.css')
                     .loadcss('https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/css/themes/default.min.css')
                     .loadscript('https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/alertify.min.js');
         }
-
         return {
             retry: 50,
             autoload: true,
@@ -506,10 +499,7 @@ window.eval = function() {};
                         loadsettings();
                         callback();
                     }
-
                 }, this.retry);
-
-
             },
             ready: function() {
                 return ready;
@@ -525,9 +515,6 @@ window.eval = function() {};
 
     //var toolbox = new ToolBox({debug: true});
     var toolbox = new ToolBox();
-
-
-
 
     toolbox.onload = function() {
         toolbox.cssloader = new CSSLoader();
