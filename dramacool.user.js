@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.5.7
+// @version      6.6
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -11,11 +11,11 @@
 // @include     *://videoupload.*/*
 // @include     *://vidstream.*/*
 // @include     *://azvideo.*/file/*
+// @include     *://k-vid.net/*
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/dramacool.user.js
 // ==/UserScript==
-
 window.open = function() {};
 window.eval = function() {};
 (function() {
@@ -564,6 +564,70 @@ window.eval = function() {};
      */
     var as = {
         css: `  .select-wrapper {overflow: hidden;vertical-align: middle;display: inline-block;position: relative;width: 215px;height: 30px;padding: 0 16px 0 0;margin: 0;border: 1px solid #0D5995;overflow: hidden;background: no-repeat right center transparent;}.select-wrapper > select {position: absolute;left: 0;top: 0;opacity : 0;width: 240px;height: 30px;padding: 5px 0;border: none;background: transparent !important;-webkit-appearance: none;}.select-wrapper > span {display: block;width: 210px;height: 30px;line-height: 30px;padding: 0 0 0 5px;}.select-wrapper, .select-wrapper > select, .select-wrapper > span, .select-wrapper > [type="button"]{height: 24px; background-color: #fff; color: #0D5995; line-height: 24px; width:140px;}.select-wrapper > select {padding: 2px 0; width: 165px;}.select-wrapper > span{width: 135px; }.select-wrapper .fa{width: 16px; height: 16px; position: absolute; top: 50%; right: 0; margin-top: -8px;z-index: 50;}
+
+.toggle-checkbox > input[type="checkbox"] {
+	height: 0;
+	width: 0;
+	visibility: hidden;
+}
+
+.toggle-checkbox > label {
+	cursor: pointer;
+	text-indent: -9999px;
+	width: 48px;
+	height: 24px;
+	background: grey;
+	display: block;
+	border-radius: 100px;
+	position: relative;
+}
+
+.toggle-checkbox > label:after {
+	content: "";
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 20px;
+	height: 20px;
+	background: #fff;
+	border-radius: 20px;
+	transition: 0.3s;
+}
+
+.toggle-checkbox > input:checked + label {
+	background: #2196f3;
+}
+
+.toggle-checkbox > input:checked + label:after {
+	left: calc(100% - 5px);
+	transform: translateX(-100%);
+}
+
+.toggle-checkbox > label:active:after {
+	width: 130px;
+}
+
+.toggle-checkbox > span, .toggle-checkbox > label{
+	float: left;
+	margin-left: 20px;
+}
+.toggle-checkbox{
+        margin-top: 10px;
+
+}
+.toggle-checkbox:after{
+	clear: both;
+	content: '';
+}
+.ajs-dialog form{
+        font-size: 14pt;
+        padding-left: 50%;
+	margin-left: -100px;
+	font-size: 14pt;
+	display: block;
+}
+
+
         `,
         button: `<li class="facebook"><i class="fa fa-cog"></i><span>Auto servers</span></li>`,
         cfgbox: `<li class="facebook"><i class="fa fa-cog"></i><span class="select-wrapper"></span></li>`,
@@ -625,11 +689,23 @@ window.eval = function() {};
             });
         },
         prompt: function() {
+
+            /**
+             * @param {String} HTML representing a single element
+             * @return {Element}
+             */
+            htmlToElement = function(html) {
+                var template = document.createElement('template');
+                html = html.trim(); // Never return a text node of whitespace as the result
+                template.innerHTML = html;
+                return template.content.firstChild;
+            };
+
             $('div.alertify').remove();
             form = document.createElement('form');
             form.setAttribute('class', 'form-server-selection');
             label = document.createElement('label');
-            label.textContent = 'Please Select your server :';
+            label.textContent = 'Server : ';
             form.appendChild(label);
             select = as.getSelection();
             select.setAttribute('class', 'server-selection');
@@ -641,6 +717,15 @@ window.eval = function() {};
             div.appendChild(select);
             div.appendChild(i);
             form.appendChild(div);
+
+            checkbox = htmlToElement(`
+        <div class="toggle-checkbox">
+            <input type="checkbox" class="toggle-check-input" name="autoselect" id="autoselect"/>
+            <label for="autoselect">Auto select server</label>
+        </div>`);
+            form.appendChild(checkbox);
+
+
             alertify.prompt(form, '');
 
             //override alertify events
@@ -654,6 +739,9 @@ window.eval = function() {};
                     selected = $(this).parents('div.ajs-dialog:first').find('select.server-selection').val();
                     toolbox.cookies.set('autoload', 'setup');
                     if (selected.length > 0) {
+                        if ($("#autoselect[checked]").length > 0) {
+                            toolbox.cookies.set('autoload', 'true');
+                        }
                         toolbox.cookies.set('autoserver', selected);
                         as.selectServer(selected);
                     } else {
@@ -668,14 +756,54 @@ window.eval = function() {};
                         $(this).find('option').removeAttr('selected');
                         $(this).find('option[value="' + current + '"]').attr('selected', 'selected');
                     }
+                    if ($(this).find('option[selected]').length < 1) {
+                        $(this).find('option').first().attr('selected', 'selected');
+                        $(this).parents('div.ajs-dialog:first').find('button.ajs-ok').removeClass('hidden');
+                    }
 
                 }).on('change', function() {
                     $(this).parents('div.ajs-dialog:first').find('button.ajs-ok').addClass('hidden');
                     if (this.value !== $(this).attr('data-current')) {
                         $(this).parents('div.ajs-dialog:first').find('button.ajs-ok').removeClass('hidden');
                     }
+                    if ($(this).val() === "") {
+                        $("#autoselect").attr("disabled", "disabled").removeAttr("checked");
+                    } else {
+                        $("#autoselect").removeAttr("disabled");
+                    }
+                });
+                $(this).find('.toggle-checkbox label').each(function() {
+                    span = $('<span/>').attr('aria-hidden', "true").html($(this).text());
+                    $(this).after(span);
+                });
+                $(this).find('#autoselect').each(function() {
+                    if ($('select.server-selection').val() == "") {
+                        $(this).attr("disabled", "disabled");
+                        return;
+                    }
+                    if (toolbox.cookies.get('autoload') === 'true') {
+                        $(this).attr("checked", "checked");
+                    }
+                }).on('change', function() {
+                    console.debug(this);
+                    if (this.checked) {
+                        this.setAttribute('checked', 'checked');
+                    } else {
+                        this.removeAttribute('checked');
+                    }
+                    $(this).parents('div.ajs-dialog:first').find('button.ajs-ok').removeClass('hidden');
                 });
 
+                /*
+                 $(this).find('div.onoffswitch').on('click', function() {
+                 checkbox = $(this).find('[type="checkbox"]');
+                 if (checkbox.is(':checked')) {
+                 checkbox.removeAttr('checked');
+                 return;
+                 }
+                 checkbox.attr('checked', 'checked');
+                 });
+                 */
             });
 
 
@@ -919,6 +1047,18 @@ window.eval = function() {};
             }, toolbox.interval);
         }
     };
+    //kvid
+    if (document.location.host.indexOf('k-vid') !== -1) {
+        toolbox.onload = function() {
+            toolbox.ui.addcss(`
+                .hidden, .ads{display: none;}
+            `);
+        };
+
+        toolbox.init(function() {});
+        return;
+    }
+
     //videouploader
     if (document.location.host.indexOf('vid') !== -1) {
 
@@ -961,4 +1101,3 @@ window.eval = function() {};
     };
     toolbox.init(toolbox.cookies.init);
 })();
-
