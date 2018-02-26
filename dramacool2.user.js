@@ -82,10 +82,16 @@ window.eval = function() {};
         /**
          * Adds elements to dom
          */
+        styles = ``;
         var ui = {
+            /**
+             * Loads remote .js file
+             * @param {type} src
+             * @returns {dramacool2.userL#22.ToolBox.ui}
+             */
             loadscript: function(src = null) {
                 if (src === null || src.length < 1) {
-                    return;
+                    return this;
                 }
                 if (public.debug) {
                     console.debug('User script : loading script ' + src + '.');
@@ -96,6 +102,11 @@ window.eval = function() {};
                 document.body.appendChild(s);
                 return this;
             },
+            /**
+             * Loads remote css
+             * @param {string} src
+             * @returns {dramacool2.userL#22.ToolBox.ui|undefined}
+             */
             loadcss: function(src = null) {
                 if (src === null || src.length < 1) {
                     return;
@@ -110,9 +121,14 @@ window.eval = function() {};
                 document.head.appendChild(s);
                 return this;
             },
+            /**
+             * Add css string to dom
+             * @param {string} css
+             * @returns {dramacool2.userL#22.ToolBox.ui}
+             */
             addcss: function(css = null) {
                 if (css === null || css.length < 1) {
-                    return;
+                    return this;
                 }
                 if (public.debug) {
                     console.debug('User script : adding css ' + css + '.');
@@ -132,6 +148,28 @@ window.eval = function() {};
                 html = html.trim(); // Never return a text node of whitespace as the result
                 template.innerHTML = html;
                 return template.content.firstChild;
+            },
+            /**
+             * Add style to stylesheet
+             * @param {string} css
+             * @returns {dramacool2.userL#22.ToolBox.ui}
+             */
+            addstyle: function(css = null) {
+                if (typeof css === 'string' && css.length > 0) {
+                    styles += css;
+                }
+                return this;
+            },
+            /**
+             * Loads and reset the stored stylesheet
+             * @returns {dramacool2.userL#22.ToolBox.ui}
+             */
+            loadstyles: function() {
+                if (styles.length > 0) {
+                    this.addcss(styles);
+                    styles = ``;
+                }
+                return this;
             }
         };
         /**
@@ -246,6 +284,12 @@ window.eval = function() {};
 
                 }, this.retry);
             },
+            /**
+             * Set a cookie
+             * @param {type} name
+             * @param {type} value
+             * @returns {dramacool2.userL#22.ToolBox.cookies}
+             */
             set: function(name, value) {
                 if (!this.ready()) {
                     if (public.debug) {
@@ -257,6 +301,12 @@ window.eval = function() {};
                 Cookies.set(name, value);
                 return this;
             },
+            /**
+             * Get a cookie value
+             * @param {type} name
+             * @param {type} value
+             * @returns {.Cookies@call;getJSON.value|.Cookies@call;get.value|dramacool2.userL#22.ToolBox.data|data}
+             */
             get: function(name, value = null) {
                 if (!this.ready()) {
                     if (public.debug) {
@@ -273,6 +323,12 @@ window.eval = function() {};
                 }
                 return data[name];
             },
+            /**
+             * Get a cookie object
+             * @param {type} name
+             * @param {type} value
+             * @returns {object}
+             */
             getobj: function(name, value = {}) {
                 if (!this.ready()) {
                     if (public.debug) {
@@ -289,6 +345,11 @@ window.eval = function() {};
                 }
                 return data[name];
             },
+            /**
+             * Remove a cookie
+             * @param {type} name
+             * @returns {dramacool2.userL#22.ToolBox.cookies}
+             */
             remove: function(name) {
                 if (!this.ready()) {
                     if (public.debug) {
@@ -301,6 +362,11 @@ window.eval = function() {};
                 Cookies.remove(name);
                 return this;
             },
+            /**
+             * Save all loaded cookies
+             * @param {type} name
+             * @returns {dramacool2.userL#22.ToolBox.cookies}
+             */
             save: function(name = null) {
                 if (!this.ready()) {
                     if (public.debug) {
