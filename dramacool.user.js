@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.5.1
+// @version      6.5.3
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -301,7 +301,6 @@ window.eval = function() {};
 
                     `,
                 b1toogle: function(e) {
-                    console.debug(e);
                     if (toolbox.cookies.get('b1') === 'true') {
                         $('#b1').removeClass('active');
                         toolbox.cookies.set('b1', 'false');
@@ -379,7 +378,6 @@ window.eval = function() {};
                         toolbox.cookies.get('switch', $('div.nav_tab_global div.datagrild_nav a.active').attr('data-tab'));
                         $('div.nav_tab_global div.datagrild_nav a').each(function() {
                             $(this).removeClass('active');
-                            console.debug($(this));
                             $('.content_episode').removeClass($(this).attr('data-tab'));
                             if ($(this).attr('data-tab') === toolbox.cookies.get('switch')) {
                                 $(this).addClass('active');
@@ -579,7 +577,6 @@ window.eval = function() {};
             $('div.main_body > div.list_episode_video > div.bottom > div.row').each(function() {
                 name = $(this).find('label').text().trim();
                 if (name.length > 0) {
-                    console.debug(name);
                     option = document.createElement('option');
                     option.value = name;
                     option.textContent = option.value;
@@ -703,7 +700,6 @@ window.eval = function() {};
             }
             toolbox.ui.addcss(as.css);
             as.button = $(as.button);
-            console.debug(as.button);
             $('div.watch_player > div.plugins > ul').last().append(as.button);
             $('div.watch-drama > div.plugins2 > ul').append(as.button);
             as.button.on('click', as.prompt);
@@ -726,9 +722,13 @@ window.eval = function() {};
      */
     var fav = {
         css: `
-                .content_episode > ul.items > li.fav, ul[class*="list-episode-item"] > li.fav{border: 1px solid rgb(253, 184, 19);}
+                .content_episode.hor > ul.items > li.fav, ul[class*="list-episode-item-2"] > li.fav{border: 1px solid rgb(253, 184, 19);}
                 .main_body ul.list a[href*="/anime/"].fav{color: rgb(253, 184, 19);}
-                ul.list-episode-item > li.fav{margin: 4px;}
+
+                li.fav .fa-bookmark{display: none;}
+                ul.list-episode-item > li.fav .fa-bookmark, .datagrild.ver > ul.items > li.fav .fa-bookmark{width: 24px; height: 24px; color: rgb(253, 184, 19); position: absolute; top: -10px; right: -12px; z-index: 50; font-size: 24px; display: block;transform: scale(1, -1);}
+                li.fav {position: relative;}
+
             `,
         widget: {
             element: `<li><a href="javascript:void(0);">Synch Fav</a></li>`,
@@ -779,7 +779,6 @@ window.eval = function() {};
                 var val = fav.list[key];
                 //anime
                 $('.content_episode > ul.items > li a[href*="' + val + '"]').each(function() {
-                    console.debug(this);
                     $(this).parents('li:first').addClass('fav');
                 });
                 $('.main_body ul.list a[href*="/anime/"][href*="' + val + '"]').addClass('fav');
@@ -788,11 +787,20 @@ window.eval = function() {};
                     $(this).parent().addClass('fav');
                 });
             });
+            //<i class="fa fa-bookmark" aria-hidden="true"></i>
+            $('.fa-bookmark').remove();
+            $('li.fav').each(function() {
+                $(this).append('<i class="fa fa-bookmark" aria-hidden="true"></i>');
+
+            });
+
+
+
+
         },
         event: function() {
             favlist = {};
             $('div.bookmark table tr').each(function() {
-                console.debug($(this));
                 a = $(this).find('td:first a');
                 if (a.length > 0) {
                     favlist[a.text().trim()] = a.attr('href');
@@ -801,7 +809,6 @@ window.eval = function() {};
             if (JSON.stringify(favlist) !== JSON.stringify(fav.list)) {
                 fav.list = favlist;
                 toolbox.cookies.set('favlist', fav.list);
-                console.debug(fav.list);
                 alertify.message('Favorites sync complete.');
             }
         },
@@ -809,6 +816,7 @@ window.eval = function() {};
             if (typeof Cookies.get('auth') === 'undefined') {
                 return;
             }
+            toolbox.ui.addcss(fav.css);
             fav.widget.init();
             fav.list = toolbox.cookies.getobj('favlist');
             if (document.location.pathname === '/user/bookmark') {
@@ -818,12 +826,14 @@ window.eval = function() {};
                 //$('td.trash').on('click', $('div.bookmark table').click);
                 return;
             }
-            if (Object.keys(fav.list).length > 0) {
-                toolbox.ui.addcss(fav.css);
-                fav.findtargets();
-                return;
+            if (Object.keys(fav.list).length < 1) {
+                fav.sync();
             }
-            fav.sync();
+            if (Object.keys(fav.list).length > 0) {
+                fav.findtargets();
+            }
+
+
         }
     };
     /**
