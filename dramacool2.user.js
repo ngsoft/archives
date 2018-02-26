@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Dramacool v2 (UI Remaster + Videouploader)
+// @name         Dramacool v2
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.0.b
 // @description  UI Remaster + Videoupload + rewrite
 // @author       daedelus
 // @include     *://*dramacool*.*/*
