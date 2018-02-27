@@ -584,6 +584,198 @@ window.eval = function() {};
 
     }
 
+    /**
+     * UserPlugins(args, callback)
+     * UserPlugins(args)
+     * UserPlugin(callback)
+     */
+    function UserPlugin() {
+
+        /**
+         * Merge attributes from sub into base
+         * @param {object} base
+         * @param {object} sub
+         * @returns {object}
+         */
+        function merge(base, sub) {
+            for (var prop in sub) {
+                if (typeof sub[prop] === 'object') {
+                    if (base.hasOwnProperty(prop)) {
+                        if (typeof base[prop] === 'object') {
+                            base[prop] = merge(base[prop], sub[prop]);
+                        }
+                        continue;
+                    } else {
+                        base[prop] = sub[prop];
+                    }
+                    continue;
+                }
+                if (base.hasOwnProperty(prop)) {
+                    if (typeof base[prop] === typeof sub[prop]) {
+                        base[prop] = sub[prop];
+                    }
+                    continue;
+                }
+                base[prop] = sub[prop];
+            }
+            return base;
+        }
+
+        var data = {};
+
+        var defaults = {
+
+        };
+
+        //override methods
+        var public = {
+            meta: {
+                name: ``,
+                description: ``
+            },
+            configure: {
+                /**
+                 * Configuration element
+                 * @returns {Element}
+                 */
+                element: function() {
+                    return document.createElement('input');
+                },
+                /**
+                 * Click on element event
+                 * @param {type} e event
+                 */
+                click: function(e) {
+
+                },
+                /**
+                 * Change event
+                 * @param {type} e
+                 * @returns {undefined}
+                 */
+                change: function(e) {
+
+                },
+                /**
+                 * Save configuration method
+                 */
+                save: function() {
+
+                },
+                /**
+                 * Reset configuration method
+                 */
+                reset: function() {
+
+                },
+                /**
+                 * Called first to initialize components
+                 */
+                init: function() {
+
+                }
+            },
+            /**
+             * Called at each page initialization
+             */
+            init: function() {
+
+            },
+            /**
+             * Called when dom ready
+             */
+            onload: function() {
+
+            },
+            /**
+             * Check if plugin is enabled
+             * @returns {Boolean}
+             */
+            enabled: function() {
+                return true;
+            }
+        };
+        var args = {};
+        var callback = function() {};
+
+        if (arguments.length > 0) {
+            switch (arguments.length) {
+                case 2:
+                    args = arguments[0];
+                    callback = arguments[1];
+                    break;
+                case 1:
+                    callback = arguments[0];
+                    break;
+                default:
+                    console.debug('Cannot load user plugin, not enough arguments');
+            }
+        }
+
+        if (typeof args === 'object' && Object.keys(args).length > 0) {
+            public = merge(public, args);
+        }
+        if (typeof callback === 'object' && Object.keys(callback).length > 0) {
+            public = merge(public, callback);
+        }
+
+        if (typeof callback === 'function') {
+            obj = callback();
+            if (typeof obj === 'object') {
+                public = merge(public, callback);
+            }
+        }
+        return public;
+    }
+
+    var app = function() {
+
+        return {
+            plugins: {
+                configure: function() {
+                    var plugins = this;
+                    Object.keys(plugins).map(function(key) {
+                        var plugin = plugins[key];
+                        if (typeof plugin === 'objet') {
+                            plugin.configure.init();
+                        }
+
+                    });
+                }
+            },
+            loadplugin: function(name, callback = null) {
+                if (typeof name === 'string' && name.length > 0) {
+                    if (typeof callback === 'object' || typeof callback === 'function') {
+                        this.plugins[name] = new UserPlugin(callback);
+                    }
+                }
+                return this;
+
+            },
+
+            init: function() {
+                var that = this;
+                Object.keys(that.plugins).map(function(key) {
+                    var plugin = that.plugins[key];
+                    if (typeof plugin === 'objet' && plugin.enabled()) {
+                        plugin.init();
+                    }
+                });
+            },
+
+            onload: function() {
+                var that = this;
+                Object.keys(that.plugins).map(function(key) {
+                    var plugin = that.plugins[key];
+                    if (typeof plugin === 'objet') {
+                        plugin.onload();
+                    }
+                });
+            }
+
+        };
+    }();
+
 
 
 
@@ -605,10 +797,11 @@ window.eval = function() {};
             window.alert = alertify.alert;
             window.confirm = alertify.confirm;
             window.notify = alertify.message;
+            app.onload();
 
             toolbox.init(function() {
+                app.init();
                 toolbox.loader.hide();
-                alert('User Script loaded');
 
             });
         });
