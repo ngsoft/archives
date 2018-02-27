@@ -754,6 +754,7 @@ window.eval = function() {};
             },
 
             init: function() {
+                this.onload();
                 var that = this;
                 Object.keys(that.plugins).map(function(key) {
                     var plugin = that.plugins[key];
@@ -787,28 +788,25 @@ window.eval = function() {};
     toolbox.onload = function() {
         toolbox.cssloader = new CSSLoader();
         toolbox.cssloader.configure();
+        //put plugins declarations there
+
+
+
+        //==============================
     };
 
-    toolbox.cookies.init(function() {
-        toolbox.notify = new alertifyjs();
-        toolbox.notify.init(function() {
-
-            //override browser notifications
-            window.alert = alertify.alert;
-            window.confirm = alertify.confirm;
-            window.notify = alertify.message;
-            app.onload();
-
-            toolbox.init(function() {
-                app.init();
+    toolbox.init(function() {
+        toolbox.cookies.init(function() {
+            toolbox.notify = new alertifyjs();
+            toolbox.notify.init(function() {
+                //override browser notifications
+                window.alert = alertify.alert;
+                window.confirm = alertify.confirm;
+                window.notify = alertify.message;
                 toolbox.loader.hide();
-
+                app.init();
             });
         });
-
     });
-
-
-
 
 })();
