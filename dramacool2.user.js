@@ -34,7 +34,7 @@ window.open = function() {};
                 wait: true,
                 src: 'https://code.jquery.com/jquery-3.2.1.min.js'
             },
-            loader: {timeout: 1500},
+            loader: {timeout: 1500, enabled: true},
             cookies: {
                 expire: 14,
                 src: 'https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js',
@@ -223,11 +223,15 @@ window.open = function() {};
             onshow: function() {},
             onhide: function() {},
             show: function() {
-                loader.onshow();
+                if (this.enabled) {
+                    loader.onshow();
+                }
                 return this;
             },
             hide: function() {
-                setTimeout(loader.onhide, this.timeout);
+                if (this.enabled) {
+                    setTimeout(loader.onhide, this.timeout);
+                }
                 return this;
             },
             setup: function(onshow = function() {}, onhide = function(){}) {
@@ -518,9 +522,9 @@ window.open = function() {};
                 // dialogs default title
                 title: 'Userscript',
                 // ok button text
-                ok: 'Yes',
+                ok: 'OK',
                 // cancel button text
-                cancel: 'No'
+                cancel: 'Cancel'
             },
             // theme settings
             theme: {
@@ -626,11 +630,13 @@ window.open = function() {};
         var defaults = {
 
         };
+        var enabled = false;
 
         //override methods
         var public = {
             meta: {
                 name: ``,
+                displayname: ``,
                 description: ``
             },
             configure: {
@@ -639,7 +645,13 @@ window.open = function() {};
                  * @returns {Element}
                  */
                 element: function() {
-                    return document.createElement('input');
+                    template = `
+                    <div class="user-toggle">
+                        <input type="checkbox" data-enabled="${public.enabled() ? 1 : 0}" name="${public.meta.name}" id="${public.meta.name}" />
+                        <label for="${public.meta.name}">${public.meta.displayname}</label>
+                        <button onclick="javascript:void(0);" data-description="${public.meta.description}" data-name="${public.meta.name}" data-display-name="${public.meta.displayname}">Info</button>
+                    </div>`;
+                    return toolbox.ui.htmlToElement(template);
                 },
                 /**
                  * Click on element event
@@ -692,7 +704,7 @@ window.open = function() {};
              * @returns {Boolean}
              */
             enabled: function() {
-                return true;
+                return enabled;
             }
         };
         var args = {};
@@ -709,6 +721,7 @@ window.open = function() {};
                     break;
                 default:
                     console.debug('Cannot load user plugin, not enough arguments');
+                    return;
             }
         }
 
@@ -729,9 +742,28 @@ window.open = function() {};
     }
 
     var app = function() {
-        function configure() {
 
-        }
+        var css = `
+                .user-toggle > input[type="checkbox"] {height: 0;width: 0;visibility: hidden;}
+                .user-toggle > label {cursor: pointer;text-indent: -9999px;width: 48px;height: 24px;background: grey;display: block;border-radius: 100px;position: relative;}
+                .user-toggle > label:after {content: "";position: absolute;top: 2px;left: 2px;width: 20px;height: 20px;background: #fff;border-radius: 20px;transition: 0.3s;}
+                .user-toggle > input:checked + label {background: #2196f3;}
+                .user-toggle > input:checked + label:after {left: calc(100% - 5px);transform: translateX(-100%);}
+                .user-toggle > label:active:after {width: 130px;}
+                .user-toggle > span, .user-toggle > label, .user-toggle > button{float: left;margin-left: 20px;}
+                .user-toggle > button{border: 1px solid #2196f3; background: transparent;vertical-align: middle;font-size: 14pt; color:#2196f3;}
+                .user-toggle{margin-top: 10px; max-width:250px; width: 50%;height: 60px; padding-top: 30px;float: left;position: relative;}
+                .user-toggle > * {margin-top: -12px;}
+                .ajs-content form {position: absolute;top:0;left:0;right:0;bottom:0;}
+                .ajs-content form:after{content: ""; clear: both;}
+                .ajs-dialog.user-conf{width: 965px; height: 453px;}
+                .ajs-content{font-size: 14pt;}
+                .ajs-content form p.user-config-prompt{position: absolute; z-index:50; bottom:0; left:0; right:0; font-weight: bold; font-size: 12pt; text-align: center; margin: 0; padding: 10px;}
+                .ajs-button:disabled {color: gray!important;}
+
+                .hidden{display: none!important;}
+
+        `;
 
         return {
             plugins: {
@@ -766,9 +798,10 @@ window.open = function() {};
                                     buttons: [
                                         {
                                             text: "Save Changes",
-                                            className: alertify.defaults.theme.ok + " hidden",
+                                            className: alertify.defaults.theme.ok,
                                             attrs: {
-                                                style: "float:right;"
+                                                style: "float:right;",
+                                                disabled: 'disabled'
                                             }
                                         },
                                         {
@@ -793,9 +826,52 @@ window.open = function() {};
                                     //$(this.elements.content);
                                     //title
                                     //$(this.elements.header);
-
+                                    //e.preventDefault();
                                     this.elements.btok = this.elements.buttons.primary.children[0];
                                     this.elements.btcancel = this.elements.buttons.primary.children[1];
+
+                                    var that = this;
+
+
+                                    $(this.elements.content).find('form').each(function() {
+                                        $(that.elements.dialog).addClass('user-conf');
+                                        $(this).on('submit', function(e) {
+                                            e.preventDefault();
+                                        }).on('change', function() {
+                                            that.elements.btok.disabled = true;
+                                            $(this).find('div.user-toggle > input:checkbox').each(function() {
+                                                val = this.checked ? "1" : "0";
+                                                if ($(this).attr("data-enabled") !== val) {
+                                                    that.elements.btok.disabled = false;
+                                                }
+                                            });
+                                        });
+
+                                        $(this).find('div.user-toggle > input:checkbox').each(function() {
+                                            id = $(this).attr('id');
+                                            if (typeof app.plugins[id].configure.change === 'function') {
+                                                $(this).on('change', app.plugins[id].configure.change).on('click', app.plugins[id].configure.click);
+                                            }
+                                        });
+
+                                        $(this).find('button[data-description]').on('click', function() {
+                                            $(that.elements.dialog).addClass('hidden');
+
+                                            alertify.alert($(this).attr('data-display-name') + " Description", toolbox.ui.htmlToElement('<p style="text-align:center;">' + $(this).attr('data-description') + '</p>'), function() {
+                                                $(that.elements.dialog).removeClass('hidden');
+                                            });
+                                        });
+                                        $(this).find('.user-toggle > label').each(function() {
+                                            span = $('<span/>').attr('aria-hidden', "true").html($(this).text());
+                                            $(this).after(span);
+                                            $(span).on('click', function() {
+                                                $(this).next().click();
+                                            }).next().addClass('hidden');
+                                        });
+
+
+                                    });
+
 
                                 },
                                 onclose() {}, onupdate: function() {}
@@ -804,7 +880,20 @@ window.open = function() {};
                     }, true, 'confirm');
                 }
 
-                alertify.configure('User Script : Configuration', '', function() {
+                var form = document.createElement('form');
+                form.className = 'user-config-form';
+
+                for (var key in this.plugins) {
+                    if (typeof this.plugins[key] === 'object') {
+                        if (typeof this.plugins[key].configure.element === 'function') {
+                            el = this.plugins[key].configure.element();
+                            form.appendChild(el);
+                        }
+                    }
+                }
+                form.appendChild(toolbox.ui.htmlToElement('<p class="user-config-prompt">Please select the functions to enable.</p>'));
+
+                alertify.configure('User Script : Configuration', form, function() {
                     console.debug('success');
                     console.debug(this);
                 }, function() {
@@ -826,6 +915,7 @@ window.open = function() {};
             },
 
             onload: function() {
+                toolbox.ui.addstyle(css);
                 var that = this;
                 Object.keys(that.plugins).map(function(key) {
                     var plugin = that.plugins[key];
@@ -833,11 +923,191 @@ window.open = function() {};
                         plugin.onload();
                     }
                 });
+                toolbox.ui.loadstyles();
             }
 
         };
     }();
 
+
+
+    app.loadplugin('radds', {
+        meta: {
+            name: `radds`,
+            displayname: `Remove Adds`,
+            description: `Remove all adds from the sites`
+        },
+        configure: {
+            /**
+             * Click on element event
+             * @param {type} e event
+             */
+            click: function(e) {
+
+            },
+            /**
+             * Change event
+             * @param {type} e
+             * @returns {undefined}
+             */
+            change: function(e) {
+
+            },
+            /**
+             * Called first to initialize components
+             */
+            init: function() {
+
+            }
+        },
+        /**
+         * Called at each page initialization
+         */
+        init: function() {
+
+        },
+        /**
+         * Called when dom ready
+         */
+        onload: function() {
+
+        }
+    });
+
+    app.loadplugin('fav', {
+        meta: {
+            name: `fav`,
+            displayname: `Favorites`,
+            description: `Display favorites on the dramas and anime lists. (needs to be logged in for it to work)`
+        },
+        configure: {
+            /**
+             * Click on element event
+             * @param {type} e event
+             */
+            click: function(e) {
+
+            },
+            /**
+             * Change event
+             * @param {type} e
+             * @returns {undefined}
+             */
+            change: function(e) {
+                if (this.checked && typeof Cookies.get('auth') === 'undefined') {
+                    this.checked = false;
+                    alertify.warning('You are not logged in, you cannot use the favorite function.');
+                    /*$(this).parents('form:first')[0].reset();*/
+                    //$(this).parents('.ajs-dialog:first').find('.ajs-ok')[0].disabled = true;
+                }
+
+            },
+            /**
+             * Called first to initialize components
+             */
+            init: function() {
+
+            }
+        },
+        /**
+         * Called at each page initialization
+         */
+        init: function() {
+
+        },
+        /**
+         * Called when dom ready
+         */
+        onload: function() {
+
+        }
+    });
+
+    app.loadplugin('ui', {
+        meta: {
+            name: `ui`,
+            displayname: `UI Remaster`,
+            description: `User interface improvements`
+        },
+        configure: {
+            /**
+             * Click on element event
+             * @param {type} e event
+             */
+            click: function(e) {
+
+            },
+            /**
+             * Change event
+             * @param {type} e
+             * @returns {undefined}
+             */
+            change: function(e) {
+
+            },
+            /**
+             * Called first to initialize components
+             */
+            init: function() {
+
+            }
+        },
+        /**
+         * Called at each page initialization
+         */
+        init: function() {
+
+        },
+        /**
+         * Called when dom ready
+         */
+        onload: function() {
+
+        }
+    });
+
+    app.loadplugin('autoserver', {
+        meta: {
+            name: `autoserver`,
+            displayname: `Auto Server`,
+            description: `Select your favorite streaming server and autoloads it if available`
+        },
+        configure: {
+            /**
+             * Click on element event
+             * @param {type} e event
+             */
+            click: function(e) {
+
+            },
+            /**
+             * Change event
+             * @param {type} e
+             * @returns {undefined}
+             */
+            change: function(e) {
+
+            },
+            /**
+             * Called first to initialize components
+             */
+            init: function() {
+
+            }
+        },
+        /**
+         * Called at each page initialization
+         */
+        init: function() {
+
+        },
+        /**
+         * Called when dom ready
+         */
+        onload: function() {
+
+        }
+    });
 
 
 
@@ -847,13 +1117,9 @@ window.open = function() {};
     var toolbox = new ToolBox();
 
     toolbox.onload = function() {
+        toolbox.loader.enabled = false;
         toolbox.cssloader = new CSSLoader();
         toolbox.cssloader.configure();
-        //put plugins declarations there
-
-
-
-        //==============================
     };
 
     toolbox.init(function() {
@@ -867,6 +1133,7 @@ window.open = function() {};
                 toolbox.loader.hide();
                 app.init();
                 app.configure();
+
 
                 /*alertify.confirm().set({onshow: function() {
                  alertify.message('confirm was shown.');
