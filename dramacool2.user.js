@@ -17,7 +17,7 @@
 // ==/UserScript==
 
 window.open = function() {};
-window.eval = function() {};
+//window.eval = function() {};
 
 (function() {
 
@@ -729,6 +729,9 @@ window.eval = function() {};
     }
 
     var app = function() {
+        function configure() {
+
+        }
 
         return {
             plugins: {
@@ -736,7 +739,7 @@ window.eval = function() {};
                     var plugins = this;
                     Object.keys(plugins).map(function(key) {
                         var plugin = plugins[key];
-                        if (typeof plugin === 'objet') {
+                        if (typeof plugin === 'object') {
                             plugin.configure.init();
                         }
 
@@ -752,13 +755,71 @@ window.eval = function() {};
                 return this;
 
             },
+            configure: function() {
 
+                if (!alertify.configure) {
+
+                    alertify.dialog('configure', function factory() {
+                        return {
+                            setup: function() {
+                                return {
+                                    buttons: [
+                                        {
+                                            text: "Save Changes",
+                                            className: alertify.defaults.theme.ok + " hidden",
+                                            attrs: {
+                                                style: "float:right;"
+                                            }
+                                        },
+                                        {
+                                            text: "Cancel",
+                                            className: alertify.defaults.theme.cancel
+                                        }
+                                    ],
+                                    focus: {
+                                        element: 0
+                                    },
+                                    options: {
+                                        closable: false,
+                                        maximizable: false
+                                    }
+                                };
+                            },
+                            hooks: {
+                                onshow() {
+                                    //The Dialog Box
+                                    //$(this.elements.dialog);
+                                    //Content div
+                                    //$(this.elements.content);
+                                    //title
+                                    //$(this.elements.header);
+
+                                    this.elements.btok = this.elements.buttons.primary.children[0];
+                                    this.elements.btcancel = this.elements.buttons.primary.children[1];
+
+                                },
+                                onclose() {}, onupdate: function() {}
+                            }
+                        };
+                    }, true, 'confirm');
+                }
+
+                alertify.configure('User Script : Configuration', '', function() {
+                    console.debug('success');
+                    console.debug(this);
+                }, function() {
+                    console.debug('cancel');
+                    console.debug(this);
+                });
+
+
+            },
             init: function() {
                 this.onload();
                 var that = this;
                 Object.keys(that.plugins).map(function(key) {
                     var plugin = that.plugins[key];
-                    if (typeof plugin === 'objet' && plugin.enabled()) {
+                    if (typeof plugin === 'object' && plugin.enabled()) {
                         plugin.init();
                     }
                 });
@@ -768,7 +829,7 @@ window.eval = function() {};
                 var that = this;
                 Object.keys(that.plugins).map(function(key) {
                     var plugin = that.plugins[key];
-                    if (typeof plugin === 'objet') {
+                    if (typeof plugin === 'object') {
                         plugin.onload();
                     }
                 });
@@ -805,6 +866,16 @@ window.eval = function() {};
                 window.notify = alertify.message;
                 toolbox.loader.hide();
                 app.init();
+                app.configure();
+
+                /*alertify.confirm().set({onshow: function() {
+                 alertify.message('confirm was shown.');
+                 console.debug(this);
+                 }});
+                 alertify.confirm('Demo');*/
+
+
+
             });
         });
     });
