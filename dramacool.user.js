@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.6
+// @version      6.6.1
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -754,7 +754,7 @@ window.eval = function() {};
                     if (current !== null && current.length > 0) {
                         $(this).attr('data-current', current);
                         $(this).find('option').removeAttr('selected');
-                        $(this).find('option[value="' + current + '"]').attr('selected', 'selected');
+                        $(this).find('option[value="' + current + '"]:first').attr('selected', 'selected');
                     }
                     if ($(this).find('option[selected]').length < 1) {
                         $(this).find('option').first().attr('selected', 'selected');
