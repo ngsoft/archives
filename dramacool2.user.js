@@ -21,7 +21,6 @@ window.open = function() {};
 
 (function() {
 
-
     function ToolBox(args = {}) {
         //private properties
         var callback = function() {};
@@ -512,7 +511,7 @@ window.open = function() {};
                 // auto-dismiss wait time (in seconds)
                 delay: 5,
                 // default position
-                position: 'bottom-right',
+                position: 'top-right',
                 // adds a close button to notifier messages
                 closeButton: false
             },
@@ -589,11 +588,10 @@ window.open = function() {};
     }
 
     /**
-     * UserPlugins(args, callback)
-     * UserPlugins(args)
-     * UserPlugin(callback)
+     * @param {object} plugin
+     * @returns {object}
      */
-    function UserPlugin() {
+    function UserPlugin(plugin) {
 
         /**
          * Merge attributes from sub into base
@@ -671,7 +669,8 @@ window.open = function() {};
                 /**
                  * Save configuration method
                  */
-                save: function() {
+                save: function(e) {
+                    enabled = this.checked;
 
                 },
                 /**
@@ -707,37 +706,12 @@ window.open = function() {};
                 return enabled;
             }
         };
-        var args = {};
-        var callback = function() {};
 
-        if (arguments.length > 0) {
-            switch (arguments.length) {
-                case 2:
-                    args = arguments[0];
-                    callback = arguments[1];
-                    break;
-                case 1:
-                    callback = arguments[0];
-                    break;
-                default:
-                    console.debug('Cannot load user plugin, not enough arguments');
-                    return;
-            }
+        if (typeof plugin === 'object' && Object.keys(plugin).length > 0) {
+            public = merge(public, plugin);
+
         }
 
-        if (typeof args === 'object' && Object.keys(args).length > 0) {
-            public = merge(public, args);
-        }
-        if (typeof callback === 'object' && Object.keys(callback).length > 0) {
-            public = merge(public, callback);
-        }
-
-        if (typeof callback === 'function') {
-            obj = callback();
-            if (typeof obj === 'object') {
-                public = merge(public, callback);
-            }
-        }
         return public;
     }
 
@@ -764,6 +738,12 @@ window.open = function() {};
                 .hidden{display: none!important;}
 
         `;
+        var defaults = {
+
+        };
+        var cookie = {};
+
+        var form;
 
         return {
             plugins: {
@@ -778,11 +758,9 @@ window.open = function() {};
                     });
                 }
             },
-            loadplugin: function(name, callback = null) {
-                if (typeof name === 'string' && name.length > 0) {
-                    if (typeof callback === 'object' || typeof callback === 'function') {
-                        this.plugins[name] = new UserPlugin(callback);
-                    }
+            loadplugin: function(plugin) {
+                if (typeof plugin === 'object' && typeof plugin.meta.name === 'string' && plugin.meta.name.length > 0) {
+                    this.plugins[plugin.meta.name] = new UserPlugin(plugin);
                 }
                 return this;
 
@@ -837,7 +815,7 @@ window.open = function() {};
                                         $(that.elements.dialog).addClass('user-conf');
                                         $(this).on('submit', function(e) {
                                             e.preventDefault();
-                                        }).on('change', function() {
+                                        }).off('change').on('change', function() {
                                             that.elements.btok.disabled = true;
                                             $(this).find('div.user-toggle > input:checkbox').each(function() {
                                                 val = this.checked ? "1" : "0";
@@ -848,23 +826,24 @@ window.open = function() {};
                                         });
 
                                         $(this).find('div.user-toggle > input:checkbox').each(function() {
-                                            id = $(this).attr('id');
+                                            var id = $(this).attr('name');
                                             if (typeof app.plugins[id].configure.change === 'function') {
-                                                $(this).on('change', app.plugins[id].configure.change).on('click', app.plugins[id].configure.click);
+                                                $(this).off('change').on('change', app.plugins[id].configure.change).off('click').on('click', app.plugins[id].configure.click).off('save').on('save', app.plugins[id].configure.save).attr('data-enabled', app.plugins[id].enabled() ? 1 : 0);
                                             }
                                         });
 
-                                        $(this).find('button[data-description]').on('click', function() {
+                                        $(this).find('button[data-description]').off('click').on('click', function() {
                                             $(that.elements.dialog).addClass('hidden');
 
                                             alertify.alert($(this).attr('data-display-name') + " Description", toolbox.ui.htmlToElement('<p style="text-align:center;">' + $(this).attr('data-description') + '</p>'), function() {
                                                 $(that.elements.dialog).removeClass('hidden');
                                             });
                                         });
+                                        $(this).find('.user-toggle > span').remove();
                                         $(this).find('.user-toggle > label').each(function() {
                                             span = $('<span/>').attr('aria-hidden', "true").html($(this).text());
                                             $(this).after(span);
-                                            $(span).on('click', function() {
+                                            $(span).off('click').on('click', function() {
                                                 $(this).next().click();
                                             }).next().addClass('hidden');
                                         });
@@ -879,23 +858,29 @@ window.open = function() {};
                         };
                     }, true, 'confirm');
                 }
+                //create form
+                if (typeof form !== 'object') {
+                    form = document.createElement('form');
+                    form.className = 'user-config-form';
 
-                var form = document.createElement('form');
-                form.className = 'user-config-form';
-
-                for (var key in this.plugins) {
-                    if (typeof this.plugins[key] === 'object') {
-                        if (typeof this.plugins[key].configure.element === 'function') {
-                            el = this.plugins[key].configure.element();
-                            form.appendChild(el);
+                    for (var key in this.plugins) {
+                        if (typeof this.plugins[key] === 'object') {
+                            if (typeof this.plugins[key].configure.element === 'function') {
+                                el = this.plugins[key].configure.element();
+                                form.appendChild(el);
+                            }
                         }
                     }
+                    form.appendChild(toolbox.ui.htmlToElement('<p class="user-config-prompt">Please select the functions to enable.</p>'));
                 }
-                form.appendChild(toolbox.ui.htmlToElement('<p class="user-config-prompt">Please select the functions to enable.</p>'));
 
                 alertify.configure('User Script : Configuration', form, function() {
-                    console.debug('success');
-                    console.debug(this);
+                    //save plugins
+                    $(this.elements.content).find('.user-toggle > input:checkbox').trigger('save').each(function() {
+                        $(this).attr('data-enabled', this.checked ? 1 : 0);
+                    });
+                    alertify.message('User Script : Configuration Saved');
+
                 }, function() {
                     console.debug('cancel');
                     console.debug(this);
@@ -929,13 +914,11 @@ window.open = function() {};
         };
     }();
 
-
-
-    app.loadplugin('radds', {
+    app.loadplugin({
         meta: {
-            name: `radds`,
-            displayname: `Remove Adds`,
-            description: `Remove all adds from the sites`
+            name: `ui`,
+            displayname: `UI Remaster`,
+            description: `User interface improvements`
         },
         configure: {
             /**
@@ -967,14 +950,15 @@ window.open = function() {};
 
         },
         /**
-         * Called when dom ready
+         * Called before init()
          */
         onload: function() {
 
         }
     });
 
-    app.loadplugin('fav', {
+
+    app.loadplugin({
         meta: {
             name: `fav`,
             displayname: `Favorites`,
@@ -1016,57 +1000,16 @@ window.open = function() {};
 
         },
         /**
-         * Called when dom ready
+         * Called before init
          */
         onload: function() {
 
         }
     });
 
-    app.loadplugin('ui', {
-        meta: {
-            name: `ui`,
-            displayname: `UI Remaster`,
-            description: `User interface improvements`
-        },
-        configure: {
-            /**
-             * Click on element event
-             * @param {type} e event
-             */
-            click: function(e) {
 
-            },
-            /**
-             * Change event
-             * @param {type} e
-             * @returns {undefined}
-             */
-            change: function(e) {
 
-            },
-            /**
-             * Called first to initialize components
-             */
-            init: function() {
-
-            }
-        },
-        /**
-         * Called at each page initialization
-         */
-        init: function() {
-
-        },
-        /**
-         * Called when dom ready
-         */
-        onload: function() {
-
-        }
-    });
-
-    app.loadplugin('autoserver', {
+    app.loadplugin({
         meta: {
             name: `autoserver`,
             displayname: `Auto Server`,
@@ -1146,5 +1089,4 @@ window.open = function() {};
             });
         });
     });
-
 })();
