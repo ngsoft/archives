@@ -744,6 +744,7 @@ window.open = function() {};
         var cookie = {};
 
         var form;
+        var configure;
 
         return {
             plugins: {
@@ -874,7 +875,7 @@ window.open = function() {};
                     form.appendChild(toolbox.ui.htmlToElement('<p class="user-config-prompt">Please select the functions to enable.</p>'));
                 }
 
-                alertify.configure('User Script : Configuration', form, function() {
+                configure = alertify.configure('User Script : Configuration', form, function() {
                     //save plugins
                     $(this.elements.content).find('.user-toggle > input:checkbox').trigger('save').each(function() {
                         $(this).attr('data-enabled', this.checked ? 1 : 0);
@@ -885,6 +886,7 @@ window.open = function() {};
                     console.debug('cancel');
                     console.debug(this);
                 });
+                console.debug(configure);
 
 
             },
