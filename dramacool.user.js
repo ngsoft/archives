@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.7
+// @version      6.7.1
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -888,6 +888,7 @@ button.ajs-button.ajs-ok{float:right;}
 
                 div.info a.user-bookmark .fa-bookmark + span:before{content: "Remove Bookmark";display: inline-block;margin: 0 5px;}
                 div.info a.user-bookmark .fa-bookmark.unset + span:before{content: "Set Bookmark";}
+                div.info a.user-bookmark .fa-bookmark.unset.loading + span:before{content: "please wait ...";}
 
             `,
         widget: {
@@ -939,8 +940,7 @@ button.ajs-button.ajs-ok{float:right;}
                     $(this).parent().addClass('fav');
                 });
                 //drama-list
-                //mark
-                console.debug($(`.filter-item a[href="${val}"]`).addClass("fav"));
+                $(`.filter-item a[href="${val}"]`).addClass("fav");
                 //drama-detail
                 if (location.pathname === val) {
                     $('.fa-bookmark').removeClass('unset');
@@ -951,8 +951,8 @@ button.ajs-button.ajs-ok{float:right;}
             $('li .fa-bookmark').remove();
             $('li.fav').each(function() {
                 $(this).append('<i class="fa fa-bookmark" aria-hidden="true"></i>');
-
             });
+            $('.fa-bookmark').removeClass("loading");
 
 
 
@@ -1002,7 +1002,7 @@ button.ajs-button.ajs-ok{float:right;}
                     return template.content.firstChild;
                 };
 
-                var el = htmlToElement(`<p><a class="user-bookmark" href="javascript:void(0)"><i class="fa fa-bookmark unset" aria-hidden="true"></i><span></span></a><p>`);
+                var el = htmlToElement(`<p><a class="user-bookmark" href="javascript:void(0)"><i class="fa fa-bookmark unset loading" aria-hidden="true"></i><span></span></a><p>`);
 
                 $('div.info:first > h1:first').after(el);
 
@@ -1036,6 +1036,8 @@ button.ajs-button.ajs-ok{float:right;}
 
 
                 $(el).find('a').on('click', function() {
+                    $(this).find('.fa-bookmark').addClass("unset loading");
+
 
                     //get first video for bookmark id
                     if (typeof favid !== 'number') {
