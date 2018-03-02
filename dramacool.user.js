@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.6.1
+// @version      6.7
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -192,17 +192,27 @@ window.eval = function() {};
         drama: true,
         ui: {
             css: `
-                    div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .content-right .fanpage, .show-all, .btn-show-all, .hidden{
-                            display: none !important;
-                    }
-                    .mediaplayer .content-left{width:100%!important;}
-                    iframe, .watch-drama .note{display:none;}
-                    .watch-iframe iframe{display: block;}
-                    .watch-drama .plugins2 .facebook{
-                        margin-right: 2px!important;
-                    }
-                    .plugins2 ul li.direction a{background-color: rgb(0, 171, 236);}
-                    button.ajs-button.ajs-ok{float:right;}
+div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .content-right .fanpage, .show-all, .btn-show-all, .hidden{
+        display: none !important;
+}
+.mediaplayer .content-left{width:100%!important;}
+iframe, .watch-drama .note{display:none;}
+.watch-iframe iframe{display: block;}
+.watch-drama .plugins2 .facebook{
+    margin-right: 2px!important;
+}
+.plugins2 ul li.direction a{background-color: rgb(0, 171, 236);}
+button.ajs-button.ajs-ok{float:right;}
+.details .info {font-size: 10pt;}
+.details .info h1 {font-size: 24pt;}
+.details .info > p {position: relative;display: block;}
+.alertify-notifier, .alertify{font-size: 12pt;}
+@media only screen and (max-width: 969px) {
+}
+@media only screen and (max-width: 479px) {
+            .details .img{display:none;}
+}
+
             `,
             btnsvr: `<li class="facebook"><i class="fa fa-server"></i><span>Select Servers</span></li>`,
             btnep: `<li class="twitter"><i class="fa fa-file-video-o"></i><span>Select Episode</span></li>`,
@@ -336,13 +346,26 @@ window.eval = function() {};
                             a = $(this).find('a').first();
                             if (a.length > 0) {
                                 a.find('h3.title').removeAttr('onclick').off('click');
-                                a.find('span.ep').attr('data-link', a.attr('href')).on('click', function(e) {
+                                a.attr('data-episode-link', a.attr('href')).find('span.ep').on('click', function(e) {
                                     e.preventDefault();
-                                    location.href = $(this).attr('data-link');
+                                    location.href = $(this).parent().attr('data-episode-link');
                                 });
                                 href = a.attr('href');
                                 href = '/drama-detail' + href.replace(/\-episode\-([0-9]+)\.html$/i, '');
-                                a.attr('href', href);
+                                a.attr('href', href).off('click').on('click', function(e) {
+                                    e.preventDefault();
+                                    toolbox.loader.show();
+                                    var el = this;
+                                    $.get($(this).attr('data-episode-link'), function(data) {
+                                        $(data).find('.watch-drama .category a').first().each(function() {
+                                            window.location.href = $(this).attr('href');
+
+                                        });
+                                    }).fail(function() {
+                                        window.location.href = $(el).attr('href');
+
+                                    });
+                                });
                             }
 
 
@@ -848,15 +871,23 @@ window.eval = function() {};
     /**
      * Favorites Plugin
      */
+    var favid = null;
     var fav = {
         css: `
                 .content_episode.hor > ul.items > li.fav, ul[class*="list-episode-item-2"] > li.fav{border: 1px solid rgb(253, 184, 19);}
-                .main_body ul.list a[href*="/anime/"].fav{color: rgb(253, 184, 19);}
+                a.fav{color: rgb(253, 184, 19);}
 
                 li.fav .fa-bookmark{display: none;}
-                ul.list-episode-item > li.fav .fa-bookmark, .datagrild > ul.items > li.fav .fa-bookmark{width: 24px; height: 24px; color: rgb(253, 184, 19); position: absolute; top: -10px; right: -12px; z-index: 50; font-size: 24px; display: block;transform: scale(1, -1);}
+                ul.list-episode-item > li.fav .fa-bookmark, .datagrild > ul.items > li.fav .fa-bookmark, div.details > div.img .fa-bookmark{width: 24px; height: 24px; position: absolute; top: -10px; right: -12px; z-index: 50; font-size: 24px; display: block;transform: scale(1, -1);}
                 li.fav {position: relative;}
                 .datagrild.hor .fa-bookmark{display: none!important;}
+                div.details > div.img .fa-bookmark{top: auto; right:0; bottom:0;}
+                .fa-bookmark{color: rgb(253, 184, 19);}
+                .fa-bookmark.unset{color: gray!important;}
+                a.user-bookmark{display:block;}
+
+                div.info a.user-bookmark .fa-bookmark + span:before{content: "Remove Bookmark";display: inline-block;margin: 0 5px;}
+                div.info a.user-bookmark .fa-bookmark.unset + span:before{content: "Set Bookmark";}
 
             `,
         widget: {
@@ -888,17 +919,9 @@ window.eval = function() {};
                         fav.list[a.text().trim()] = a.attr('href');
                     }
                 });
-                alertify.message('Favorites sync complete.');
-                if (Object.keys(fav.list).length > 0) {
-                    toolbox.cookies.set('favlist', fav.list);
-                    alertify.message("Successfully added " + Object.keys(fav.list).length + " favorites.");
-                    fav.findtargets();
-                    /*window.alert("Successfully added " + Object.keys(fav.list).length + " favorites.");
-                     fav.findtargets();*/
-                    return;
-                }
-
-                alertify.message('No Favorites set.');
+                alertify.message(`Favorites sync complete <br /> (${Object.keys(fav.list).length} Favorites)`);
+                toolbox.cookies.set('favlist', fav.list);
+                fav.findtargets();
             });
             $(this).parents('.nav_down_up').toggle();
         },
@@ -915,13 +938,22 @@ window.eval = function() {};
                 $('ul[class*="list-episode-item"] > li > a[href*="' + val + '"]').each(function() {
                     $(this).parent().addClass('fav');
                 });
+                //drama-list
+                //mark
+                console.debug($(`.filter-item a[href="${val}"]`).addClass("fav"));
+                //drama-detail
+                if (location.pathname === val) {
+                    $('.fa-bookmark').removeClass('unset');
+                }
+
             });
             //<i class="fa fa-bookmark" aria-hidden="true"></i>
-            $('.fa-bookmark').remove();
+            $('li .fa-bookmark').remove();
             $('li.fav').each(function() {
                 $(this).append('<i class="fa fa-bookmark" aria-hidden="true"></i>');
 
             });
+
 
 
 
@@ -955,13 +987,90 @@ window.eval = function() {};
                 //$('td.trash').on('click', $('div.bookmark table').click);
                 return;
             }
+
+
+
+            if (document.location.pathname.indexOf('/drama-detail/') !== -1) {
+                /**
+                 * @param {String} HTML representing a single element
+                 * @return {Element}
+                 */
+                htmlToElement = function(html) {
+                    var template = document.createElement('template');
+                    html = html.trim(); // Never return a text node of whitespace as the result
+                    template.innerHTML = html;
+                    return template.content.firstChild;
+                };
+
+                var el = htmlToElement(`<p><a class="user-bookmark" href="javascript:void(0)"><i class="fa fa-bookmark unset" aria-hidden="true"></i><span></span></a><p>`);
+
+                $('div.info:first > h1:first').after(el);
+
+                if (typeof ajaxBookmark === 'undefined') {
+                    function ajaxBookmark(id, url, callback) {
+                        $.ajax({
+                            dataType: 'json',
+                            type: 'post',
+                            //async: false,
+                            data: {
+                                id: id,
+                                _csrf: $("meta[name=csrf-token]").attr('content')
+                            },
+                            url: url,
+                            success: function(response) {
+                                callback(response);
+                            }
+                        });
+                    }
+                }
+
+                var toggle = function(id) {
+                    if (typeof id === 'number') {
+                        $('.fa-bookmark').addClass('unset');
+                        ajaxBookmark(id, '/user/switchBookmark', function() {
+                            setTimeout(fav.sync, 2500);
+                        });
+                    }
+
+                };
+
+
+                $(el).find('a').on('click', function() {
+
+                    //get first video for bookmark id
+                    if (typeof favid !== 'number') {
+                        var vidurl = $('ul[class*="list-episode-item"] > li:first a').first().attr('href');
+                        if (vidurl.length > 0) {
+                            $.ajax({
+                                type: "GET",
+                                cache: false,
+                                url: vidurl,
+                                //async: false,
+                                success: function(data) {
+                                    console.debug('success');
+                                    $(data).filter('script:contains("ajaxBookmark")').each(function() {
+                                        regex = new RegExp(/ajaxBookmark\(([0-9]+)/);
+                                        results = regex.exec(this.text);
+                                        if (results !== null) {
+                                            favid = parseInt(results[1]);
+                                            toggle(favid);
+                                        }
+                                    });
+                                }
+                            });
+
+                        }
+                        return;
+                    }
+                    toggle(favid);
+                });
+            }
             if (Object.keys(fav.list).length < 1) {
                 fav.sync();
             }
             if (Object.keys(fav.list).length > 0) {
                 fav.findtargets();
             }
-
 
         }
     };
@@ -995,7 +1104,7 @@ window.eval = function() {};
                 // auto-dismiss wait time (in seconds)
                 delay: 5,
                 // default position
-                position: 'bottom-right',
+                position: 'top-right',
                 // adds a close button to notifier messages
                 closeButton: false
             },
@@ -1097,7 +1206,12 @@ window.eval = function() {};
 
         //toolbox.cookies.onready = dramacool.init;
         toolbox.cookies.onready = notify.init;
-        notify.onready = dramacool.init;
+        notify.onready = function() {
+            window.alert = alertify.alert;
+            window.confirm = alertify.confirm;
+            window.prompt = alertify.prompt;
+            dramacool.init();
+        };
     };
     toolbox.init(toolbox.cookies.init);
 })();
