@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -14,10 +14,11 @@
 // ==/UserScript==
 
 
-window.open = function() {};
 
-var toolbox = toolbox || (function api() {
-    this.addstyle = function(css = null) {
+
+function toolbox() {
+    var api = {};
+    api.addstyle = function(css = null) {
         if (css === null || css.length < 1) {
             return this;
         }
@@ -28,7 +29,7 @@ var toolbox = toolbox || (function api() {
             document.body.appendChild(s);
         });
     };
-    this.ondomready = function(fn) {
+    api.ondomready = function(fn) {
         if (typeof fn !== 'function') {
             return this;
         }
@@ -39,19 +40,29 @@ var toolbox = toolbox || (function api() {
         }
         return this;
     };
-    this.elementcreate = function(html) {
+    api.elementcreate = function(html) {
         var template = document.createElement('template');
         html = html.trim();
         template.innerHTML = html;
         return template.content.firstChild;
     };
-    return this;
-})();
-
+    api.loadscript = function(src = null) {
+        if (src === null || src.length < 1) {
+            return this;
+        }
+        return this.ondomready(function() {
+            s = document.createElement('script');
+            s.setAttribute('src', src);
+            s.setAttribute('type', "text/javascript");
+            document.head.appendChild(s);
+        });
+    };
+    return api;
+}
 
 (function() {
 
-    toolbox.addstyle(`
+    toolbox().addstyle(`
         div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"],
         .ads-outsite, #disqus_thread, .hidden, .this-message-does-not-harm-to-you-dont-remove-it,
         .widget.crop, .widget.comment, iframe, body.watch #sidebar{display: none !important;}
@@ -59,8 +70,11 @@ var toolbox = toolbox || (function api() {
 
         body.watch #main{margin:0!important; padding:0!important;}
 
-    `);
+    `).ondomready(function() {
+        el = (el = document.getElementById('disqus_thread')) ? el.remove() : null;
+        window.open = function() {};
 
+    });
 
 })();
 
