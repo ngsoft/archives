@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.7.3
+// @version      6.8
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -889,6 +889,8 @@ button.ajs-button.ajs-ok{float:right;}
                 div.info a.user-bookmark .fa-bookmark + span:before{content: "Remove Bookmark";display: inline-block;margin: 0 5px;}
                 div.info a.user-bookmark .fa-bookmark.unset + span:before{content: "Set Bookmark";}
                 div.info a.user-bookmark .fa-bookmark.unset.loading + span:before{content: "please wait ...";}
+                ul[favonly].hidden{ display: block!important; min-height: 500px;}
+                ul[favonly].hidden > li{display:none!important;}
 
             `,
         widget: {
@@ -953,10 +955,29 @@ button.ajs-button.ajs-ok{float:right;}
                 $(this).append('<i class="fa fa-bookmark" aria-hidden="true"></i>');
             });
             $('.fa-bookmark').removeClass("loading");
+            $('li.fav .fa-bookmark').off('click').on('click', function(e) {
+                e.preventDefault();
+                toolbox.loader.show();
+                $(this).parents('ul:first').each(function() {
+                    toolbox.loader.hide();
+                    if (this.dataset.favonly) {
+                        delete this.dataset.favonly;
+                        $(this).find('[data-favhidden]').removeClass('hidden');
+                        if ($('li.userplugin.active').length > 0) {
+                            $(this).find('li:not([data-subbed])').addClass('hidden');
+                        }
+                        return;
+                    }
+                    this.dataset.favonly = true;
+                    $(this).find('li').each(function() {
+                        if ($(this).hasClass('fav')) {
+                            return;
+                        }
+                        $(this).attr('data-favhidden', true).addClass('hidden');
+                    });
+                });
 
-
-
-
+            });
 
         },
         event: function() {
@@ -987,8 +1008,6 @@ button.ajs-button.ajs-ok{float:right;}
                 //$('td.trash').on('click', $('div.bookmark table').click);
                 return;
             }
-
-            //mark
             $('div.info a.bookmark').one('click', function() {
                 $(this).on('click', function() {
                     setTimeout(fav.sync, 2500);
@@ -1028,19 +1047,10 @@ button.ajs-button.ajs-ok{float:right;}
                     }
                 }
 
-                var toggle = function(id) {
-                    if (typeof id === 'number') {
-                        $('.fa-bookmark').addClass('unset');
-                        ajaxBookmark(id, '/user/switchBookmark', function() {
-                            setTimeout(fav.sync, 2500);
-                        });
-                    }
 
-                };
-
-
-                $(el).find('a').on('click', function() {
+                var evt = function() {
                     $(this).find('.fa-bookmark').addClass("unset loading");
+                    var a = this;
 
 
                     //get first video for bookmark id
@@ -1069,8 +1079,31 @@ button.ajs-button.ajs-ok{float:right;}
                         return;
                     }
                     toggle(favid);
-                });
+                };
+
+                var toggle = function(id) {
+                    if (typeof id === 'number') {
+                        $('.fa-bookmark').addClass('unset');
+                        ajaxBookmark(id, '/user/switchBookmark', function() {
+                            setTimeout(function() {
+                                fav.sync();
+                                $(el).find('a').one('click', evt);
+                            }, 2500);
+                        });
+                    }
+
+                };
+
+                $(el).find('a').one('click', evt);
             }
+
+            $('li.userplugin').on('click', function() {
+                toolbox.loader.show();
+                setTimeout(function() {
+                    $('[data-favonly] [data-favhidden]').addClass('hidden');
+                    toolbox.loader.onhide();
+                }.bind(this), 700);
+            });
 
 
 
@@ -1208,6 +1241,7 @@ button.ajs-button.ajs-ok{float:right;}
         toolbox.loader.onshow = cssloader.show;
         toolbox.loader.onhide = cssloader.hide;
         toolbox.loader.show();
+        toolbox.loader.timeout = 700;
         toolbox.ui.addcss(dramacool.ui.css);
         el = document.getElementById('disqus_thread');
         if (el !== null) {
