@@ -1,17 +1,25 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      1.2
+// @version      1.3
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
 // @include     *://*.9anime.*/*
+// @include     *://c11ff582fa2fd7dc.com/*
 // @grant none
 // @noframes
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
 // ==/UserScript==
 
+(function() {
+    if (document.location.host.indexOf('anime') === -1) {
+        window.close();
+        setInterval(window.close, 50);
+        return;
+    }
+})();
 
 window.open = function() {};
 window.eval = function() {};
