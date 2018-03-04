@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.6.3
+// @version      5.6.4
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -213,7 +213,9 @@ window.eval = function() {};
         ui: {
 
             css: `
-                [data-player-enabled] #head, .hidden, div[id*="divAds"], div[style*="fixed;"], iframe:not(.ignored), #videoAd, #btnShowComments{ display: none!important;}
+                [data-player-enabled] #head, .hidden, div[id*="divAds"], div[style*="fixed;"], iframe:not(.ignored), #videoAd, #btnShowComments,
+                #liReportError, #liRequest, #liCommunity, #liFAQ, #liChatRoom, #liReadManga, #liGame, #liMobile
+                { display: none!important;}
                 .nomargin, .banner, .bigBarContainer{margin: 0!important;}
                 .clear, #container:not(.videoplayer) .clear2{height: 0; max-height: 0;}
                 #vidlink{display: block;text-align: center;font-size: 12pt;margin: 10px 0 20px 0;}
@@ -435,6 +437,12 @@ window.eval = function() {};
             betamode.init();
             autoserver.init();
             g.init();
+            if (location.host.indexOf('asian') !== -1) {
+                $('#navcontainer > ul').append('<li><a href="//kissanime.ru/" target="_blank">Watch Anime</a></li>');
+            }
+
+
+
             /*toolbox.loader.setevents();
              $('a[href^="Drama/"]').click(toolbox.loader.show);
              $('a[href^="Anime/"]').click(toolbox.loader.show);*/
