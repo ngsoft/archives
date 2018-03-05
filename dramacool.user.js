@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.8
-// @description  UI Remaster + Videoupload
+// @version      6.9
+// @description  UI Remaster + Videoupload (last legacy version)
 // @author       daedelus
 // @include     *://*dramacool*.*/*
 // @include     *://*watchasia*.*/*
@@ -192,12 +192,12 @@ window.eval = function() {};
         drama: true,
         ui: {
             css: `
-div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .content-right .fanpage, .show-all, .btn-show-all, .hidden{
+div[id*="BB_SK"], .mediaplayer .content-right, div[class*="ads_"],div[id*="rcjsload"],.report2,.ads-outsite, #disqus_thread, .content-right .fanpage, .show-all, .btn-show-all, .hidden, .ajs-content .top, .ajs-content .list_episode .list_top{
         display: none !important;
 }
 .mediaplayer .content-left{width:100%!important;}
 iframe, .watch-drama .note{display:none;}
-.watch-iframe iframe{display: block;}
+.watch-iframe iframe, [data-visible].hidden{display: block!important;}
 .watch-drama .plugins2 .facebook{
     margin-right: 2px!important;
 }
@@ -207,7 +207,17 @@ button.ajs-button.ajs-ok{float:right;}
 .details .info h1 {font-size: 24pt;}
 .details .info > p {position: relative;display: block;}
 .alertify-notifier, .alertify{font-size: 12pt;}
+.btn-btt{z-index: 40;}
+.ajs-content .list_episode_video, .ajs-content .list_episode_video a, .ajs-content .list_episode a{color: #000!important;}
+.ajs-content .list_episode_video .row:nth-child(2n+1), .ajs-content .list_episode ul li:nth-child(2n){background-color: #eee;}
+.ajs-content .list_episode_video .row:hover{background-color: #009bc3!important;}
+
+div.ajs-dialog.sticky{min-width: 720px!important; min-height: 405px!important; }
+
+
+
 @media only screen and (max-width: 969px) {
+
 }
 @media only screen and (max-width: 479px) {
             .details .img{display:none;}
@@ -222,6 +232,8 @@ button.ajs-button.ajs-ok{float:right;}
                     if (dramacool.drama == false) {
                         return dramacool.ui.anime.init();
                     }
+                    $('div.watch-drama').attr('id', 'player');
+                    location.hash = 'player';
                     $('.container').addClass('mediaplayer');
                     $('.watch-drama .anime_muti_link').addClass('hidden');
                     $('.watch-drama div:contains("Please scroll down to choose")').addClass('hidden');
@@ -231,19 +243,40 @@ button.ajs-button.ajs-ok{float:right;}
                     $('.plugins2 .facebook').remove();
                     $('.plugins2 .twitter').remove();
                     dramacool.ui.btnsvr = $(dramacool.ui.btnsvr);
+
                     dramacool.ui.btnsvr.click(function(e) {
-                        if ($('.watch-drama .anime_muti_link').hasClass('hidden'))
-                            $('.watch-drama .anime_muti_link').removeClass('hidden');
-                        else
-                            $('.watch-drama .anime_muti_link').addClass('hidden');
+                        let list = $('.watch-drama .anime_muti_link').each(function() {
+                            this.dataset.visible = true;
+                        }).clone();
+                        list.removeClass('hidden');
+                        var box = alertify.alert('Userscript: Server Selection', list[0]);
+                        box.set('closable', true).set('label', 'Close').set('maximizable', true).set('closableByDimmer', false);
+
+                        $(box.elements.dialog).addClass('sticky');
+
+                        $(box.elements.content).find('li:not(.selected)').one('click', function(e) {
+                            e.preventDefault();
+                            let vidlink = this.dataset.video;
+                            $('[data-video]').removeClass('selected');
+                            $(`[data-video="${vidlink}"]`).click();
+                            delete $('.watch-drama .anime_muti_link')[0].dataset.visible;
+                            box.close();
+                        });
+                        box.set('resizable', true).show();
                     });
+
+
                     dramacool.ui.btnep = $(dramacool.ui.btnep);
                     dramacool.ui.btnep.click(function(e) {
-                        selector = $('ul.all-episode').parents('div.block-tab');
-                        if (selector.hasClass('hidden'))
-                            selector.removeClass('hidden');
-                        else
-                            selector.addClass('hidden');
+                        var list = $('ul.all-episode').clone();
+
+                        var box = alertify.alert('Userscript: Episode Selection', list[0]);
+
+                        box.set('closable', true).set('label', 'Close').set('maximizable', true)
+                                .set('closableByDimmer', false).set('resizable', true);
+
+                        $(box.elements.footer).remove();
+                        box.resizeTo('75%', '75%');
                     });
                     $('.plugins2 ul').prepend(dramacool.ui.btnep);
                     $('.plugins2 ul').prepend(dramacool.ui.btnsvr);
@@ -276,22 +309,48 @@ button.ajs-button.ajs-ok{float:right;}
                     dramacool.ui.btnep = $(dramacool.ui.btnep);
                     toolbar.prepend(dramacool.ui.btnep).prepend(dramacool.ui.btnsvr);
                     $('div[class*="list_episode"]').addClass('hidden');
+
                     dramacool.ui.btnsvr.off('click').on('click', function() {
-                        target = $('div.list_episode_video');
-                        if (target.hasClass('hidden')) {
-                            target.removeClass('hidden');
-                        } else {
-                            target.addClass('hidden');
-                        }
+                        let list = $('div.list_episode_video').each(function() {
+                            this.dataset.visible = true;
+                            var loop = 0;
+                            $(this).find('a').each(function() {
+                                loop++;
+                                this.dataset.item = loop;
+                            });
+                        }).clone();
+                        var box = alertify.alert('Userscript: Server Selection', list[0]);
+                        box.set('closable', true).set('label', 'Close').set('maximizable', true).set('resizable', true).set('closableByDimmer', false);
+
+                        $(box.elements.dialog).addClass('sticky');
+
+                        $(box.elements.content).find('.row').has('a:not(.selected)').one('click', function(e) {
+                            e.preventDefault();
+                            $(this).find('a.play-video').each(function() {
+                                $(`a.play-video[data-item="${this.dataset.item}"]`).click();
+                                delete $('.main_body div.list_episode_video')[0].dataset.visible
+                            });
+                            box.close();
+                        });
+                        box.show();
+
                     });
-                    dramacool.ui.btnep.off('click').on('click', function() {
-                        target = $('div.list_episode');
-                        if (target.hasClass('hidden')) {
-                            target.removeClass('hidden');
-                        } else {
-                            target.addClass('hidden');
-                        }
+
+
+                    dramacool.ui.btnep.click(function(e) {
+                        var list = $('div.list_episode').clone().each(function() {
+                            this.dataset.visible = true;
+                        });
+
+                        var box = alertify.alert('Userscript: Episode Selection', list[0]);
+
+                        box.set('closable', true).set('label', 'Close').set('maximizable', true)
+                                .set('closableByDimmer', false).set('resizable', true);
+
+                        $(box.elements.footer).remove();
+                        box.resizeTo('75%', '75%');
                     });
+
                     //dlbtn
                     btndl = $('.fa-download').parent('a');
                     btndl.off('click').on('click', function(e) {
@@ -684,8 +743,8 @@ button.ajs-button.ajs-ok{float:right;}
         },
         loadserver: function(server) {
             alertify.message('Autoloading server : ' + server);
-            $('div.main_body > div.list_episode_video > div.bottom > div.row:contains(' + server + ') a.play-video').click();
-            $('div.watch-drama > div.anime_muti_link > ul > li:contains(' + server + ')').click();
+            $('div.main_body > div.list_episode_video > div.bottom > div.row:contains(' + server + ') a.play-video:first').click();
+            $('div.watch-drama > div.anime_muti_link > ul > li:contains(' + server + '):first').click();
         },
         selectServer: function(server) {
             dialog = toolbox.cookies.get('autoload', 'setup');
@@ -816,17 +875,6 @@ button.ajs-button.ajs-ok{float:right;}
                     }
                     $(this).parents('div.ajs-dialog:first').find('button.ajs-ok').removeClass('hidden');
                 });
-
-                /*
-                 $(this).find('div.onoffswitch').on('click', function() {
-                 checkbox = $(this).find('[type="checkbox"]');
-                 if (checkbox.is(':checked')) {
-                 checkbox.removeAttr('checked');
-                 return;
-                 }
-                 checkbox.attr('checked', 'checked');
-                 });
-                 */
             });
 
 
@@ -860,6 +908,7 @@ button.ajs-button.ajs-ok{float:right;}
             if (current !== null && current.length > 0) {
                 if ($('div.main_body > div.list_episode_video > div.bottom > div.row:contains(' + current + ')').length > 0 || $('div.watch-drama > div.anime_muti_link > ul > li:contains(' + current + ')').length > 0) {
                     as.selectServer(current);
+
                 }
             }
 
@@ -889,8 +938,8 @@ button.ajs-button.ajs-ok{float:right;}
                 div.info a.user-bookmark .fa-bookmark + span:before{content: "Remove Bookmark";display: inline-block;margin: 0 5px;}
                 div.info a.user-bookmark .fa-bookmark.unset + span:before{content: "Set Bookmark";}
                 div.info a.user-bookmark .fa-bookmark.unset.loading + span:before{content: "please wait ...";}
-                ul[favonly].hidden{ display: block!important; min-height: 500px;}
-                ul[favonly].hidden > li{display:none!important;}
+                ul[data-favonly] > li:not(.fav){display:none!important;}
+                ul[data-favonly] .fa-bookmark{color: #3ec2cf;}
 
             `,
         widget: {
@@ -912,9 +961,6 @@ button.ajs-button.ajs-ok{float:right;}
         },
         sync: function() {
             $.ajax({url: document.location.origin + '/user/bookmark', cache: false}).done(function(data) {
-                /*
-                 $.ajaxSetup({cache: false});
-                 $.get(document.location.origin + '/user/bookmark', function(data) {*/
                 fav.list = {};
                 $(data).find('div.bookmark table tr').each(function() {
                     a = $(this).find('td:first a');
@@ -957,26 +1003,12 @@ button.ajs-button.ajs-ok{float:right;}
             $('.fa-bookmark').removeClass("loading");
             $('li.fav .fa-bookmark').off('click').on('click', function(e) {
                 e.preventDefault();
-                toolbox.loader.show();
-                $(this).parents('ul:first').each(function() {
-                    toolbox.loader.hide();
-                    if (this.dataset.favonly) {
-                        delete this.dataset.favonly;
-                        $(this).find('[data-favhidden]').removeClass('hidden');
-                        if ($('li.userplugin.active').length > 0) {
-                            $(this).find('li:not([data-subbed])').addClass('hidden');
-                        }
-                        return;
-                    }
-                    this.dataset.favonly = true;
-                    $(this).find('li').each(function() {
-                        if ($(this).hasClass('fav')) {
-                            return;
-                        }
-                        $(this).attr('data-favhidden', true).addClass('hidden');
-                    });
-                });
-
+                let ul = $(this).parents('ul:first')[0];
+                if (ul.dataset.favonly) {
+                    delete ul.dataset.favonly;
+                    return;
+                }
+                ul.dataset.favonly = true;
             });
 
         },
@@ -1005,7 +1037,6 @@ button.ajs-button.ajs-ok{float:right;}
                 $('div.bookmark table').on('click', function() {
                     setTimeout(fav.event, 2000);
                 });
-                //$('td.trash').on('click', $('div.bookmark table').click);
                 return;
             }
             $('div.info a.bookmark').one('click', function() {
@@ -1096,17 +1127,6 @@ button.ajs-button.ajs-ok{float:right;}
 
                 $(el).find('a').one('click', evt);
             }
-
-            $('li.userplugin').on('click', function() {
-                toolbox.loader.show();
-                setTimeout(function() {
-                    $('[data-favonly] [data-favhidden]').addClass('hidden');
-                    toolbox.loader.onhide();
-                }.bind(this), 700);
-            });
-
-
-
 
             if (Object.keys(fav.list).length < 1) {
                 fav.sync();
