@@ -2,5 +2,6 @@
 /draft/
 /res/
 /dev/
+/tools/
 /freebox*
-/*.dev.*
+*.dev.*
