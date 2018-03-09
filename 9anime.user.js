@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      1.4
+// @version      1.4.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -52,7 +52,7 @@
                         /*#player > iframe{display: block!important;}*/
                         body.watch #main{margin:0!important; padding:0!important;}`);
             ondomready(function() {
-                let el;
+                let el, nextloop = false;
                 (el = document.getElementById('disqus_thread')) ? el.remove() : null;
                 let i = setInterval(function() {
                     if (document.querySelectorAll('#rufous-sandbox').length > 0) {
@@ -66,6 +66,16 @@
                             }
                         }
                     }
+                }, 200);
+                let j = setInterval(function() {
+                    if ('jQuery' in window && jQuery.isReady === true) {
+                        if (!nextloop) return nextloop = true;
+                        clearInterval(j);
+                        (function($) {
+                            $('span.tab[data-name="sub"]').click();
+                        }(window.jQuery))
+                    }
+
                 }, 200);
 
             });
