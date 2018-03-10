@@ -1,12 +1,11 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      1.4.1
+// @version      1.5.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
 // @include     *://*.9anime.*/*
-// @include     *://c11ff582fa2fd7dc.com/*
 // @grant none
 // @run-at      document-start
 // @noframes
@@ -15,11 +14,14 @@
 // ==/UserScript==
 
 (function() {
-    if (document.location.host.indexOf('anime') === -1) {
-        window.close();
-        setInterval(window.close, 50);
-        return;
-    }
+
+    let z = setInterval(function() {
+        if ('l5m3X' in window) {
+            window['l5m3X'] = null;
+        }
+    }, 1);
+
+
 
     var ondomready = this.ondomready = function(callback) {
         let retval = false;
@@ -54,6 +56,23 @@
             ondomready(function() {
                 let el, nextloop = false;
                 (el = document.getElementById('disqus_thread')) ? el.remove() : null;
+
+                //jQuery is too slow...
+                if ((el = document.querySelectorAll('div.widget.hotnew span.tab[data-name]')) && el.length) {
+                    let t = el[0].parentNode.dataset.target;
+                    for (let e of el) {
+                        e.classList.remove('active');
+                        if (e.dataset.name === "sub") {
+                            e.classList.add('active');
+                        }
+                    }
+                    for (let e of document.querySelectorAll(t)) {
+                        e.classList.add('hidden');
+                        if (e.dataset.name === "sub")
+                            e.classList.remove("hidden");
+                    }
+                }
+
                 let i = setInterval(function() {
                     if (document.querySelectorAll('#rufous-sandbox').length > 0) {
                         clearInterval(i);
@@ -67,17 +86,16 @@
                         }
                     }
                 }, 200);
-                let j = setInterval(function() {
+                /*let j = setInterval(function() {
                     if ('jQuery' in window && jQuery.isReady === true) {
                         if (!nextloop) return nextloop = true;
                         clearInterval(j);
                         (function($) {
                             $('span.tab[data-name="sub"]').click();
-                        }(window.jQuery))
+                        }(window.jQuery));
                     }
 
-                }, 200);
-
+                }, 200);*/
             });
         }
     }, 20);
