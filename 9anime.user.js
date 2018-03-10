@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      1.5.1
+// @version      1.5.2
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -18,6 +18,7 @@
     let z = setInterval(function() {
         if ('l5m3X' in window) {
             window['l5m3X'] = null;
+            clearInterval(z);
         }
     }, 1);
 
