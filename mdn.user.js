@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MDN Web Docs
 // @namespace   https://github.com/ngsoft
-// @version     1.1
+// @version     1.2
 // @description Use MDN Web Docs UI to store lang and auto redirect to the choosen lang
 // @author      daedelus
 // @include     https://developer.mozilla.org/*
@@ -48,7 +48,8 @@
     if ((lang = localStorage.getItem('lang')) !== null) {
         Array.from(langs).forEach(function(element) {
             if (element.dataset.locale && lang === element.dataset.locale) {
-                window.location.href = element.href;
+                //redirect without new entry in the history
+                window.location.replace(element.href);
             }
         }.bind(this));
     }
