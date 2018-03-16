@@ -59,6 +59,32 @@ class Importer extends Format {
     }
 
     /**
+     * Imports data from object
+     * @param object $obj
+     * @throws UnexpectedValueException
+     * @return Importable
+     */
+    public function fromObject($obj) {
+        if (!is_object($obj)) {
+            throw new UnexpectedValueException('Argument 1 for method fromObject is expected to be an object, %s given', $method, gettype($obj));
+        }
+        $data = [];
+        if ($obj instanceof Contracts\Exportable) {
+            $data = $obj->export()->toArray();
+        } elseif ($obj instanceof \JsonSerializable || $obj instanceof \stdClass) {
+            if ($json = JsonConverter::encode($obj)) {
+                $data = JsonConverter::decode($json);
+            }
+        } else {
+            foreach ($obj as $prop => $val) {
+                $data[$prop] = $val;
+            }
+        }
+        $this->object->__setData($data, $this);
+        return $this->object;
+    }
+
+    /**
      * Import class data from array
      * @param string $filename file to import
      * @param string|null $format if format not defined, method will get the format from the file extension

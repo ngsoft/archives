@@ -64,6 +64,28 @@ class Exporter extends Format {
         return [];
     }
 
+    public function toObject(): \stdClass {
+        if ($array = $this->object->__getData()) {
+            if (!is_array($array)) {
+                throw new InvalidFormatException('class %s did not return an array, %s given', get_class($this->object), gettype($array));
+            }
+            return $this->_arrayToObj($array);
+        }
+        return new \stdClass();
+    }
+
+    private function _arrayToObj(array $array): \stdClass {
+        $obj = new \stdClass();
+        foreach ($obj as $k => $v) {
+            if (is_array($v)) {
+                $obj->{$k} = $this->_arrayToObj($v);
+                continue;
+            }
+            $obj->{$k} = $v;
+        }
+        return $obj;
+    }
+
     /**
      * Save formatted data from class to file
      * @param string $filename
