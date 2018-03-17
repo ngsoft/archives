@@ -1,13 +1,12 @@
 // ==UserScript==
 // @name        MDN Web Docs
 // @namespace   https://github.com/ngsoft
-// @version     1.2
+// @version     1.3
 // @description Use MDN Web Docs UI to store lang and auto redirect to the choosen lang
 // @author      daedelus
 // @include     https://developer.mozilla.org/*
 // @noframes
 // @grant       none
-// run-at       document-end
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/mdn.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/mdn.user.js
 // ==/UserScript==
