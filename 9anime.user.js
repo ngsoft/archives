@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      1.6
+// @version      1.6.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -12,6 +12,11 @@
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
 // ==/UserScript==
+
+/**
+ * Works best with following line in hosts file
+ * 0.0.0.0 st.bebi.com ads.2mdnsys.com cfa.2mdnsys.com defpush.com
+ */
 
 (function() {
 
@@ -87,21 +92,8 @@
                         }
                     }
                 }, 200);
-                /*let j = setInterval(function() {
-                    if ('jQuery' in window && jQuery.isReady === true) {
-                        if (!nextloop) return nextloop = true;
-                        clearInterval(j);
-                        (function($) {
-                            $('span.tab[data-name="sub"]').click();
-                        }(window.jQuery));
-                    }
-
-                }, 200);*/
             });
         }
     }, 20);
 
 })();
-
-
-
