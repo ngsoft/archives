@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      1.6.1
+// @version      2.0
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -19,17 +19,9 @@
  */
 
 (function() {
-
-    let z = setInterval(function() {
-        if ('l5m3X' in window) {
-            window['l5m3X'] = null;
-            clearInterval(z);
-        }
-    }, 1);
-
-
-
-    var ondomready = this.ondomready = function(callback) {
+    /* jshint expr: true */
+    /* jshint -W018 */
+    const ondomready = this.ondomready = function(callback) {
         let retval = false;
         for (let f of arguments) {
             if (typeof f === "function") {
@@ -39,13 +31,39 @@
         }
         return retval;
     };
-    var addstyle = this.addstyle = function(css) {
+    const addstyle = this.addstyle = function(css) {
         return !css ? null : function() {
-            s = document.createElement('style');
+            let s = document.createElement('style');
             s.setAttribute('type', "text/css");
             s.appendChild(document.createTextNode('<!-- ' + css + ' -->'));
             document.body.appendChild(s);
         }();
+    };
+
+    const html2element = function(html) {
+        if (typeof html === "string") {
+            let template = document.createElement('template');
+            html = html.trim();
+            template.innerHTML = html;
+            return template.content.firstChild;
+        }
+        return null;
+    };
+
+    const onjQuery = function(fn, binding) {
+        if (!typeof fn === "function")
+            return;
+        binding = binding || window;
+
+        function w() {
+            if (typeof jQuery !== void 0 && jQuery.isReady === true) {
+                !w.i || clearInterval(w.i);
+                fn.apply(binding, [jQuery]);
+                return true;
+            }
+            return false;
+        }
+        !w() || (w.i = setInterval(w, 200));
     };
 
     let w = setInterval(function() {
@@ -53,17 +71,63 @@
         if (document.body !== null) {
             window.open = function() {};
             clearInterval(w);
-            addstyle(`  div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"],
-                        .ads-outsite, #disqus_thread, .hidden, .this-message-does-not-harm-to-you-dont-remove-it,
-                        .widget.crop, .widget.comment, :not(#player) > iframe, body.watch #sidebar,
-                        #main > .content > .widget.slider + div, .adsbox {display: none !important;}
-                        /*#player > iframe{display: block!important;}*/
-                        body.watch #main{margin:0!important; padding:0!important;}`);
+            addstyle(`
+                div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"],
+                .ads-outsite, #disqus_thread, .hidden, .this-message-does-not-harm-to-you-dont-remove-it,
+                .widget.crop, .widget.comment, :not(#player) > iframe, body.watch #sidebar,
+                #main > .content > .widget.slider + div, .adsbox {display: none !important;}
+                /*#player > iframe{display: block!important;}*/
+                body.watch #main{margin:0!important; padding:0!important;}
+                .widget.quickfilter .widget-title > span:first-child + *{float: right;}
+                .widget.quickfilter .widget-title ul{display:inline!important;padding: 4px!important;}
+                .widget.quickfilter .widget-title ul label{min-width: 110px; text-align: right;}
+            `);
             ondomready(function() {
-                let el, nextloop = false;
-                (el = document.getElementById('disqus_thread')) ? el.remove() : null;
+                let el;
+                const Store = new class {
+                    constructor() {
+                        let o = "object", s = "string", n = null, d = {script: {namespace: "http://tampermonkey.net/", name: "New Userscript", author: "You"}}, info = (typeof GM_info === o && GM_info !== n) ? GM_info : (typeof GM === o && GM !== n && typeof GM.info === o) ? GM.info : d,
+                        id = (typeof info.script.namespace === s ? info.script.namespace : d.script.namespace) + '.' + (typeof info.script.name === s ? info.script.name : d.script.name) + '.' + (typeof info.script.author === s ? info.script.author : d.script.author);
+                        this.prefix = id.replace(/[^\w]+/g, '.') + '.';
+                    }
+                    get ready() {return typeof Storage !== 'undefined' && window.hasOwnProperty('localStorage') && window.localStorage instanceof Storage;}
+                    get prefix() {return this.__prefix__;}set prefix(v) {this.__prefix__ = this.__prefix__ || v;}
+                    has(k) {return this.get(k) !== null;}
+                    get(k, d = null) {
+                        let r = d;
+                        if (this.ready) {
+                            let v = window.localStorage.getItem(this.prefix + k) || d;
+                            try {r = JSON.parse(v);} catch (e) {r = v;}
+                        }
+                        return r;
+                    }
+                    set(k, v) {
+                        if (this.ready) {
+                            let j;
+                            try {j = JSON.stringify(v);} catch (e) {j = v;}
+                            window.localStorage.setItem(this.prefix + k, j);
+                        }
+                        return this;
+                    }
+                    unset(k) {
+                        !this.ready || window.localStorage.removeItem(this.prefix + k);/* jshint ignore:line */
+                        return this;
+                    }
+                }();
 
-                //jQuery is too slow...
+                (function() {
+                    let message = Store.get("usermessage");
+                    if (message && alertify) {
+                        alertify.message(message);
+                        Store.unset("usermessage");
+                    }
+                }());
+
+
+                if ((el = document.getElementById('disqus_thread'))) {
+                    el.remove();
+                }
+                //setting main page tab to subbed
                 if ((el = document.querySelectorAll('div.widget.hotnew span.tab[data-name]')) && el.length) {
                     let t = el[0].parentNode.dataset.target;
                     for (let e of el) {
@@ -74,11 +138,57 @@
                     }
                     for (let e of document.querySelectorAll(t)) {
                         e.classList.add('hidden');
-                        if (e.dataset.name === "sub")
-                            e.classList.remove("hidden");
+                        if (e.dataset.name === "sub") e.classList.remove("hidden");
                     }
                 }
+                /**
+                 * Save Quick Filter selection
+                 */
+                if ((el = document.querySelector('#sidebar div.quickfilter form.filters'))) {
+                    let key = "userfilters";
+                    let bt = html2element('<span class="filters"><ul class="filter list-unstyled"><li><input type="checkbox" id="userfiltersave"/><label for="userfiltersave">Save Filters</label></li></ul></span>');
+                    el.parentNode.parentNode.querySelector('.widget-title').appendChild(bt);
+                    bt = bt.querySelector('input');
+                    if ((bt.checked = Store.get("userfiltersave", false))) {
+                        let list;
+                        if ((list = Store.get(key, [])) && list.length) {
+                            let e;
+                            list.forEach(function(id) {
+                                if ((e = document.getElementById(id))) {
+                                    e.checked = true;
+                                }
+                            });
+                            !alertify || alertify.message('Quick Filters Loaded.');
+                            onjQuery(function() {
+                                jQuery(el).find('input:checked').trigger('change');
+                            });
+                        }
 
+                    }
+                    bt.addEventListener('change', function(evt) {
+                        Store.set("userfiltersave", evt.target.checked);
+                        if (evt.target.checked === false) {
+                            Store.unset(key);
+                            !alertify || alertify.message("Quick Filters Removed");
+                            Array.from(el.querySelectorAll('input:checked')).forEach(function(e) {
+                                e.checked = false;
+                            });
+                            onjQuery(function() {
+                                jQuery(el).find('input').trigger("change");
+                            });
+                        }
+                    });
+                    el.addEventListener('submit', function(evt) {
+                        if (!bt.checked) return;
+                        Store.set("usermessage", "Quick filters saved.");
+                        let ids = [];
+                        Array.from(evt.target.querySelectorAll(':checked')).forEach(function(el){
+                            ids.push(el.id);
+                        });
+                        Store.set(key, ids);
+                    });
+                }
+                //removing iframes to reduce page load time
                 let i = setInterval(function() {
                     if (document.querySelectorAll('#rufous-sandbox').length > 0) {
                         clearInterval(i);
@@ -95,5 +205,12 @@
             });
         }
     }, 20);
+    //popups for each click are annoying
+    let z = setInterval(function() {
+        if ('l5m3X' in window) {
+            window.l5m3X = null;
+            clearInterval(z);
+        }
+    }, 1);
 
 })();
