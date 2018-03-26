@@ -6,3 +6,4 @@
 /tools/
 /freebox*
 *.dev.*
+*.sublime*
