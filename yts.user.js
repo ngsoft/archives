@@ -15,25 +15,26 @@
 //adios popups
 window.open = function() {};
 
+function onready(fn, domloaded = false, binding) {
+
+    function w() {
+        if (document.body !== null) {
+            !w.i || clearInterval(w.i);
+            if (domloaded && document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', fn.bind(binding));
+                return;
+            }
+            fn.apply(binding);
+            return true;
+        }
+        return false;
+    }
+    w() || (w.i = setInterval(w, 20));
+    return binding;
+}
 
 (function() {
-    function onready(fn, domloaded = false, binding) {
 
-        function w() {
-            if (document.body !== null) {
-                !w.i || clearInterval(w.i);
-                if (domloaded && document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', fn.bind(binding));
-                    return;
-                }
-                fn.apply(binding);
-                return true;
-            }
-            return false;
-        }
-        w() || (w.i = setInterval(w, 20));
-        return binding;
-    }
 
     onready(function() {
         document.querySelectorAll('.ibox-bordered').forEach(x => x.style.display = "none");
