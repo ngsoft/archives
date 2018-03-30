@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YTS
 // @namespace    https://github.com/ngsoft
-// @version      1.2
+// @version      1.3
 // @description  Anti ads
 // @author       daedelus
 // @include     *://yts.*/*
@@ -24,16 +24,10 @@ window.open = function() {};
         }
     }
 
-    if (document.location.pathname === '/') {
-        document.location.href = '/yify';
-    }
-
-
     onready(function() {
-        vpnwarning = document.body.getElementsByClassName('ibox-bordered');
-        if (vpnwarning.length > 0) {
-            vpnwarning[0].remove();
-        }
+        document.querySelectorAll('.ibox-bordered').forEach(function(el) {
+            el.remove();
+        });
     });
 
 })();
