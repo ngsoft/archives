@@ -36,9 +36,7 @@ window.open = function() {};
     }
 
     onready(function() {
-        document.querySelectorAll('.ibox-bordered').forEach(function(el) {
-            el.style.display = "none";
-        });
+        document.querySelectorAll('.ibox-bordered').forEach(x => x.style.display = "none");
     });
 
 })();
