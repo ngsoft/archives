@@ -124,10 +124,8 @@
                     }
                 }());
 
+                document.querySelectorAll("#disqus_thread").forEach(x => x.remove());
 
-                if ((el = document.getElementById('disqus_thread'))) {
-                    el.remove();
-                }
                 //setting main page tab to subbed
                 if ((el = document.querySelectorAll('div.widget.hotnew span.tab[data-name]')) && el.length) {
                     let t = el[0].parentNode.dataset.target;
@@ -222,18 +220,12 @@
                     });
                 });
 
-
                 document.querySelectorAll('.widget.servers ul.episodes a').forEach(function(el) {
                     el.addEventListener('click', function(e) {
                         e.preventDefault();
                         document.querySelector('.widget.player').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
                     });
                 });
-
-
-
-
-
             });
         }
     }, 20);
