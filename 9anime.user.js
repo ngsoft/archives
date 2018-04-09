@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.0
+// @version      2.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -17,6 +17,7 @@
  * Works best with following line in hosts file
  * 0.0.0.0 st.bebi.com ads.2mdnsys.com cfa.2mdnsys.com defpush.com
  */
+
 
 (function() {
     /* jshint expr: true */
@@ -75,7 +76,7 @@
                 div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"],
                 .ads-outsite, #disqus_thread, .hidden, .this-message-does-not-harm-to-you-dont-remove-it,
                 .widget.crop, .widget.comment, :not(#player) > iframe, body.watch #sidebar,
-                #main > .content > .widget.slider + div, .adsbox {display: none !important;}
+                #main > .content > .widget.slider + div, .adsbox, #controls div.report.control.tip {display: none !important;}
                 /*#player > iframe{display: block!important;}*/
                 body.watch #main{margin:0!important; padding:0!important;}
                 .widget.quickfilter .widget-title > span:first-child + *{float: right;}
@@ -202,6 +203,37 @@
                         }
                     }
                 }, 200);
+                //get direct video link
+                document.querySelectorAll('.widget.player').forEach(function(el) {
+                    el.addEventListener("change", function() {
+                        let frame, i = setInterval(function() {
+                            if ((frame = el.querySelector("#player > iframe")) !== null) {
+                                clearInterval(i);
+                                let find, ctrl, link = html2element(`<a class="report control tip" target="_blank" href="${frame.src}"><i class="icon icon-info-circle"></i><span> Video Link</span></a>`);
+                                if ((find = document.querySelector('#controls .report.control.tip')) !== null) {
+                                    ctrl = find.parentNode;
+                                    ctrl.insertBefore(link, find);
+                                    find.remove();
+                                }
+
+
+                            }
+                        }, 3);
+                    });
+                });
+
+
+                document.querySelectorAll('.widget.servers ul.episodes a').forEach(function(el) {
+                    el.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.querySelector('.widget.player').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
+                    });
+                });
+
+
+
+
+
             });
         }
     }, 20);
