@@ -86,13 +86,14 @@
         onjQuery(function($) {
             $('#videooverlay').click();
             let src;
-
-            document.querySelectorAll('p[id]').forEach(x => src = src || x.innerText.match(/~/) ? x.innerText : src);
-
+            document.querySelectorAll('p[id]').forEach(x => src = src || (x.innerText.match(/^[\w\.~]+$/) && x.innerText.match(/~/)) ? x.innerText : src);
             if (src) {
                 src = document.location.origin + "/stream/" + src;
                 let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank" title="${document.querySelector('div.videocontainer > span.title').innerText}">DOWNLOAD LINK</a></div>`);
                 document.querySelector('#mediaspace_wrapper').insertBefore(dl, document.querySelector('#mediaspace_wrapper').firstChild);
+                dl.addEventListener("click", function(e) {
+                    e.target.remove();
+                });
                 document.querySelectorAll('#olvideo video').forEach(function(el) {
                     el.addEventListener("play", function() {
                         dl.classList.add('hidden');
@@ -102,13 +103,17 @@
                     });
                 });
             }
-        });
+            if (videojs) {
+                !videojs("olvideo").vast || videojs("olvideo").vast.disable();
+            }
 
-        !videojs("olvideo").vast || videojs("olvideo").vast.disable();
+        });
 
         window.onclick = function() {};
         document.onclick = function() {};
         document.body.onclick = function() {};
     });
+
+
 
 })();
