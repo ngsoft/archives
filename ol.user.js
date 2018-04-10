@@ -8,6 +8,8 @@
 // @include      /^(https?:)?\/\/openload\.co\/*.*/
 // @grant        none
 // @run-at       document-start
+// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
 // ==/UserScript==
 
 
