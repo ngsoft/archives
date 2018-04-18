@@ -2,7 +2,7 @@
 // @name         Openload Embed
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      1.3
+// @version      1.3.1
 // @description  Openload
 // @include      http://openload.co
 // @include      /^(https?:)?\/\/openload\.co\/embed/*
@@ -70,11 +70,11 @@
                     document.querySelectorAll('p[id]').forEach(x => src = src || (x.innerText.match(/^[\w\.~]+$/) && x.innerText.match(/~/)) ? x.innerText : src);
                     if (src) {
                         src = document.location.origin + "/stream/" + src;
-                        let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank" title="${document.querySelector('div.videocontainer > span.title') !== null ? document.querySelector('div.videocontainer > span.title').innerText : ""}">DOWNLOAD LINK</a></div>`);
+                        let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DOWNLOAD LINK</a></div>`);
                         document.querySelector('#mediaspace_wrapper').insertBefore(dl, document.querySelector('#mediaspace_wrapper').firstChild);
-                        /*dl.addEventListener("click", function(e) {
-                         e.target.remove();
-                         });*/
+                        dl.addEventListener("click", function(e) {
+                            e.target.classList.add('hidden');
+                        });
                         document.querySelectorAll('#olvideo video').forEach(function(el) {
                             el.addEventListener("play", function() {
                                 dl.classList.add('hidden');
