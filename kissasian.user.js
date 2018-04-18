@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.6.4
+// @version      5.7
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -360,6 +360,7 @@ window.eval = function() {};
                     $('div > span.st_facebook_hcount').parent('div').parent('div').remove();
                     $('#divComments').remove();
                     $("div.barContent > div > div > div:contains('video is stuttering,')").parent('div').addClass('hidden');
+
                     if (kissasian.loggedin == false)
                         return;
                     //autolink
@@ -696,6 +697,7 @@ window.eval = function() {};
                 Cookies.remove('lastserver');
                 location.href = this.value;
             });
+            let framelink = kissasian.ui.nav.add('Frame Link', $('#centerDivVideo iframe').attr('src') + '" target="_blank');
 
         }
     };
