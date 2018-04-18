@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Openload
+// @name         Openload Embed
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @version      1.3
