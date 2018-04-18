@@ -2,7 +2,7 @@
 // @name         Openload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.1
 // @description  Openload
 // @include      http://openload.co
 // @include      /^(https?:)?\/\/openload\.co\/*.*/
@@ -86,29 +86,34 @@
 
 
         onjQuery(function($) {
-            $('#videooverlay').click();
-            let src;
-            document.querySelectorAll('p[id]').forEach(x => src = src || (x.innerText.match(/^[\w\.~]+$/) && x.innerText.match(/~/)) ? x.innerText : src);
-            if (src) {
-                src = document.location.origin + "/stream/" + src;
-                let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank" title="${document.querySelector('div.videocontainer > span.title').innerText}">DOWNLOAD LINK</a></div>`);
-                document.querySelector('#mediaspace_wrapper').insertBefore(dl, document.querySelector('#mediaspace_wrapper').firstChild);
-                dl.addEventListener("click", function(e) {
-                    e.target.remove();
-                });
-                document.querySelectorAll('#olvideo video').forEach(function(el) {
-                    el.addEventListener("play", function() {
-                        dl.classList.add('hidden');
-                    });
-                    el.addEventListener("pause", function() {
-                        dl.classList.remove('hidden');
-                    });
-                });
-            }
-            if (videojs) {
-                !videojs("olvideo").vast || videojs("olvideo").vast.disable();
-            }
+            let pi = setInterval(function() {
+                if (document.querySelector('#videooverlay') === null) {
+                    clearInterval(pi);
+                    $('#videooverlay').click();
+                    let src;
+                    document.querySelectorAll('p[id]').forEach(x => src = src || (x.innerText.match(/^[\w\.~]+$/) && x.innerText.match(/~/)) ? x.innerText : src);
+                    if (src) {
+                        src = document.location.origin + "/stream/" + src;
+                        let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank" title="${document.querySelector('div.videocontainer > span.title').innerText}">DOWNLOAD LINK</a></div>`);
+                        document.querySelector('#mediaspace_wrapper').insertBefore(dl, document.querySelector('#mediaspace_wrapper').firstChild);
+                        dl.addEventListener("click", function(e) {
+                            e.target.remove();
+                        });
+                        document.querySelectorAll('#olvideo video').forEach(function(el) {
+                            el.addEventListener("play", function() {
+                                dl.classList.add('hidden');
+                            });
+                            el.addEventListener("pause", function() {
+                                dl.classList.remove('hidden');
+                            });
+                        });
+                    }
+                    if (videojs) {
+                        !videojs("olvideo").vast || videojs("olvideo").vast.disable();
+                    }
+                }
 
+            }, 20);
         });
 
         window.onclick = function() {};
