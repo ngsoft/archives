@@ -55,7 +55,7 @@
             }
             return false;
         }
-        w() || (w.i = setInterval(w, 100));
+        !w() || (w.i = setInterval(w, 100));
     };
 
 
@@ -87,7 +87,7 @@
 
         onjQuery(function($) {
             let pi = setInterval(function() {
-                if (document.querySelector('#videooverlay') === null) {
+                if (document.querySelector('#videooverlay') !== null) {
                     clearInterval(pi);
                     $('#videooverlay').click();
                     let src;
@@ -95,10 +95,10 @@
                     if (src) {
                         src = document.location.origin + "/stream/" + src;
                         let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank" title="${document.querySelector('div.videocontainer > span.title').innerText}">DOWNLOAD LINK</a></div>`);
-                        document.querySelector('#mediaspace_wrapper').insertBefore(dl, document.querySelector('#mediaspace_wrapper').firstChild);
-                        dl.addEventListener("click", function(e) {
+                        document.querySelector('#mediaspace_wrapper').insertBefore(dl, document.querySelector('.videocontainer'));
+                        /*dl.addEventListener("click", function(e) {
                             e.target.remove();
-                        });
+                        });*/
                         document.querySelectorAll('#olvideo video').forEach(function(el) {
                             el.addEventListener("play", function() {
                                 dl.classList.add('hidden');
