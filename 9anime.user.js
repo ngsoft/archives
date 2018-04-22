@@ -77,7 +77,7 @@
                 .ads-outsite, #disqus_thread, .hidden, .this-message-does-not-harm-to-you-dont-remove-it,
                 .widget.crop, .widget.comment, :not(#player) > iframe, body.watch #sidebar,
                 #main > .content > .widget.slider + div, .adsbox, #controls div.report.control.tip,
-                body > div:last-of-type > div[style*="fixed"] {display: none !important;}
+                body > div > div[style*="fixed"] {display: none !important;}
                 /*#player > iframe{display: block!important;}*/
                 body.watch #main{margin:0!important; padding:0!important;}
                 .widget.quickfilter .widget-title > span:first-child + *{float: right;}
@@ -231,7 +231,7 @@
                     document.querySelector('.widget.player').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
                 }
 
-                document.querySelectorAll('body > div:last-of-type > div[style*="fixed"]').forEach(x => x.remove());
+                document.querySelectorAll('body > div > div[style*="fixed"]').forEach(x => x.remove());
 
             });
         }
