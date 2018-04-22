@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.1
+// @version      2.2
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -76,7 +76,8 @@
                 div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"],
                 .ads-outsite, #disqus_thread, .hidden, .this-message-does-not-harm-to-you-dont-remove-it,
                 .widget.crop, .widget.comment, :not(#player) > iframe, body.watch #sidebar,
-                #main > .content > .widget.slider + div, .adsbox, #controls div.report.control.tip {display: none !important;}
+                #main > .content > .widget.slider + div, .adsbox, #controls div.report.control.tip,
+                body > div:last-of-type > div[style*="fixed"] {display: none !important;}
                 /*#player > iframe{display: block!important;}*/
                 body.watch #main{margin:0!important; padding:0!important;}
                 .widget.quickfilter .widget-title > span:first-child + *{float: right;}
