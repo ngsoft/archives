@@ -227,6 +227,10 @@
                         document.querySelector('.widget.player').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
                     });
                 });
+                if ((el = document.querySelector("#player > iframe")) !== null) {
+                    document.querySelector('.widget.player').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
+                }
+
             });
         }
     }, 20);
