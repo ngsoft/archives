@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.2
+// @version      2.3
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -230,6 +230,8 @@
                 if ((el = document.querySelector("#player > iframe")) !== null) {
                     document.querySelector('.widget.player').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
                 }
+
+                document.querySelectorAll('body > div:last-of-type > div[style*="fixed"]').forEach(x => x.remove());
 
             });
         }
