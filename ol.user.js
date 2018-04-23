@@ -2,7 +2,7 @@
 // @name         Openload Embed
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      1.5
+// @version      1.6
 // @description  Openload
 // @include      http://openload.co
 // @include      /^(https?:)?\/\/openload\.co\/embed/*
@@ -18,6 +18,7 @@
 
     window.adblock = false;
     window.adblock2 = false;
+    window.sadbl = false;
     window.turnoff = true;
     window.open = function() {};
 
@@ -66,13 +67,23 @@
 
 
     onDocStart(function() {
+        document.onbeforescriptexecute = function(e) {
+            if (e.target.src.search('script.packed') != -1)
+                e.preventDefault();
+        };
         addstyle(`
             div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999; background-color: #000; padding: .5em 0;}
             div.dlvideo a{color: #fff; text-decoration: none;}
-            .hidden{display:none!important;}
+            .hidden, #dlframe{display:none!important;}
         `);
     });
     onDocEnd(function() {
+        window.BetterJsPop = null;
+        window.doPopAds = null;
+        window.doSecondPop = null;
+        window.secondsdl = 0;
+        window.popAdsLoaded = true;
+        window.noPopunder = true;
         let voi = setInterval(function() {
             if (document.querySelectorAll('p[id]').length) {
                 let src;
@@ -80,7 +91,12 @@
                 if (src) {
                     clearInterval(voi);
                     src = document.location.origin + "/stream/" + src;
-                    let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DOWNLOAD LINK</a></div>`);
+                    let dl = html2element(`<div class="dlvideo"><a href="${src}" target="dlframe">DOWNLOAD LINK</a></div>`);
+                    let tel;
+                    if ((tel = document.querySelector('div.videocontainer > span.title'))) {
+                        dl.setAttribute('title', tel.innerText);
+                    }
+                    document.body.appendChild(html2element(`<iframe name="dlframe" id="dlframe"></iframe>`));
                     document.querySelector('#mediaspace_wrapper').insertBefore(dl, document.querySelector('#mediaspace_wrapper').firstChild);
                     dl.addEventListener("click", function(e) {
                         e.target.classList.add('hidden');
@@ -94,18 +110,23 @@
                         });
                     });
                 }
-                if (videojs) {
-                    !videojs("olvideo").vast || videojs("olvideo").vast.disable();
+                if (videojs && videojs("olvideo").vast) {
+                    videojs("olvideo").vast.disable();
+                    vasturl = null;
                 }
-                document.querySelector('#videooverlay').dispatchEvent(new Event('click', {bubbles: true, cancelable: true}));
+                $('body').off('mouseup');
+                $('#videooverlay').click();
             }
         }, 20);
 
-        window.onclick = function() {};
-        document.onclick = function() {};
-        document.body.onclick = function() {};
+
     });
 
-
+    let z = setInterval(function() {
+        if ('J9RR' in window) {
+            window.J9RR = null;
+            clearInterval(z);
+        }
+    }, 1);
 
 })();
