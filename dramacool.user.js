@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.9
+// @version      6.9.1
 // @description  UI Remaster + Videoupload (last legacy version)
 // @author       daedelus
 // @include     *://*dramacool*.*/*
 // @include     *://*watchasia*.*/*
 // @include     *://animetv.*/*
-// @include     *://myanimeseries.*/*
+// @include     *://*myanimeseries.*/*
 // @include     *://videoupload.*/*
 // @include     *://vidstream.*/*
 // @include     *://azvideo.*/file/*
