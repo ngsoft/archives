@@ -9,8 +9,8 @@
 // @grant none
 // @run-at      document-start
 // @noframes
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
+// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/4udrama.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/4udrama.user.js
 // ==/UserScript==
 
 
@@ -69,9 +69,10 @@
             window.open = function() {};
             clearInterval(w);
             addstyle(`
-                .hidden {display: none !important;}
+                .hidden, #disqus_thread, div[id*="ScriptRoot"], .hn-comment, body > div:first-child {display: none !important;}
             `);
             ondomready(function() {
+                document.querySelectorAll("#disqus_thread").forEach(x => x.remove());
 
 
             });
