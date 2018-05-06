@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.3
+// @version      2.4
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -74,11 +74,10 @@
             clearInterval(w);
             addstyle(`
                 div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"],
-                .ads-outsite, #disqus_thread, .hidden, .this-message-does-not-harm-to-you-dont-remove-it,
-                .widget.crop, .widget.comment, :not(#player) > iframe, body.watch #sidebar,
-                #main > .content > .widget.slider + div, .adsbox, #controls div.report.control.tip,
-                body > div > div[style*="fixed"] {display: none !important;}
-                /*#player > iframe{display: block!important;}*/
+                .ads-outsite, #disqus_thread, .this-message-does-not-harm-to-you-dont-remove-it,
+                #main > .content > .widget.slider + div, .adsbox, #controls div.report.control.tip, body > div > div[style*="fixed"], :not(#player) > iframe{visibility: hidden!important;}
+                .widget.crop, .widget.comment ,body.watch #sidebar{visibility: hidden!important;}
+                .hidden{display: none !important;}
                 body.watch #main{margin:0!important; padding:0!important;}
                 .widget.quickfilter .widget-title > span:first-child + *{float: right;}
                 .widget.quickfilter .widget-title ul{display:inline!important;padding: 4px!important;}
@@ -231,7 +230,15 @@
                     document.querySelector('.widget.player').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
                 }
 
-                document.querySelectorAll('body > div > div[style*="fixed"]').forEach(x => x.remove());
+                let addrm = setInterval(function() {
+                    if(document.querySelector('body > div > div[style*="fixed"]') !== null){
+                        clearInterval(addrm);
+                        document.querySelectorAll('body > div > div[style*="fixed"]').forEach(x => x.remove());
+                    }
+                }, 10);
+
+                document.querySelectorAll('.widget.crop, .widget.comment ,body.watch #sidebar').forEach(x => x.remove());
+
 
             });
         }
