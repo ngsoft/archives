@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         streamango
 // @namespace    https://github.com/ngsoft
-// @version      2.0
+// @version      2.1
 // @description  Add remover + autoplay
 // @author       daedelus
 // @include     *://streamango.*/embed/*
@@ -57,6 +57,53 @@
         }
         !w() || (w.i = setInterval(w, 200));
     };
+    const Store = new class {
+        constructor() {
+            let o = "object", s = "string", n = null, d = {script: {namespace: "http://tampermonkey.net/", name: "New Userscript", author: "You"}}, info = (typeof GM_info === o && GM_info !== n) ? GM_info : (typeof GM === o && GM !== n && typeof GM.info === o) ? GM.info : d,
+                    id = (typeof info.script.namespace === s ? info.script.namespace : d.script.namespace) + '.' + (typeof info.script.name === s ? info.script.name : d.script.name) + '.' + (typeof info.script.author === s ? info.script.author : d.script.author);
+            this.prefix = id.replace(/[^\w]+/g, '.') + '.';
+        }
+        get ready() {
+            return typeof Storage !== 'undefined' && window.hasOwnProperty('localStorage') && window.localStorage instanceof Storage;
+        }
+        get prefix() {
+            return this.__prefix__;
+        }
+        set prefix(v) {
+            this.__prefix__ = this.__prefix__ || v;
+        }
+        has(k) {
+            return this.get(k) !== null;
+        }
+        get(k, d = null) {
+            let r = d;
+            if (this.ready) {
+                let v = window.localStorage.getItem(this.prefix + k) || d;
+                try {
+                    r = JSON.parse(v);
+                } catch (e) {
+                    r = v;
+                }
+            }
+            return r;
+        }
+        set(k, v) {
+            if (this.ready) {
+                let j;
+                try {
+                    j = JSON.stringify(v);
+                } catch (e) {
+                    j = v;
+                }
+                window.localStorage.setItem(this.prefix + k, j);
+            }
+            return this;
+        }
+        unset(k) {
+            !this.ready || window.localStorage.removeItem(this.prefix + k);/* jshint ignore:line */
+            return this;
+        }
+    }();
 
 
     let w = setInterval(function() {
@@ -72,11 +119,9 @@
             clearInterval(w);
 
             addstyle(`
-                div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999; background-color: #000; padding: .5em 0;color: #fff;}
-                div.dlvideo a{color: #fff; text-decoration: none;}
-                div.dlvideo span.automode{position:absolute; right:5px; top:5px; width: auto;}
-                span.automode, span.automode *{cursor: pointer;}
-                span.automode label{margin-left: 5px;}
+                div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999; background-color: rgb(253, 250, 250); padding: .5em 0;color: rgb(116, 44, 161);}
+                div.dlvideo a{color: rgb(116, 44, 161); text-decoration: none;}
+                div.dlvideo span.automode{position:absolute; right:5px; top:5px; width: auto;}span.automode, span.automode *{cursor: pointer;}span.automode label{margin-left: 5px;}
                 .hidden, .videologo, #dlframe {display: none !important;}
             `);
             ondomready(function() {
@@ -90,60 +135,13 @@
 
 
                 if (src) {
-                    const Store = new class {
-                        constructor() {
-                            let o = "object", s = "string", n = null, d = {script: {namespace: "http://tampermonkey.net/", name: "New Userscript", author: "You"}}, info = (typeof GM_info === o && GM_info !== n) ? GM_info : (typeof GM === o && GM !== n && typeof GM.info === o) ? GM.info : d,
-                                    id = (typeof info.script.namespace === s ? info.script.namespace : d.script.namespace) + '.' + (typeof info.script.name === s ? info.script.name : d.script.name) + '.' + (typeof info.script.author === s ? info.script.author : d.script.author);
-                            this.prefix = id.replace(/[^\w]+/g, '.') + '.';
-                        }
-                        get ready() {
-                            return typeof Storage !== 'undefined' && window.hasOwnProperty('localStorage') && window.localStorage instanceof Storage;
-                        }
-                        get prefix() {
-                            return this.__prefix__;
-                        }
-                        set prefix(v) {
-                            this.__prefix__ = this.__prefix__ || v;
-                        }
-                        has(k) {
-                            return this.get(k) !== null;
-                        }
-                        get(k, d = null) {
-                            let r = d;
-                            if (this.ready) {
-                                let v = window.localStorage.getItem(this.prefix + k) || d;
-                                try {
-                                    r = JSON.parse(v);
-                                } catch (e) {
-                                    r = v;
-                                }
-                            }
-                            return r;
-                        }
-                        set(k, v) {
-                            if (this.ready) {
-                                let j;
-                                try {
-                                    j = JSON.stringify(v);
-                                } catch (e) {
-                                    j = v;
-                                }
-                                window.localStorage.setItem(this.prefix + k, j);
-                            }
-                            return this;
-                        }
-                        unset(k) {
-                            !this.ready || window.localStorage.removeItem(this.prefix + k);/* jshint ignore:line */
-                            return this;
-                        }
-                    }();
+
 
                     let autoplay = Store.get('autoplay', false);
 
                     let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DOWNLOAD LINK</a><span class="automode"><input type="checkbox" disabled name="autoplay" id="autoplay"/><label for="autoplay">AUTOPLAY</label></span></div>`), title;
                     if ((title = document.querySelector('meta[name="og:title"]')) !== null) {
                         dl.setAttribute('title', title.content);
-                        dl.querySelector('a').setAttribute('download', title.content);
                     }
                     document.body.appendChild(dl);
                     if (autoplay) {
@@ -154,6 +152,9 @@
                         let checked = this.querySelector('input').checked;
                         Store.set('autoplay', checked === false);
                         this.querySelector('input').checked = Store.get('autoplay');
+                        if (Store.get('autoplay')) {
+                            document.location.replace(document.location.href);
+                        }
                     });
 
                     document.querySelectorAll('#mgvideo video').forEach(function(el) {
