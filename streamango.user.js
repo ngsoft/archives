@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         streamango
 // @namespace    https://github.com/ngsoft
-// @version      1.0.1
-// @description  UI Remaster
+// @version      2.0
+// @description  Add remover + autoplay
 // @author       daedelus
 // @include     *://streamango.*/embed/*
 // @grant none
@@ -11,78 +11,168 @@
 // ==/UserScript==
 
 (function() {
-    window.adblock = false;
-    window.adblock2 = false;
-    window.turnoff = true;
-    window.open = function() {};
-    window.eval = function() {};
-
-    var toolbox = {
-
-        loader: {
-            timeout: 1500,
-            show: function() {
-                document.body.style.opacity = '0';
-            },
-            hide: function() {
-                setTimeout(function() {
-                    document.body.style.opacity = '1';
-                }, toolbox.loader.timeout);
-
+    /* jshint expr: true */
+    /* jshint -W018 */
+    const ondomready = this.ondomready = function(callback) {
+        let retval = false;
+        for (let f of arguments) {
+            if (typeof f === "function") {
+                retval = true;
+                (document.readyState !== 'loading' ? f() : document.addEventListener('DOMContentLoaded', f));
             }
-        },
-        ui: {
-            addcss: function(css) {
-                html = '<style type="text/css"><!-- ' + css + ' --></style>';
-                $('body').append(html);
+        }
+        return retval;
+    };
+    const addstyle = this.addstyle = function(css) {
+        return !css ? null : function() {
+            let s = document.createElement('style');
+            s.setAttribute('type', "text/css");
+            s.appendChild(document.createTextNode('<!-- ' + css + ' -->'));
+            document.body.appendChild(s);
+        }();
+    };
+
+    const html2element = function(html) {
+        if (typeof html === "string") {
+            let template = document.createElement('template');
+            html = html.trim();
+            template.innerHTML = html;
+            return template.content.firstChild;
+        }
+        return null;
+    };
+
+    const onjQuery = function(fn, binding) {
+        if (!typeof fn === "function")
+            return;
+        binding = binding || window;
+
+        function w() {
+            if (typeof jQuery !== void 0 && jQuery.isReady === true) {
+                !w.i || clearInterval(w.i);
+                fn.apply(binding, [jQuery]);
+                return true;
             }
-        },
+            return false;
+        }
+        !w() || (w.i = setInterval(w, 200));
+    };
 
-        init: function(fn) {
 
-            toolbox.ready(fn);
-        },
-        onload: function() {},
-        load: function() {},
-        wait: function() {
-            toolbox.onload();
-            interval = setInterval(function() {
-                if (typeof $ !== 'undefined') {
-                    toolbox.load();
-                    clearInterval(interval);
+    let w = setInterval(function() {
+
+        if (document.body !== null) {
+            window.open = function() {};
+            window.BetterJsPop = null;
+            window.doPopAds = null;
+            window.doSecondPop = null;
+            window.secondsdl = 0;
+            window.popAdsLoaded = true;
+            window.noPopunder = true;
+            clearInterval(w);
+
+            addstyle(`
+                div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999; background-color: #000; padding: .5em 0;color: #fff;}
+                div.dlvideo a{color: #fff; text-decoration: none;}
+                div.dlvideo span.automode{position:absolute; right:5px; top:5px; width: auto;}
+                span.automode, span.automode *{cursor: pointer;}
+                span.automode label{margin-left: 5px;}
+                .hidden, .videologo, #dlframe {display: none !important;}
+            `);
+            ondomready(function() {
+                //videooverlay
+                if (videojs && videojs("mgvideo").vast) {
+                    videojs("mgvideo").vast.disable();
+                    vasturl = null;
                 }
-            }, 50);
-        },
 
-        ready: function(fn) {
-            toolbox.load = fn;
-            if (document.readyState != 'loading') {
-                toolbox.wait();
-            } else {
-                document.addEventListener('DOMContentLoaded', toolbox.wait);
-            }
+                let src = document.querySelector('#mgvideo video').src;
 
+
+                if (src) {
+                    const Store = new class {
+                        constructor() {
+                            let o = "object", s = "string", n = null, d = {script: {namespace: "http://tampermonkey.net/", name: "New Userscript", author: "You"}}, info = (typeof GM_info === o && GM_info !== n) ? GM_info : (typeof GM === o && GM !== n && typeof GM.info === o) ? GM.info : d,
+                                    id = (typeof info.script.namespace === s ? info.script.namespace : d.script.namespace) + '.' + (typeof info.script.name === s ? info.script.name : d.script.name) + '.' + (typeof info.script.author === s ? info.script.author : d.script.author);
+                            this.prefix = id.replace(/[^\w]+/g, '.') + '.';
+                        }
+                        get ready() {
+                            return typeof Storage !== 'undefined' && window.hasOwnProperty('localStorage') && window.localStorage instanceof Storage;
+                        }
+                        get prefix() {
+                            return this.__prefix__;
+                        }
+                        set prefix(v) {
+                            this.__prefix__ = this.__prefix__ || v;
+                        }
+                        has(k) {
+                            return this.get(k) !== null;
+                        }
+                        get(k, d = null) {
+                            let r = d;
+                            if (this.ready) {
+                                let v = window.localStorage.getItem(this.prefix + k) || d;
+                                try {
+                                    r = JSON.parse(v);
+                                } catch (e) {
+                                    r = v;
+                                }
+                            }
+                            return r;
+                        }
+                        set(k, v) {
+                            if (this.ready) {
+                                let j;
+                                try {
+                                    j = JSON.stringify(v);
+                                } catch (e) {
+                                    j = v;
+                                }
+                                window.localStorage.setItem(this.prefix + k, j);
+                            }
+                            return this;
+                        }
+                        unset(k) {
+                            !this.ready || window.localStorage.removeItem(this.prefix + k);/* jshint ignore:line */
+                            return this;
+                        }
+                    }();
+
+                    let autoplay = Store.get('autoplay', false);
+
+                    let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DOWNLOAD LINK</a><span class="automode"><input type="checkbox" disabled name="autoplay" id="autoplay"/><label for="autoplay">AUTOPLAY</label></span></div>`), title;
+                    if ((title = document.querySelector('meta[name="og:title"]')) !== null) {
+                        dl.setAttribute('title', title.content);
+                        dl.querySelector('a').setAttribute('download', title.content);
+                    }
+                    document.body.appendChild(dl);
+                    if (autoplay) {
+                        dl.querySelector('#autoplay').checked = true;
+                    }
+
+                    dl.querySelector('.automode').addEventListener('click', function(e) {
+                        let checked = this.querySelector('input').checked;
+                        Store.set('autoplay', checked === false);
+                        this.querySelector('input').checked = Store.get('autoplay');
+                    });
+
+                    document.querySelectorAll('#mgvideo video').forEach(function(el) {
+                        el.addEventListener("play", function() {
+                            dl.classList.add('hidden');
+                        });
+                        el.addEventListener("pause", function() {
+                            dl.classList.remove('hidden');
+                        });
+                    });
+                    document.querySelector('undefined').remove();
+                    document.querySelector('#videooverlay').dispatchEvent(new Event("click", {bubbles: true, cancelable: true}));
+                    if (autoplay) {
+                        setTimeout(x => document.querySelector('.vjs-big-play-button').dispatchEvent(new Event("click", {bubbles: true, cancelable: true})), 1500);
+                    }
+                }
+            });
         }
-    };
-
-    var mango = {
-
-        init: function() {
-
-
-            $('.vjs-big-play-button').click();
-
-
-        }
-    };
-
-
-
-    toolbox.onload = function() {
-
-
-    };
-
-    toolbox.init(mango.init);
+    }, 20);
 
 })();
+
