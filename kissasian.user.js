@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.7.1
+// @version      5.7.2
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -698,12 +698,12 @@ window.eval = function() {};
                 location.href = this.value;
             });
             let framelink = kissasian.ui.nav.add('Frame Link', $('#centerDivVideo iframe').attr('src') + '" target="_blank');
-            let embed = document.createElement('embed');
+            /*let embed = document.createElement('embed');
             $('#centerDivVideo iframe').each(function() {
                 for (let i = 0; i < this.attributes.length; i++) {
                     embed.setAttribute(this.attributes[i].name, this.attributes[i].value);
                 }
-            }).after(embed).remove();
+            }).after(embed).remove();*/
 
 
 
