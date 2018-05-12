@@ -697,7 +697,10 @@ window.eval = function() {};
                 Cookies.remove('lastserver');
                 location.href = this.value;
             });
-            let framelink = kissasian.ui.nav.add('Frame Link', $('#centerDivVideo iframe').attr('src') + '" target="_blank');
+            if (kissasian.ui.player.loaded !== false){
+                let framelink = kissasian.ui.nav.add('Frame Link', $('#centerDivVideo iframe').attr('src') + '" target="_blank');
+            }
+
             /*let embed = document.createElement('embed');
             $('#centerDivVideo iframe').each(function() {
                 for (let i = 0; i < this.attributes.length; i++) {
