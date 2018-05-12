@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.5
+// @version      2.6
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -73,7 +73,7 @@
             window.open = function() {};
             clearInterval(w);
             addstyle(`
-                div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"],
+                div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"], div[id*="-ps"],
                 .ads-outsite, #disqus_thread, .this-message-does-not-harm-to-you-dont-remove-it,
                  .adsbox, #controls div.report.control.tip, body > div > div[style*="fixed"], :not(#player) > iframe{visibility: hidden!important;}
                 .widget.crop, .widget.comment ,body.watch #sidebar{visibility: hidden!important;}
@@ -234,6 +234,12 @@
                     if(document.querySelector('body > div > div[style*="fixed"]') !== null){
                         clearInterval(addrm);
                         document.querySelectorAll('body > div > div[style*="fixed"]').forEach(x => x.remove());
+                    }
+                }, 10);
+                let addrm2 = setInterval(function() {
+                    if (document.querySelector('body > div[id*="-ps"]') !== null) {
+                        clearInterval(addrm2);
+                        document.querySelectorAll('body > div[id*="-ps"]').forEach(x => x.remove());
                     }
                 }, 10);
 
