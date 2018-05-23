@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      1.6.1
+// @version      1.7
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -31,6 +31,7 @@ window.open = function() {};
 window.eval = function() {};
 
 (function() {
+    var $;
 
     /**
      * Userscript library
@@ -148,6 +149,7 @@ window.eval = function() {};
                 if (typeof jQuery !== 'undefined') {
                     if (toolbox.exec === false) {
                         clearInterval(interval);
+                        $ = jQuery;
                         (function($) {
                             if (toolbox.ondocumentready === false) {
                                 toolbox.load();
@@ -189,7 +191,7 @@ window.eval = function() {};
         },
 
         init: function() {
-            //no need for jquery there
+
             console.debug('user script dramago jquery content loaded');
 
             setTimeout(function() {
