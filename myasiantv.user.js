@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MyAsian.TV
 // @namespace    https://github.com/ngsoft
-// @version      1.7
+// @version      1.7.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*myasiantv*/*
@@ -238,6 +238,7 @@ window.eval = function() {};
         toolbox.loader.timeout = 200;
         toolbox.ui.addcss(atv.ui.css);
         toolbox.loader.show();
+        window.localStorage.setItem('dsqremoveroverride', 'true');
         if (el = document.getElementById('disqus_thread')) {
             el.remove();
         }

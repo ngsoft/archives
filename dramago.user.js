@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      1.6
+// @version      1.6.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -337,6 +337,7 @@ window.eval = function() {};
         //toolbox.ui.loadcss('https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css');
 
         toolbox.autoloadjquery = true;
+        window.localStorage.setItem('dsqremoveroverride', 'true');
 
         if (el = document.getElementById('disqus_thread')) {
             el.remove();
