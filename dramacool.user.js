@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.9.2
+// @version      6.9.3
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -1263,6 +1263,7 @@ div.ajs-dialog.sticky{min-width: 720px!important; min-height: 405px!important; }
         toolbox.loader.show();
         toolbox.loader.timeout = 700;
         toolbox.ui.addcss(dramacool.ui.css);
+        window.localStorage.setItem('dsqremoveroverride', 'true');
         el = document.getElementById('disqus_thread');
         if (el !== null) {
             el.remove();
