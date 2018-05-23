@@ -141,7 +141,7 @@
                         input.checked = !dsqenabled;
                         span.addEventListener('click', function() {
                             WStore.set('dsqconf', true);
-                            dsqconf = true;
+                            dsqtag.dataset.dsqconf = dsqconf = true;
                             input.checked = input.checked === false;
                             dsqenabled = !input.checked;
                             console.log('DISQUS DISABLER :' + (!dsqenabled ? "en" : "dis") + 'abled.');
