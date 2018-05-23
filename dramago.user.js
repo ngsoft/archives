@@ -5,6 +5,7 @@
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
+// @include     *://*dramagalaxy.*/*
 // @include     *://*gooddrama.*/*
 // @include     *://*goodanime.*/*
 // @include     *://*animewow.*/*
@@ -196,7 +197,7 @@ window.eval = function() {};
 
             setTimeout(function() {
                 console.debug("removing unrequired iframes");
-                $('div#streams iframe').addClass('ignored');
+                $('div#streams iframe').addClass('ignored').attr("allowfullscreen", true);
                 $('div.postcontent > p > iframe').addClass('ignored');
                 $('iframe:not(.ignored)').remove();
             }, 5000);
@@ -243,6 +244,12 @@ window.eval = function() {};
                 a.text = 'DIRECT PLAY';
                 realdl.appendChild(a);
                 document.body.appendChild(realdl);
+                $('video').on('play', function() {
+                    $(realdl).hide();
+                });
+                $('video').on('pause', function() {
+                    $(realdl).show();
+                });
             }
 
 
