@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramanice UI Remaster
 // @namespace    https://github.com/ngsoft
-// @version      3.0.1
+// @version      3.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*dramanice.*/*
@@ -165,7 +165,7 @@ window.eval = function() {};
 
         ui: {
             css: `
-                div[id*="rcjsload"],.ads-outsite, .PubAdAI, #disqus_thread, .ads, .facebookbox, .social_dis, div[class*="ads_"], .btn.twitter, .btn.facebook, a[href*="/report.html"]{
+                div[id*="rcjsload"],.ads-outsite, .PubAdAI, .ads, .facebookbox, .social_dis, div[class*="ads_"], .btn.twitter, .btn.facebook, a[href*="/report.html"]{
                     display: none !important;
                 }
 
@@ -212,9 +212,6 @@ window.eval = function() {};
         toolbox.loader.onhide = cssloader.hide;
         toolbox.loader.timeout = 200;
         toolbox.loader.show();
-        if (el = document.getElementById('disqus_thread')) {
-            el.remove();
-        }
 
     };
     toolbox.init(dramanice.init);
