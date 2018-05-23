@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.6
+// @version      2.6.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -125,6 +125,7 @@
                 }());
 
                 document.querySelectorAll("#disqus_thread").forEach(x => x.remove());
+                window.localStorage.setItem('dsqremoveroverride', 'true');
 
                 //setting main page tab to subbed
                 if ((el = document.querySelectorAll('div.widget.hotnew span.tab[data-name]')) && el.length) {
