@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4udrama
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.0.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://4udrama.*/*
@@ -73,6 +73,7 @@
             `);
             ondomready(function() {
                 document.querySelectorAll("#disqus_thread").forEach(x => x.remove());
+                window.localStorage.setItem('dsqremoveroverride', 'true');
 
 
             });
