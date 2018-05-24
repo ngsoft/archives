@@ -73,7 +73,7 @@
         };
         addstyle(`
             div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999; background-color: #000; padding: .5em 0;}
-            div.dlvideo a{color: #fff; text-decoration: none;}
+            div.dlvideo a{color: #fff; text-decoration: none;} div.dlvideo span{position:absolute; right:5px; top:5px; width: auto;}
             .hidden, #dlframe{display:none!important;}
         `);
     });
@@ -91,16 +91,15 @@
                 if (src) {
                     clearInterval(voi);
                     src = document.location.origin + "/stream/" + src;
-                    let dl = html2element(`<div class="dlvideo"><a href="${src}" target="dlframe">DOWNLOAD LINK</a></div>`);
+                    let dl = html2element(`<div class="dlvideo"><a href="${src}" target="dlframe">DOWNLOAD LINK</a><span><a target="_blank" href="${document.location.href}">&infin;</a></span></div>`);
                     let tel;
                     if ((tel = document.querySelector('div.videocontainer > span.title'))) {
                         dl.setAttribute('title', tel.innerText);
                     }
                     document.body.appendChild(html2element(`<iframe name="dlframe" id="dlframe"></iframe>`));
                     document.body.appendChild(dl);
-                    //document.querySelector('#mediaspace_wrapper').insertBefore(dl, document.querySelector('#mediaspace_wrapper').firstChild);
-                    dl.addEventListener("click", function(e) {
-                        e.target.classList.add('hidden');
+                    document.querySelector('.dlvideo > a').addEventListener("click", function(e) {
+                        dl.classList.add('hidden');
                     });
                     document.querySelectorAll('#olvideo video').forEach(function(el) {
                         el.addEventListener("play", function() {
