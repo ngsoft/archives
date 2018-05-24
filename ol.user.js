@@ -2,7 +2,7 @@
 // @name         Openload Embed
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      1.6
+// @version      1.7
 // @description  Openload
 // @include      http://openload.co
 // @include      /^(https?:)?\/\/openload\.co\/embed/*
@@ -97,7 +97,8 @@
                         dl.setAttribute('title', tel.innerText);
                     }
                     document.body.appendChild(html2element(`<iframe name="dlframe" id="dlframe"></iframe>`));
-                    document.querySelector('#mediaspace_wrapper').insertBefore(dl, document.querySelector('#mediaspace_wrapper').firstChild);
+                    document.body.appendChild(dl);
+                    //document.querySelector('#mediaspace_wrapper').insertBefore(dl, document.querySelector('#mediaspace_wrapper').firstChild);
                     dl.addEventListener("click", function(e) {
                         e.target.classList.add('hidden');
                     });
