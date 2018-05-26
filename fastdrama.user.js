@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         fastdrama.co
 // @namespace    https://github.com/ngsoft
-// @version      2.0
+// @version      2.1
 // @description  simplify UI
 // @author       daedelus
-// @include     *://fastdrama.co/*
+// @include     *://fastdrama.*/*
 // @noframes
 // @run-at      document-start
 // @grant none
