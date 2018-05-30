@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      1.7
+// @version      2.0
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -19,7 +19,6 @@
 // @include     *://easyvideo.me/*
 // @include     *://video66.org/*
 // @include     *://playbb.me/*
-// @include     *://www.yourupload.com/*
 // @include     *://www.bitvid.sx/embed/*
 // @exclude     *://www.gogoanime.to/*
 // @exclude     *://*.*/ads/*
@@ -175,6 +174,16 @@ window.eval = function() {};
         }
     };
 
+    const html2element = function(html) {
+        if (typeof html === "string") {
+            let template = document.createElement('template');
+            html = html.trim();
+            template.innerHTML = html;
+            return template.content.firstChild;
+        }
+        return null;
+    };
+
     /**
      * Sites Mods
      */
@@ -183,10 +192,11 @@ window.eval = function() {};
         player: false,
         ui: {
             css: `
-                    .premiumdll, div#eps_blocks, [id*="comments"],iframe, div#body > div.right_col, div.ad, .hidden, div[id^="BB_SK"], div[id^="bb_sa"],div[id*="rcjsload"], div#Mad, div#M_AD, div#mini-announcement, div.s_right_col, div.l_right_col div#sidebar div#home_sidebar{display: none!important;}
+                    .premiumdll, div#eps_blocks, [id*="comments"],iframe, div#body > div.right_col, div.ad, .hidden, div[id^="BB_SK"], div[id^="bb_sa"],div[id*="rcjsload"], div#Mad, div#M_AD, div#mini-announcement, div.s_right_col, div.l_right_col div#sidebar div#home_sidebar, #streams .vmargin > div:last-child {display: none!important;}
                     div.s_left_col, div#body > div.left_col{float: none!important; width: auto!important;}
                     #options_bar, #genre_list{text-align: center;}
-                #streams iframe, iframe.ignored {display: block!important;}
+                    #streams > .tab iframe.active{display: block!important;}
+                    #streams > .tab {height: 500px; border-top: 1px solid rgb(229, 228, 226); padding-left: 100px; padding-top: 20px;}
 
             `
         },
@@ -222,6 +232,49 @@ window.eval = function() {};
                     $(this).find('div').first().hide().data('visible', false);
                 }
             });
+            $('#streams').append('<div class="tab" />');
+            $('#streams > .vmargin').each(function() {
+                let self = this;
+                let plname = $(this).find('iframe').attr('src');
+                let match;
+                if ((match = plname.match(/\/\/(.*?)\//)) !== null) {
+                    $(this).find('span.playlist').html(match[1]);
+                    this.dataset.origin = match[1];
+                    let origin = match[1];
+
+                    $(this).find('ul.part_list li a').each(function() {
+                        let a = this;
+                        let url = $(this).attr('href'), frame;
+                        $(this).on('click', function(e) {
+                            e.preventDefault();
+                            $('.part_list a').removeClass('selected');
+                            $(this).addClass('selected');
+                            $(`#streams iframe`).removeClass('active');
+                            $(`#streams iframe[data-tab="${this.href}"]`).addClass('active');
+                        });
+
+                        $.get(url, function(data) {
+                            frame = $(data).find(`iframe`).filter(`[src*="${origin}"]`).first()[0];
+                            frame.dataset.tab = url;
+                            $(frame).attr("allowfullscreen", true).addClass('ignored');
+                            $(self).parent().find('.tab').append(frame);
+                            if ($(a).hasClass('selected')) {
+                                $(frame).addClass('active');
+                            }
+                        });
+
+                    });
+
+                }
+            });
+            $('#streams > .tab').addClass('vmargin');
+            if ($('#streams').length > 0) {
+                location.hash = 'streams';
+            }
+
+
+
+
         }
     };
 
@@ -346,15 +399,7 @@ window.eval = function() {};
         //toolbox.ui.loadcss('https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css');
 
         toolbox.autoloadjquery = true;
-        window.localStorage.setItem('dsqremoveroverride', 'true');
-
-        if (el = document.getElementById('disqus_thread')) {
-            el.remove();
-        }
-
-
-
-
+        localStorage.removeItem('dsqremoveroverride');
 
     };
 
