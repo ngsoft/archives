@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      2.0
+// @version      2.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -192,10 +192,10 @@ window.eval = function() {};
         player: false,
         ui: {
             css: `
-                    .premiumdll, div#eps_blocks, [id*="comments"],iframe, div#body > div.right_col, div.ad, .hidden, div[id^="BB_SK"], div[id^="bb_sa"],div[id*="rcjsload"], div#Mad, div#M_AD, div#mini-announcement, div.s_right_col, div.l_right_col div#sidebar div#home_sidebar, #streams .vmargin > div:last-child {display: none!important;}
+                    .premiumdll, div#eps_blocks, [id*="comments"],iframe, div#body > div.right_col, div.ad, .hidden, div[id^="BB_SK"], div[id^="bb_sa"],div[id*="rcjsload"], div#Mad, div#M_AD, div#mini-announcement, div.s_right_col, div.l_right_col div#sidebar div#home_sidebar, #streams .vmargin > div:last-child, div[style*="fixed"] {display: none!important;}
                     div.s_left_col, div#body > div.left_col{float: none!important; width: auto!important;}
                     #options_bar, #genre_list{text-align: center;}
-                    #streams > .tab iframe.active{display: block!important;}
+                    #streams > .tab iframe.active, .anime iframe.ignored{display: block!important;}
                     #streams > .tab {height: 500px; border-top: 1px solid rgb(229, 228, 226); padding-left: 100px; padding-top: 20px;}
 
             `
@@ -204,6 +204,9 @@ window.eval = function() {};
         init: function() {
 
             console.debug('user script dramago jquery content loaded');
+            if (document.location.origin.match(/anime/) !== null) {
+                $('body').addClass('anime');
+            }
 
             setTimeout(function() {
                 console.debug("removing unrequired iframes");
