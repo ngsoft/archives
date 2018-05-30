@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         fastdrama.co
 // @namespace    https://github.com/ngsoft
-// @version      2.2
+// @version      2.3
 // @description  simplify UI
 // @author       daedelus
 // @include     *://fastdrama.*/*
 // @include     *://hkfree.*/*
 // @include     *://dramahk.*/*
-// @noframes
+// @include     *://hdfree.se/embed/*
 // @run-at      document-start
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/fastdrama.user.js
@@ -76,8 +76,25 @@
     };
 
 
-    ondocumentready(function() {
 
+
+
+    ondocumentready(function() {
+        if (document.location.origin.match(/hdfree.se/) !== null) {
+            console.log('fastdrama stream');
+            addstyle(`.hidden, #advPlayer_background{display: none!important;} #videoembed{display: block!important;}`);
+            let ca = setInterval(function() {
+                if (typeof CloseAd === 'function') {
+                    clearInterval(ca);
+                    CloseAd();
+                }
+            }, 20);
+            return;
+        }
+        if (window.top != window.self) {
+            console.log('iframe detected');
+            return;
+        }
         addstyle(`
                 .hidden{display: none!important;}
                 iframe:not(#videoembed), div[class*="ad"]{display: none!important;}
