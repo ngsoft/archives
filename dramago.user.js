@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      2.1
+// @version      2.2
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -196,7 +196,7 @@ window.eval = function() {};
                     div.s_left_col, div#body > div.left_col{float: none!important; width: auto!important;}
                     #options_bar, #genre_list{text-align: center;}
                     #streams > .tab iframe.active, .anime iframe.ignored{display: block!important;}
-                    #streams > .tab {height: 500px; border-top: 1px solid rgb(229, 228, 226); padding-left: 100px; padding-top: 20px;}
+                    #streams > .tab {height: 640px; border-top: 1px solid rgb(229, 228, 226); padding-left: 100px; padding-top: 20px;}
 
             `
         },
@@ -235,7 +235,10 @@ window.eval = function() {};
                     $(this).find('div').first().hide().data('visible', false);
                 }
             });
-            $('#streams').append('<div class="tab" />');
+            $('#streams').append('<div class="tab"><span class="playlist"></span></div>');
+            $('#streams .tab .playlist').on('change', function() {
+                $(this).html($('#streams a.selected').parents('.vmargin').find('.playlist').text() + " &gt; " + $('#streams a.selected').text());
+            });
             $('#streams > .vmargin').each(function() {
                 let self = this;
                 let plname = $(this).find('iframe').attr('src');
@@ -254,19 +257,20 @@ window.eval = function() {};
                             $(this).addClass('selected');
                             $(`#streams iframe`).removeClass('active');
                             $(`#streams iframe[data-tab="${this.href}"]`).addClass('active');
+                            $.get(url, function(data) {
+                                frame = $(data).find(`iframe`).filter(`[src*="${origin}"]`).first()[0];
+                                frame.dataset.tab = url;
+                                $(frame).attr("allowfullscreen", true).addClass('ignored');
+                                $(self).parent().find('.tab').append(frame);
+                                if ($(a).hasClass('selected')) {
+                                    $(frame).addClass('active');
+                                    $('#streams .tab .playlist').trigger('change');
+                                }
+                            });
+                            //$('#streams .tab .playlist').trigger('change');
                         });
-
-                        $.get(url, function(data) {
-                            frame = $(data).find(`iframe`).filter(`[src*="${origin}"]`).first()[0];
-                            frame.dataset.tab = url;
-                            $(frame).attr("allowfullscreen", true).addClass('ignored');
-                            $(self).parent().find('.tab').append(frame);
-                            if ($(a).hasClass('selected')) {
-                                $(frame).addClass('active');
-                            }
-                        });
-
                     });
+                    $(this).find('ul.part_list li a.selected').trigger('click');
 
                 }
             });
@@ -297,6 +301,7 @@ window.eval = function() {};
                 realdl.setAttribute('id', 'realdl');
                 a = document.createElement('a');
                 a.setAttribute('href', '');
+                a.setAttribute('download', 'video.flv');
                 a.text = 'DIRECT PLAY';
                 realdl.appendChild(a);
                 document.body.appendChild(realdl);
