@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      2.2
+// @version      2.3
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -255,8 +255,12 @@ window.eval = function() {};
                             e.preventDefault();
                             $('.part_list a').removeClass('selected');
                             $(this).addClass('selected');
-                            $(`#streams iframe`).removeClass('active');
-                            $(`#streams iframe[data-tab="${this.href}"]`).addClass('active');
+                            $('#streams .tab .playlist').trigger('change');
+                            $(`#streams .tab iframe`).removeClass('active');
+                            if ($(`#streams .tab iframe[data-tab="${this.href}"]`).length > 0) {
+                                $(`#streams .tab iframe[data-tab="${this.href}"]`).addClass('active');
+                                return;
+                            }
                             $.get(url, function(data) {
                                 frame = $(data).find(`iframe`).filter(`[src*="${origin}"]`).first()[0];
                                 frame.dataset.tab = url;
@@ -264,10 +268,8 @@ window.eval = function() {};
                                 $(self).parent().find('.tab').append(frame);
                                 if ($(a).hasClass('selected')) {
                                     $(frame).addClass('active');
-                                    $('#streams .tab .playlist').trigger('change');
                                 }
                             });
-                            //$('#streams .tab .playlist').trigger('change');
                         });
                     });
                     $(this).find('ul.part_list li a.selected').trigger('click');
