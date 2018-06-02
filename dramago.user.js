@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramago, Gooddrama, Animewow, Animetoon
 // @namespace    https://github.com/ngsoft
-// @version      2.3
+// @version      3.0
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://*.dramago.*/*
@@ -291,30 +291,28 @@ window.eval = function() {};
         loaded: false,
         ui: {
             css: `
-                        #adv1, .jhasvdjhas, .sharetools-overlay, .hidden, #box_0, div.safeuploada-filter{display: none!important;}
-                        div#realdl{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999; background-color: #000; padding: .5em 0;}
-                        div#realdl a{color: #fff; text-decoration: none;}
+            #adv1, .jhasvdjhas, .sharetools-overlay, .hidden, #box_0, div.safeuploada-filter, #myvid, div[class*="safeuploadPlayer"]{display: none!important;}
+            div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999; background-color: #000; padding: .5em 0;}
+            div.dlvideo a{color: #fff; text-decoration: none;}div.dlvideo span{position:absolute; right:5px; top:5px; width: auto;}
+            #cvid video {position: absolute;top: 0; left: 0; right: 0; bottom: 0;width: 100%; height: 100%; object-fit: fill;}
                 `
         },
         addlink: function() {
-            if ($('div#realdl').length < 1) {
+            if ($('div.dlvideo').length < 1) {
                 console.debug('user script adding download link');
-                realdl = document.createElement('div');
-                realdl.setAttribute('id', 'realdl');
-                a = document.createElement('a');
-                a.setAttribute('href', '');
-                a.setAttribute('download', 'video.flv');
-                a.text = 'DIRECT PLAY';
-                realdl.appendChild(a);
-                document.body.appendChild(realdl);
-                $('video').on('play', function() {
-                    $(realdl).hide();
-                });
-                $('video').on('pause', function() {
-                    $(realdl).show();
-                });
+                let dl = html2element(`<div class="dlvideo"><a href="" target="_blank" download>DIRECT LINK</a></div>`);
+                document.body.appendChild(dl);
             }
 
+
+        },
+        addvid: function(src) {
+            if ($('div#cvid').length < 1) {
+                console.debug('user script adding custom video');
+                let videotag = html2element(`<div id="cvid"><video controls src="${src}"></video></div>`);
+                console.log(videotag);
+                document.body.appendChild(videotag);
+            }
 
         },
         onload: function() {
@@ -330,7 +328,8 @@ window.eval = function() {};
                 if (results !== null) {
                     href = 'http' + results[1];
                     vids.addlink();
-                    $('div#realdl a').attr('href', href);
+                    vids.addvid(href);
+                    $('div.dlvideo a').attr('href', href);
                 }
 
             });
@@ -358,18 +357,12 @@ window.eval = function() {};
                 if ($('video').length > 0) {
                     clearInterval(interval);
                     //removeAd();
-                    vids.addlink();
-                    $('video').on('loadeddata', function(e) {
-                        $('div#realdl a').attr('href', $(this).attr('src'));
-                    }).on('play', function() {
-                        $('div#realdl').addClass('hidden');
-                        $('div#realdl a').attr('href', $(this).attr('src'));
+                    //vids.addlink();
+
+                    $('video').on('play', function() {
+                        $('div.dlvideo').hide();
                     }).on('pause', function() {
-                        $('div#realdl').removeClass('hidden');
-                        $('div#realdl a').attr('href', $(this).attr('src'));
-                    }).each(function() {
-                        vids.addlink();
-                        $('div#realdl a').attr('href', $(this).attr('src'));
+                        $('div.dlvideo').show();
                     });
                 }
             }, 50);
@@ -409,7 +402,6 @@ window.eval = function() {};
         //toolbox.ui.loadcss('https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css');
 
         toolbox.autoloadjquery = true;
-        localStorage.removeItem('dsqremoveroverride');
 
     };
 
