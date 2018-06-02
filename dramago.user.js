@@ -239,6 +239,7 @@ window.eval = function() {};
             $('#streams .tab .playlist').on('change', function() {
                 $(this).html($('#streams a.selected').parents('.vmargin').find('.playlist').text() + " &gt; " + $('#streams a.selected').text());
             });
+            let inprogress;
             $('#streams > .vmargin').each(function() {
                 let self = this;
                 let plname = $(this).find('iframe').attr('src');
@@ -257,19 +258,27 @@ window.eval = function() {};
                             $(this).addClass('selected');
                             $('#streams .tab .playlist').trigger('change');
                             $(`#streams .tab iframe`).removeClass('active');
+
                             if ($(`#streams .tab iframe[data-tab="${this.href}"]`).length > 0) {
-                                $(`#streams .tab iframe[data-tab="${this.href}"]`).addClass('active');
+                                $(`#streams .tab iframe[data-tab="${this.href}"]`).first().addClass('active');
                                 return;
                             }
-                            $.get(url, function(data) {
-                                frame = $(data).find(`iframe`).filter(`[src*="${origin}"]`).first()[0];
-                                frame.dataset.tab = url;
-                                $(frame).attr("allowfullscreen", true).addClass('ignored');
-                                $(self).parent().find('.tab').append(frame);
-                                if ($(a).hasClass('selected')) {
-                                    $(frame).addClass('active');
-                                }
-                            });
+                            if (inprogress !== url) {
+                                inprogress = url;
+                                $.get(url, function(data) {
+                                    frame = $(data).find(`iframe`).filter(`[src*="${origin}"]`).first()[0];
+                                    frame.dataset.tab = url;
+                                    $(frame).attr("allowfullscreen", true).addClass('ignored');
+                                    $(self).parent().find('.tab').append(frame);
+                                    if ($(a).hasClass('selected')) {
+                                        $(frame).addClass('active');
+                                    }
+                                    inprogress = false;
+                                });
+                            }
+
+
+
                         });
                     });
                     $(this).find('ul.part_list li a.selected').trigger('click');
@@ -310,7 +319,6 @@ window.eval = function() {};
             if ($('div#cvid').length < 1) {
                 console.debug('user script adding custom video');
                 let videotag = html2element(`<div id="cvid"><video controls src="${src}"></video></div>`);
-                console.log(videotag);
                 document.body.appendChild(videotag);
             }
 
