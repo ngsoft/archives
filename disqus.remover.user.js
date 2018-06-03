@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         disqus
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.1
 // @description  disqus remover
 // @author       daedelus
 // @include     *://*/*
@@ -97,23 +97,29 @@
     let w = setInterval(function() {
 
         if (document.body !== null) {
-            window.open = function() {};
-            clearInterval(w);
-            addstyle(`
-                div.dsqconf > div{display: none !important;}
-                div.dsqconf{min-height: 30px;position: fixed; bottom: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999;  background-color: transparent;}
-                div.dsqconf:hover > div, div.dsqconf[data-dsqconf="false"] > div{display: block !important; position: relative; height:100%; width: 100%; background-color: rgb(253, 250, 250);color: rgb(116, 44, 161);padding: .5em 0;}
-                div.dsqconf a{color: rgb(116, 44, 161); text-decoration: none;}
-                div.dsqconf span{position:absolute; right:5px; bottom:5px; width: auto;} div.dsqconf span, div.dsqconf span *{cursor: pointer;} div.dsqconf span label{margin-left: 5px;}
-            `);
-            let dsqconf = WStore.get('dsqconf', false);
-            let dsqenabled = WStore.get('dsqenabled', false);
-            let dsqtagplaced = false;
-            if (dsqconf && !dsqenabled) {
-                addstyle(`#disqus_thread{display: none !important;}`);
-            }
+
 
             ondomready(function() {
+
+                if (document.querySelector("#disqus_thread") === null) {
+                    return;
+                }
+                window.open = function() {};
+                clearInterval(w);
+                addstyle(`
+                        div.dsqconf > div{display: none !important;}
+                        div.dsqconf{min-height: 30px;position: fixed; bottom: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999;  background-color: transparent;}
+                        div.dsqconf:hover > div, div.dsqconf[data-dsqconf="false"] > div{display: block !important; position: relative; height:100%; width: 100%; background-color: rgb(253, 250, 250);color: rgb(116, 44, 161);padding: .5em 0;}
+                        div.dsqconf a{color: rgb(116, 44, 161); text-decoration: none;}
+                        div.dsqconf span{position:absolute; right:5px; bottom:5px; width: auto;} div.dsqconf span, div.dsqconf span *{cursor: pointer;} div.dsqconf span label{margin-left: 5px;}
+                    `);
+                let dsqconf = WStore.get('dsqconf', false);
+                let dsqenabled = WStore.get('dsqenabled', false);
+                let dsqtagplaced = false;
+                if (dsqconf && !dsqenabled) {
+                    addstyle(`#disqus_thread{display: none !important;}`);
+                }
+
                 let dsqtag = html2element(`
                     <div class="dsqconf" data-dsqconf="${dsqconf}">
                         <div>
