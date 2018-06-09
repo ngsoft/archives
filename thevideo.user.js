@@ -1,13 +1,14 @@
 // ==UserScript==
-// @name         streamango
+// @name         thevideo.me
 // @namespace    https://github.com/ngsoft
-// @version      2.2
+// @version      1.0
 // @description  Add remover + autoplay
 // @author       daedelus
-// @include     *://streamango.*/embed/*
+// @include     *://vev.io/embed/*
+// @include     *://thevideo.me/embed/*
 // @grant none
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/streamango.user.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/streamango.user.js
+// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
 // ==/UserScript==
 
 (function() {
@@ -42,68 +43,6 @@
         return null;
     };
 
-    const onjQuery = function(fn, binding) {
-        if (!typeof fn === "function")
-            return;
-        binding = binding || window;
-
-        function w() {
-            if (typeof jQuery !== void 0 && jQuery.isReady === true) {
-                !w.i || clearInterval(w.i);
-                fn.apply(binding, [jQuery]);
-                return true;
-            }
-            return false;
-        }
-        !w() || (w.i = setInterval(w, 200));
-    };
-    const Store = new class {
-        constructor() {
-            let o = "object", s = "string", n = null, d = {script: {namespace: "http://tampermonkey.net/", name: "New Userscript", author: "You"}}, info = (typeof GM_info === o && GM_info !== n) ? GM_info : (typeof GM === o && GM !== n && typeof GM.info === o) ? GM.info : d,
-                    id = (typeof info.script.namespace === s ? info.script.namespace : d.script.namespace) + '.' + (typeof info.script.name === s ? info.script.name : d.script.name) + '.' + (typeof info.script.author === s ? info.script.author : d.script.author);
-            this.prefix = id.replace(/[^\w]+/g, '.') + '.';
-        }
-        get ready() {
-            return typeof Storage !== 'undefined' && window.hasOwnProperty('localStorage') && window.localStorage instanceof Storage;
-        }
-        get prefix() {
-            return this.__prefix__;
-        }
-        set prefix(v) {
-            this.__prefix__ = this.__prefix__ || v;
-        }
-        has(k) {
-            return this.get(k) !== null;
-        }
-        get(k, d = null) {
-            let r = d;
-            if (this.ready) {
-                let v = window.localStorage.getItem(this.prefix + k) || d;
-                try {
-                    r = JSON.parse(v);
-                } catch (e) {
-                    r = v;
-                }
-            }
-            return r;
-        }
-        set(k, v) {
-            if (this.ready) {
-                let j;
-                try {
-                    j = JSON.stringify(v);
-                } catch (e) {
-                    j = v;
-                }
-                window.localStorage.setItem(this.prefix + k, j);
-            }
-            return this;
-        }
-        unset(k) {
-            !this.ready || window.localStorage.removeItem(this.prefix + k);/* jshint ignore:line */
-            return this;
-        }
-    }();
 
 
     let w = setInterval(function() {
@@ -119,14 +58,10 @@
             clearInterval(w);
 
             addstyle(`
-                div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999; padding: .5em 0;}
-                div.dlvideo > span{position:absolute; right:5px; top:5px; width: auto;}
-                div.dlvideo span, div.dlvideo span *{cursor: pointer;}
-                div.dlvideo span label{margin-left: 5px;}
-                .hidden, .videologo, #dlframe {display: none !important;}
-                /* color theme */
-                div.dlvideo{color: rgb(116, 44, 161); background-color: rgb(253, 250, 250);}
+                div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999; background-color: rgb(253, 250, 250); padding: .5em 0;color: rgb(116, 44, 161);}
                 div.dlvideo a{color: rgb(116, 44, 161); text-decoration: none;}
+                div.dlvideo span.automode{position:absolute; right:5px; top:5px; width: auto;}span.automode, span.automode *{cursor: pointer;}span.automode label{margin-left: 5px;}
+                .hidden, .videologo, #dlframe {display: none !important;}
             `);
             ondomready(function() {
                 //videooverlay
