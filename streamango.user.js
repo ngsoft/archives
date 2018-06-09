@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         streamango
 // @namespace    https://github.com/ngsoft
-// @version      2.2
+// @version      2.3
 // @description  Add remover + autoplay
 // @author       daedelus
 // @include     *://streamango.*/embed/*
@@ -135,7 +135,7 @@
                     vasturl = null;
                 }
 
-                let src = document.querySelector('#mgvideo video').src;
+                let src = document.querySelector('#mgvideo video') !== null ? document.querySelector('#mgvideo video').src : undefined;
 
 
                 if (src) {
@@ -169,7 +169,7 @@
                             dl.classList.remove('hidden');
                         });
                     });
-                    document.querySelector('undefined').remove();
+                    //document.querySelector('undefined').remove();
                     document.querySelector('#videooverlay').dispatchEvent(new Event("click", {bubbles: true, cancelable: true}));
                     if (autoplay) {
                         setTimeout(x => document.querySelector('.vjs-big-play-button').dispatchEvent(new Event("click", {bubbles: true, cancelable: true})), 1500);
