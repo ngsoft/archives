@@ -2,7 +2,7 @@
 // @name         thevideo.me
 // @namespace    https://github.com/ngsoft
 // @version      1.0
-// @description  Add remover + autoplay
+// @description  best available quality + direct link
 // @author       daedelus
 // @include     *://vev.io/embed/*
 // @include     *://thevideo.me/embed/*
@@ -58,58 +58,69 @@
             clearInterval(w);
 
             addstyle(`
-                div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999; background-color: rgb(253, 250, 250); padding: .5em 0;color: rgb(116, 44, 161);}
-                div.dlvideo a{color: rgb(116, 44, 161); text-decoration: none;}
-                div.dlvideo span.automode{position:absolute; right:5px; top:5px; width: auto;}span.automode, span.automode *{cursor: pointer;}span.automode label{margin-left: 5px;}
+                div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999; padding: .5em 0;}
+                div.dlvideo > span{position:absolute; right:5px; top:5px; width: auto;}
+                div.dlvideo span, div.dlvideo span *{cursor: pointer;}
+                div.dlvideo span label{margin-left: 5px;}
                 .hidden, .videologo, #dlframe {display: none !important;}
+                /* color theme */
+                div.dlvideo{color: #FFF; background-color: #000;}
+                div.dlvideo a{color: #FFF; text-decoration: none;}
             `);
             ondomready(function() {
-                //videooverlay
-                if (videojs && videojs("mgvideo").vast) {
-                    videojs("mgvideo").vast.disable();
-                    vasturl = null;
-                }
 
-                let src = document.querySelector('#mgvideo video').src;
-
-
-                if (src) {
-
-
-                    let autoplay = Store.get('autoplay', false);
-
-                    let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DOWNLOAD LINK</a><span class="automode"><input type="checkbox" disabled name="autoplay" id="autoplay"/><label for="autoplay">AUTOPLAY</label></span></div>`), title;
-                    if ((title = document.querySelector('meta[name="og:title"]')) !== null) {
-                        dl.setAttribute('title', title.content);
+                let qualityi = setInterval(function() {
+                    if (document.querySelector('.vjs-quality-submenu') === null) {
+                        return;
                     }
-                    document.body.appendChild(dl);
-                    if (autoplay) {
-                        dl.querySelector('#autoplay').checked = true;
-                    }
-
-                    dl.querySelector('.automode').addEventListener('click', function(e) {
-                        let checked = this.querySelector('input').checked;
-                        Store.set('autoplay', checked === false);
-                        this.querySelector('input').checked = Store.get('autoplay');
-                        if (Store.get('autoplay')) {
-                            document.location.replace(document.location.href);
+                    clearInterval(qualityi);
+                    let qlist = [], last = 0;
+                    document.querySelectorAll('.vjs-quality-submenu ul.vjs-menu-submenu > li').forEach(function(el) {
+                        //let q = el.querySelector('.vjs-menu-item-label').text;
+                        let quality = el.textContent;
+                        let index, results;
+                        if ((results = quality.match(/([0-9]+)/))) {
+                            index = results[1];
+                            if (index > last) {
+                                qlist.unshift({
+                                    quality: quality,
+                                    element: el
+                                });
+                            } else {
+                                qlist.push({
+                                    quality: quality,
+                                    element: el
+                                });
+                            }
+                            last = index;
                         }
                     });
-
-                    document.querySelectorAll('#mgvideo video').forEach(function(el) {
-                        el.addEventListener("play", function() {
-                            dl.classList.add('hidden');
-                        });
-                        el.addEventListener("pause", function() {
-                            dl.classList.remove('hidden');
-                        });
-                    });
-                    document.querySelector('undefined').remove();
-                    document.querySelector('#videooverlay').dispatchEvent(new Event("click", {bubbles: true, cancelable: true}));
-                    if (autoplay) {
-                        setTimeout(x => document.querySelector('.vjs-big-play-button').dispatchEvent(new Event("click", {bubbles: true, cancelable: true})), 1500);
+                    if (qlist.length > 0) {
+                        qlist[0].element.dispatchEvent(new Event("click", {bubbles: true, cancelable: true}));
+                        let srci = setInterval(function() {
+                            let src = document.querySelector('video') !== null ? document.querySelector('video').src : undefined;
+                            if (src) {
+                                clearInterval(srci);
+                                let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DIRECT LINK</a></div>`), title;
+                                document.body.appendChild(dl);
+                                document.querySelectorAll('video').forEach(function(el) {
+                                    el.addEventListener("play", function() {
+                                        dl.classList.add('hidden');
+                                    });
+                                    el.addEventListener("pause", function() {
+                                        dl.classList.remove('hidden');
+                                    });
+                                });
+                            }
+                        }, 500);
                     }
-                }
+
+                }, 10);
+
+
+
+
+
             });
         }
     }, 20);

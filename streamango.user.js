@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         streamango
 // @namespace    https://github.com/ngsoft
-// @version      2.3
+// @version      2.3.1
 // @description  Add remover + autoplay
 // @author       daedelus
 // @include     *://streamango.*/embed/*
@@ -135,46 +135,51 @@
                     vasturl = null;
                 }
 
-                let src = document.querySelector('#mgvideo video') !== null ? document.querySelector('#mgvideo video').src : undefined;
+                let srci = setInterval(function() {
+                    let src = document.querySelector('#mgvideo video') !== null ? document.querySelector('#mgvideo video').src : undefined;
 
 
-                if (src) {
+                    if (src) {
+                        clearInterval(srci);
 
 
-                    let autoplay = Store.get('autoplay', false);
+                        let autoplay = Store.get('autoplay', false);
 
-                    let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DOWNLOAD LINK</a><span class="automode"><input type="checkbox" disabled name="autoplay" id="autoplay"/><label for="autoplay">AUTOPLAY</label></span></div>`), title;
-                    if ((title = document.querySelector('meta[name="og:title"]')) !== null) {
-                        dl.setAttribute('title', title.content);
-                    }
-                    document.body.appendChild(dl);
-                    if (autoplay) {
-                        dl.querySelector('#autoplay').checked = true;
-                    }
-
-                    dl.querySelector('.automode').addEventListener('click', function(e) {
-                        let checked = this.querySelector('input').checked;
-                        Store.set('autoplay', checked === false);
-                        this.querySelector('input').checked = Store.get('autoplay');
-                        if (Store.get('autoplay')) {
-                            document.location.replace(document.location.href);
+                        let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DOWNLOAD LINK</a><span class="automode"><input type="checkbox" disabled name="autoplay" id="autoplay"/><label for="autoplay">AUTOPLAY</label></span></div>`), title;
+                        if ((title = document.querySelector('meta[name="og:title"]')) !== null) {
+                            dl.setAttribute('title', title.content);
                         }
-                    });
+                        document.body.appendChild(dl);
+                        if (autoplay) {
+                            dl.querySelector('#autoplay').checked = true;
+                        }
 
-                    document.querySelectorAll('#mgvideo video').forEach(function(el) {
-                        el.addEventListener("play", function() {
-                            dl.classList.add('hidden');
+                        dl.querySelector('.automode').addEventListener('click', function(e) {
+                            let checked = this.querySelector('input').checked;
+                            Store.set('autoplay', checked === false);
+                            this.querySelector('input').checked = Store.get('autoplay');
+                            if (Store.get('autoplay')) {
+                                document.location.replace(document.location.href);
+                            }
                         });
-                        el.addEventListener("pause", function() {
-                            dl.classList.remove('hidden');
+
+                        document.querySelectorAll('#mgvideo video').forEach(function(el) {
+                            el.addEventListener("play", function() {
+                                dl.classList.add('hidden');
+                            });
+                            el.addEventListener("pause", function() {
+                                dl.classList.remove('hidden');
+                            });
                         });
-                    });
-                    //document.querySelector('undefined').remove();
-                    document.querySelector('#videooverlay').dispatchEvent(new Event("click", {bubbles: true, cancelable: true}));
-                    if (autoplay) {
-                        setTimeout(x => document.querySelector('.vjs-big-play-button').dispatchEvent(new Event("click", {bubbles: true, cancelable: true})), 1500);
+                        //document.querySelector('undefined').remove();
+                        document.querySelector('#videooverlay').dispatchEvent(new Event("click", {bubbles: true, cancelable: true}));
+                        if (autoplay) {
+                            setTimeout(x => document.querySelector('.vjs-big-play-button').dispatchEvent(new Event("click", {bubbles: true, cancelable: true})), 1500);
+                        }
                     }
-                }
+                }, 10);
+
+
             });
         }
     }, 20);

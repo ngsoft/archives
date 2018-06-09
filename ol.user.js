@@ -2,7 +2,7 @@
 // @name         Openload Embed
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      1.7
+// @version      1.8
 // @description  Openload
 // @include      http://openload.co
 // @include      /^(https?:)?\/\/openload\.co\/embed/*
@@ -75,6 +75,9 @@
             div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999; background-color: #000; padding: .5em 0;}
             div.dlvideo a{color: #fff; text-decoration: none;} div.dlvideo span{position:absolute; right:5px; top:5px; width: auto;}
             .hidden, #dlframe{display:none!important;}
+            /* color theme */
+            div.dlvideo{color: #FFF; background-color: #000;}
+            div.dlvideo a{color: #FFF; text-decoration: none;}
         `);
     });
     onDocEnd(function() {
