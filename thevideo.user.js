@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         thevideo.me
 // @namespace    https://github.com/ngsoft
-// @version      1.1
+// @version      1.2
 // @description  best available quality + direct link
 // @author       daedelus
 // @include     *://vev.io/embed*
@@ -70,12 +70,20 @@
             ondomready(function() {
 
                 let qualityi = setInterval(function() {
-                    if (document.querySelector('.vjs-quality-submenu') === null) {
+                    let pel;
+
+                    ['.vjs-quality-submenu', 'div.vjs-menu-button[title="Quality"]'].forEach(function(x) {
+                        if (document.querySelector(x) !== null) {
+                            pel = document.querySelector(x);
+                        }
+                    });
+
+                    if (!pel) {
                         return;
                     }
                     clearInterval(qualityi);
                     let qlist = [], last = 0;
-                    document.querySelectorAll('.vjs-quality-submenu ul.vjs-menu-submenu > li').forEach(function(el) {
+                    pel.querySelectorAll('ul > li').forEach(function(el) {
                         //let q = el.querySelector('.vjs-menu-item-label').text;
                         let quality = el.textContent;
                         let index, results;
@@ -97,25 +105,33 @@
                     });
                     if (qlist.length > 0) {
                         qlist[0].element.dispatchEvent(new Event("click", {bubbles: true, cancelable: true}));
-                        let srci = setInterval(function() {
-                            let src = document.querySelector('video') !== null ? document.querySelector('video').src : undefined;
-                            if (src) {
-                                clearInterval(srci);
-                                let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DIRECT LINK</a></div>`), title;
-                                document.body.appendChild(dl);
-                                document.querySelectorAll('video').forEach(function(el) {
-                                    el.addEventListener("play", function() {
-                                        dl.classList.add('hidden');
-                                    });
-                                    el.addEventListener("pause", function() {
-                                        dl.classList.remove('hidden');
-                                    });
-                                });
-                            }
-                        }, 500);
+                        document.querySelectorAll('.dlvideo').forEach(x => x.classList.add('hidden'));
+                        setTimeout(function() {
+                            document.querySelectorAll('.dlvideo a').forEach(x => x.href = document.querySelector('video').src);
+                            document.querySelectorAll('.dlvideo').forEach(x => x.classList.remove('hidden'));
+                        }, 1000);
+                        return;
                     }
-
                 }, 10);
+
+                let srci = setInterval(function() {
+                    let src = document.querySelector('video') !== null ? document.querySelector('video').src : undefined;
+                    if (src) {
+                        clearInterval(srci);
+                        let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DIRECT LINK</a></div>`), title;
+                        document.body.appendChild(dl);
+                        document.querySelectorAll('video').forEach(function(el) {
+                            el.addEventListener("play", function() {
+                                dl.classList.add('hidden');
+                                dl.href = el.src;
+                            });
+                            el.addEventListener("pause", function() {
+                                dl.classList.remove('hidden');
+                                dl.href = el.src;
+                            });
+                        });
+                    }
+                }, 500);
 
 
 
