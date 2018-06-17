@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dramacool (UI Remaster + Videouploader)
 // @namespace    https://github.com/ngsoft
-// @version      6.9.4
+// @version      6.9.5
 // @description  UI Remaster + Videoupload
 // @author       daedelus
 // @include     *://*dramacool*.*/*
@@ -213,7 +213,7 @@ button.ajs-button.ajs-ok{float:right;}
 .ajs-content .list_episode_video .row:hover{background-color: #009bc3!important;}
 
 div.ajs-dialog.sticky{min-width: 720px!important; min-height: 405px!important; }
-[class*="list-episode-item"] a:visited h3{color: rgb(253, 184, 19);}
+[class*="list-episode-item"] a:visited[href*="episode"] h3{color: rgb(253, 184, 19);}
 
 
 @media only screen and (max-width: 969px) {
