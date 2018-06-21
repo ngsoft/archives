@@ -456,9 +456,7 @@ window.eval = function() {};
             toolbox.loader.hide();
             //external search ?q=MySearch
             let sp = new URL(location.href), search;
-            console.log(sp);
             if ((search = sp.searchParams.get('q')) !== null) {
-                console.log(search);
                 $('#formSearch #keyword').val(search);
                 $('#formSearch #imgSearch').click();
 
