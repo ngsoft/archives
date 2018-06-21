@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.7.3
+// @version      5.8
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
 // @include     *://*kissasian.*/*
@@ -385,6 +385,12 @@ window.eval = function() {};
                         kissasian.ui.player.getlink();
                     }
 
+
+
+
+
+
+
                 }
             },
             main: function() {
@@ -448,6 +454,15 @@ window.eval = function() {};
              $('a[href^="Drama/"]').click(toolbox.loader.show);
              $('a[href^="Anime/"]').click(toolbox.loader.show);*/
             toolbox.loader.hide();
+            //external search ?q=MySearch
+            let sp = new URL(location.href), search;
+            console.log(sp);
+            if ((search = sp.searchParams.get('q')) !== null) {
+                console.log(search);
+                $('#formSearch #keyword').val(search);
+                $('#formSearch #imgSearch').click();
+
+            }
         }
 
     };
