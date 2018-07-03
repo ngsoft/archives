@@ -80,8 +80,11 @@ function vtt2srt(string $contents) {
     foreach ($stream as $entry => $val) {
         if ($entry > 1)
             $srt .= "\n";
-        $srt .= sprintf("%d\n%s --> %s\n%s\n", $entry, $val['start'], $val['end'], implode("\n", $val['text']));
+        if (isset($val['text'])) {
+            $srt .= sprintf("%d\n%s --> %s\n%s\n", $entry, $val['start'], $val['end'], implode("\n", $val['text']));
+        }
     }
+
 
     return $srt;
 }
