@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         disqus
 // @namespace    https://github.com/ngsoft
-// @version      1.1
+// @version      1.2
 // @description  disqus remover
 // @author       daedelus
 // @include     *://*/*
@@ -94,6 +94,8 @@
         }
     }();
 
+    let selector = "#disqus_thread, discuss"
+
     let w = setInterval(function() {
 
         if (document.body !== null) {
@@ -101,7 +103,7 @@
 
             ondomready(function() {
 
-                if (document.querySelector("#disqus_thread") === null) {
+                if (document.querySelector(selector) === null) {
                     return;
                 }
                 window.open = function() {};
@@ -117,7 +119,7 @@
                 let dsqenabled = WStore.get('dsqenabled', false);
                 let dsqtagplaced = false;
                 if (dsqconf && !dsqenabled) {
-                    addstyle(`#disqus_thread{display: none !important;}`);
+                    addstyle(`${selector}{display: none !important;}`);
                 }
 
                 let dsqtag = html2element(`
@@ -131,7 +133,7 @@
                     </div>
                 `);
 
-                document.querySelectorAll("#disqus_thread").forEach(function(x) {
+                document.querySelectorAll(selector).forEach(function(x) {
                     //other scripts can fore disable that script
                     if (window.localStorage.getItem('dsqremoveroverride') === "true") {
                         console.log('DISQUS DISABLER: disabled');
