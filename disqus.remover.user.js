@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         disqus
 // @namespace    https://github.com/ngsoft
-// @version      1.2
+// @version      1.2.1
 // @description  disqus remover
 // @author       daedelus
 // @include     *://*/*
@@ -94,20 +94,20 @@
         }
     }();
 
-    let selector = "#disqus_thread, discuss"
+    let selector = "#disqus_thread, discuss";
 
     let w = setInterval(function() {
 
         if (document.body !== null) {
 
-
+            clearInterval(w);
             ondomready(function() {
 
                 if (document.querySelector(selector) === null) {
                     return;
                 }
                 window.open = function() {};
-                clearInterval(w);
+
                 addstyle(`
                         div.dsqconf > div{display: none !important;}
                         div.dsqconf{min-height: 30px;position: fixed; bottom: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999;  background-color: transparent;}
