@@ -27,16 +27,9 @@
     };
 
     addstyle(`
-    #seasons .se-c .se-a ul.episodios li .episodiotitle a:visited{color: rgba(255, 193, 7, .7)!important;}
+        #seasons .se-c .se-a ul.episodios li .episodiotitle a{color: rgba(255, 193, 7, 1);}
+        #seasons .se-c .se-a ul.episodios li .episodiotitle a:visited{color: rgba(248, 249, 250, 1);}
+        #seasons .se-c .se-a ul.episodios li .episodiotitle a:hover{color: rgba(40, 167, 69, 1);}
     `);
-
-
-
-
-
-
-
-
-
 
 })();
