@@ -69,8 +69,8 @@
             window.open = function() {};
             clearInterval(w);
             addstyle(`
-                .hidden, [class*="spnsr"], .nav-link[href*="/vip"], .nav-link[href*="store."]{display: none !important;}
-                #app{margin-top: 64px;}
+                .hidden, [class*="spnsr"], .nav-link[href*="/vip"], .nav-link[href*="store."], .mdl-support-goal{display: none !important;}
+                #app{margin-top: 2rem;}.box{border-width:0;}
             `);
 
         }
