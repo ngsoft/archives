@@ -70,7 +70,7 @@
             clearInterval(w);
             addstyle(`
                 .hidden, [class*="spnsr"], .nav-link[href*="/vip"], .nav-link[href*="store."], .mdl-support-goal{display: none !important;}
-                #app{margin-top: 2rem;}.box{border-width:0;}
+                body{margin-top: 2rem;}.box{border-width:0;}
             `);
 
         }
