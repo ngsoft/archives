@@ -2,7 +2,7 @@
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
 // @version      1.0.0
-// @description  Subtitle downloader
+// @description  Subtitle downloader (add button to subtitle selection)
 // @author       daedelus
 // @include     *://*.dimsum.my/*
 // @include     *://dimsum.my/*
