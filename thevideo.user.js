@@ -1,11 +1,12 @@
 // ==UserScript==
-// @name         thevideo.me
+// @name         thevideo.me + mp4upload.com
 // @namespace    https://github.com/ngsoft
-// @version      1.2
+// @version      1.3
 // @description  best available quality + direct link
 // @author       daedelus
 // @include     *://vev.io/embed*
 // @include     *://thevideo.me/embed*
+// @include     *://*mp4upload.com/embed*
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
