@@ -124,9 +124,6 @@
                     }
                 }());
 
-                document.querySelectorAll("#disqus_thread").forEach(x => x.remove());
-                window.localStorage.setItem('dsqremoveroverride', 'true');
-
                 //setting main page tab to subbed
                 if ((el = document.querySelectorAll('div.widget.hotnew span.tab[data-name]')) && el.length) {
                     let t = el[0].parentNode.dataset.target;
@@ -251,12 +248,5 @@
             });
         }
     }, 20);
-    //popups for each click are annoying
-    let z = setInterval(function() {
-        if ('l5m3X' in window) {
-            window.l5m3X = null;
-            clearInterval(z);
-        }
-    }, 1);
 
 })();
