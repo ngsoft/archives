@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      1.1
+// @version      1.2
 // @description  Subtitle downloader (add button to subtitle selection)
 // @author       daedelus
-// @include     *://*.dimsum.my/*
+// @include     *://www.dimsum.my/*
 // @include     *://dimsum.my/*
 // @run-at      document-idle
 // @grant none
