@@ -1,10 +1,19 @@
 // ==UserScript==
 // @name         adf.ly bypasser
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.1
 // @description  bypasser
 // @author       daedelus
 // @include     *://*adf.ly/*
+// @include     *://*fawright.com/*
+// @include     *://*flyserve.co/*
+// @include     *://*kializer.com/*
+// @include     *://*skamaker.com/*
+// @include     *://*skamason.com/*
+// @include     *://*yamechanic.com/*
+// @include     *://*yoineer.com/*
+// @include     *://*yoitect.com /*
+// @include     *://*clearload.bid/*
 // @exclude     */ad/*
 // @grant none
 // @run-at      document-start
