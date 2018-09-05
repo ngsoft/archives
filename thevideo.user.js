@@ -1,12 +1,14 @@
 // ==UserScript==
-// @name         thevideo.me + mp4upload.com
+// @name         thevideo.me + mp4upload.com + uptoBOX + rapidvideo
 // @namespace    https://github.com/ngsoft
-// @version      1.3
+// @version      1.4
 // @description  best available quality + direct link
 // @author       daedelus
 // @include     *://vev.io/embed*
 // @include     *://thevideo.me/embed*
 // @include     *://*mp4upload.com/embed*
+// @include     *://*uptostream.com/iframe/*
+// @include     *://*rapidvideo.com/e/*
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
@@ -46,6 +48,14 @@
 
 
 
+    /*let scriptname = (function() {
+        let o = "object", s = "string", n = null, info = (typeof GM_info === "object" && GM_info !== null) ? GM_info : (typeof GM === o && GM !== n && typeof GM.info === o) ? GM.info : {script: {namespace: "", name: "", author: "", version: ""}};
+        return info.script.name + ' ' + info.script.version;
+    })();*/
+
+
+
+
     let w = setInterval(function() {
 
         if (document.body !== null) {
@@ -65,15 +75,42 @@
                 div.dlvideo span label{margin-left: 5px;}
                 .hidden, .videologo, #dlframe {display: none !important;}
                 /* color theme */
-                div.dlvideo{color: #FFF; background-color: #000;}
+                div.dlvideo{color: #FFF; background-color: rgba(0,0,0,.4);}
                 div.dlvideo a{color: #FFF; text-decoration: none;}
             `);
             ondomready(function() {
 
+
+                let srci = setInterval(function() {
+                    let src = document.querySelector('video') !== null ? document.querySelector('video').src : undefined;
+                    if (src) {
+                        clearInterval(srci);
+                        let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">VIDEO LINK</a></div>`), title;
+                        document.body.appendChild(dl);
+                        document.querySelectorAll('video').forEach(function(el) {
+                            el.addEventListener("play", function() {
+                                dl.classList.add('hidden');
+                                dl.href = el.src;
+                            });
+                            el.addEventListener("pause", function() {
+                                dl.classList.remove('hidden');
+                                dl.href = el.src;
+                            });
+                        });
+                    }
+                }, 500);
+
+
+                /**
+                 * Quality selector only available for thevideo.me and vev.io
+                 */
+                if (location.host.match(/thevideo.me|vev.io/) === null) {
+                    return;
+                }
                 let qualityi = setInterval(function() {
                     let pel;
 
-                    ['.vjs-quality-submenu', 'div.vjs-menu-button[title="Quality"]'].forEach(function(x) {
+                    ['.vjs-quality-submenu', 'div.vjs-menu-button[title="Quality"]', 'div.vjs-menu-button[aria-label="Quality"]'].forEach(function(x) {
                         if (document.querySelector(x) !== null) {
                             pel = document.querySelector(x);
                         }
@@ -82,6 +119,7 @@
                     if (!pel) {
                         return;
                     }
+
                     clearInterval(qualityi);
                     let qlist = [], last = 0;
                     pel.querySelectorAll('ul > li').forEach(function(el) {
@@ -114,28 +152,6 @@
                         return;
                     }
                 }, 10);
-
-                let srci = setInterval(function() {
-                    let src = document.querySelector('video') !== null ? document.querySelector('video').src : undefined;
-                    if (src) {
-                        clearInterval(srci);
-                        let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">DIRECT LINK</a></div>`), title;
-                        document.body.appendChild(dl);
-                        document.querySelectorAll('video').forEach(function(el) {
-                            el.addEventListener("play", function() {
-                                dl.classList.add('hidden');
-                                dl.href = el.src;
-                            });
-                            el.addEventListener("pause", function() {
-                                dl.classList.remove('hidden');
-                                dl.href = el.src;
-                            });
-                        });
-                    }
-                }, 500);
-
-
-
 
 
             });
