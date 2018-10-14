@@ -9,6 +9,7 @@
 // @include     *://*mp4upload.com/embed*
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*rapidvideo.com/e/*
+// @include     *://*yourupload.com/embed/*
 // @run-at      document-start
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
