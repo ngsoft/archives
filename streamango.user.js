@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         streamango
 // @namespace    https://github.com/ngsoft
-// @version      2.3.1
+// @version      2.3.2
 // @description  Add remover + autoplay
 // @author       daedelus
 // @include     *://streamango.*/embed/*
