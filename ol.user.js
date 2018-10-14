@@ -73,7 +73,7 @@
         };
         addstyle(`
             div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999; background-color: #000; padding: 1em 0;}
-            div.dlvideo span{position:absolute; right:5px; top:1rem; width: auto;}
+            div.dlvideo span{position:absolute; right:1rem; top:1rem; width: auto;}
             .hidden, #dlframe, .hidden *{display:none!important;}
             /* color theme */
             div.dlvideo{color: #FFF; background-color: rgba(0,0,0,.4);}
