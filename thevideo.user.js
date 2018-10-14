@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         thevideo.me + mp4upload.com + uptoBOX + rapidvideo
 // @namespace    https://github.com/ngsoft
-// @version      1.6
+// @version      1.6.1
 // @description  jwplayer video downloader
 // @author       daedelus
 // @include     *://vev.io/embed*
@@ -125,9 +125,9 @@
                 }, 500);
 
                 /**
-                 * Quality selector only available for rapidvideo
+                 * Best Quality selector only available for rapidvideo
                  */
-                if (location.host.match(/rapidvideo/) !== null) {
+                if (location.host.match(/rapidvideo/) !== null && location.href.match(/q=/) === null) {
                     document.querySelectorAll('#home_video > div[style*="23px"]').forEach(function(x) {
                         let best;
                         x.querySelectorAll('a[href*="q="]').forEach(y => best = y.href);
@@ -139,7 +139,7 @@
 
 
                 /**
-                 * Quality selector only available for thevideo.me and vev.io
+                 * Best Quality selector only available for thevideo.me and vev.io
                  */
                 if (location.host.match(/thevideo.me|vev.io/) === null) {
                     return;
