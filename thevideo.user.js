@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         thevideo.me + mp4upload.com + uptoBOX + rapidvideo
 // @namespace    https://github.com/ngsoft
-// @version      1.4
+// @version      1.5
 // @description  best available quality + direct link
 // @author       daedelus
 // @include     *://vev.io/embed*
@@ -9,6 +9,7 @@
 // @include     *://*mp4upload.com/embed*
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*rapidvideo.com/e/*
+// @run-at      document-start
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
@@ -46,6 +47,13 @@
         return null;
     };
 
+    document.addEventListener = (function(old) {
+        return function(type, listener, capture) {
+            if (type !== 'contextmenu')
+                old(type, listener, !!capture);
+        };
+    })(document.addEventListener);
+
 
 
     /*let scriptname = (function() {
@@ -69,14 +77,21 @@
             clearInterval(w);
 
             addstyle(`
-                div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999; padding: .5em 0;}
-                div.dlvideo > span{position:absolute; right:5px; top:5px; width: auto;}
+                /* Link Bar */
+                div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999999; padding: 1em 0;}
+                div.dlvideo > span{position:absolute; right:5px; top:1em; width: auto;}
                 div.dlvideo span, div.dlvideo span *{cursor: pointer;}
                 div.dlvideo span label{margin-left: 5px;}
-                .hidden, .videologo, #dlframe {display: none !important;}
+                .hidden, .videologo, #dlframe, .hidden * {display: none !important;}
+                /* thevideo mods */
+                #home_video{position: relative;}
+                #home_video > div[style*="calc"]{height: calc(100% - 50px)!important;}
+
+
                 /* color theme */
                 div.dlvideo{color: #FFF; background-color: rgba(0,0,0,.4);}
                 div.dlvideo a{color: #FFF; text-decoration: none;}
+
             `);
             ondomready(function() {
 
@@ -85,16 +100,24 @@
                     let src = document.querySelector('video') !== null ? document.querySelector('video').src : undefined;
                     if (src) {
                         clearInterval(srci);
-                        let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">VIDEO LINK</a></div>`), title;
+                        let dl = html2element(`<div class="dlvideo"><a href="${src}" target="_blank">VIDEO LINK</a><span><a target="_blank" href="${document.location.href}">🔗</a></span></div>`), title;
+                        let target = document.querySelector('#home_video');
+
+                        if (target instanceof EventTarget) {
+                            target.oncontextmenu = x => false;
+                        }
+
                         document.body.appendChild(dl);
+
+
                         document.querySelectorAll('video').forEach(function(el) {
                             el.addEventListener("play", function() {
                                 dl.classList.add('hidden');
-                                dl.href = el.src;
+                                dl.querySelector('a').href = el.src;
                             });
                             el.addEventListener("pause", function() {
                                 dl.classList.remove('hidden');
-                                dl.href = el.src;
+                                dl.querySelector('a').href = el.src;
                             });
                         });
                     }
