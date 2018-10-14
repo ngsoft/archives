@@ -2,7 +2,7 @@
 // @name         Openload Embed
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      2.0.1
+// @version      2.0.2
 // @description  Openload
 // @include      http://openload.co
 // @include      /^(https?:)?\/\/openload\.co\/embed/*
@@ -77,6 +77,7 @@
             .hidden, #dlframe, .hidden *{display:none!important;}
             /* color theme */
             div.dlvideo{color: #FFF; background-color: rgba(0,0,0,.4);}
+            div.dlvideo:hover, .video-js:hover button.vjs-big-play-button{background-color: rgba(0,170,255,.9);}
             div.dlvideo a{color: #FFF; text-decoration: none;}
         `);
     });
@@ -94,7 +95,7 @@
                 if (src) {
                     clearInterval(voi);
                     src = document.location.origin + "/stream/" + src;
-                    let dl = html2element(`<div class="dlvideo"><a href="${src}" target="dlframe">DOWNLOAD LINK</a><span><a target="_blank" href="${document.location.href}">&infin;</a></span></div>`);
+                    let dl = html2element(`<div class="dlvideo"><a href="${src}" target="dlframe">VIDEO LINK</a><span><a target="_blank" href="${document.location.href}">&infin;</a></span></div>`);
                     let tel;
                     if ((tel = document.querySelector('div.videocontainer > span.title'))) {
                         dl.setAttribute('title', tel.innerText);
