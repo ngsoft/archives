@@ -125,8 +125,8 @@
                 div.dlvideo span label{margin-left: 5px;}
                 .hidden, .videologo, #dlframe {display: none !important;}
                 /* color theme */
-                div.dlvideo{color: rgb(116, 44, 161); background-color: rgb(253, 250, 250);}
-                div.dlvideo a{color: rgb(116, 44, 161); text-decoration: none;}
+                div.dlvideo{color: rgba(116, 44, 161,1); background-color: rgba(253, 250, 250,1);}
+                div.dlvideo a{color: rgba(116, 44, 161,1); text-decoration: none;}
             `);
             ondomready(function() {
                 //videooverlay
