@@ -11,7 +11,7 @@
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/viki.user.js
 // ==/UserScript==
 
-window.open = function() {};
+//window.open = function() {};
 window.eval = function() {};
 
 (function() {
@@ -211,7 +211,8 @@ window.eval = function() {};
     converter = {
         iframe: `<iframe id="vikiconverter" name="vikiconverter" class="hidden"></iframe>`,
         form: `<form method="post" class="hidden" target="vikiconverter" action=""><textarea name="data"></textarea><input type="submit" /></form>`,
-        src: '//daedelus.uk.to/proxy/convert/',
+        //src: '//daedelus.uk.to/proxy/convert/',
+        src: 'http://127.0.0.1:8091/assets/srt/convert/',
         links: 'a.subtitle-link-tamper',
         title: function(lang) {
             ep = video.number;
