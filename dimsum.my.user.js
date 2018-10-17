@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      2.0
+// @version      2.0.1
 // @description  Subtitle downloader (add button to subtitle selection)
 // @author       daedelus
 // @include     *://www.dimsum.my/*
@@ -25,9 +25,14 @@ function getProxyUrl(href, lang) {
             title+='.'+lng;
         }
         title+='.srt';
-        let url = new URL('http://daedelus.uk.to');
+        /*let url = new URL('http://daedelus.uk.to');
         url.searchParams.set('from', href);
-        url.pathname = '/proxy/' + title;
+        url.pathname = '/proxy/' + title;*/
+        let url = new URL('http://127.0.0.1:8091');
+        url.searchParams.set('from', href);
+        url.pathname = '/assets/srt/' + title;
+
+
         return url.href;
     }
 }
