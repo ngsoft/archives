@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      2.0.1
+// @version      2.0.2
 // @description  Subtitle downloader (add button to subtitle selection)
 // @author       daedelus
 // @include     *://www.dimsum.my/*
@@ -17,7 +17,7 @@
 
 function getProxyUrl(href, lang) {
     let matches, title, lng;
-    if((matches = window.playerModule._title.match(/^E([0-9]+) (.*?)$/i)) !== null){
+    if ((matches = window.playerModule._title.match(/E([0-9]+) (.*?)$/i)) !== null) {
         title = matches[2].replace(/[\|&;\$%@"\'’<>\(\)\ \+,]/g, ".");
         title += '.1x' + matches[1];
         if ((lng = href.match(/\_([A-Z\-]+).srt$/i)) !== null) {
