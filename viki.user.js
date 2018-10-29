@@ -17,6 +17,18 @@ window.eval = function() {};
 (function() {
 
     /**
+     * Use locale en on site load
+     */
+
+    if (document.location.pathname.match(/^\/videos\//i) === null) {
+        if (typeof window.sessionStorage.activesession === "undefined") {
+            window.sessionStorage.activesession = true;
+            document.location.replace('?locale=en');
+        }
+        return;
+    }
+
+    /**
      * Userscript library
      */
 
@@ -254,14 +266,6 @@ window.eval = function() {};
             }
         }
     };
-
-    if (document.location.pathname.match(/^\/videos\//i) === null) {
-        if (typeof window.sessionStorage.activesession === "undefined") {
-            window.sessionStorage.activesession = true;
-            document.location.replace('?locale=en');
-        }
-        return;
-    }
 
     //initialize everything
     toolbox.init(vikisubs.init);
