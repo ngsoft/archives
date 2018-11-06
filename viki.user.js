@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viki Subs
 // @namespace    https://github.com/ngsoft
-// @version      3.1
+// @version      3.2
 // @description  Get Viki Subtitles + Converter
 // @author       daedelus
 // @match        https://www.viki.com/*
@@ -19,12 +19,14 @@ window.eval = function() {};
     /**
      * Use locale en on site load
      */
+    if (typeof window.sessionStorage.activesession === "undefined") {
+        window.sessionStorage.activesession = true;
+        let url = new URL(document.location.href);
+        url.searchParams.set('locale', 'en');
+        document.location.replace(url.href);
+    }
 
     if (document.location.pathname.match(/^\/videos\//i) === null) {
-        if (typeof window.sessionStorage.activesession === "undefined") {
-            window.sessionStorage.activesession = true;
-            document.location.replace('?locale=en');
-        }
         return;
     }
 
