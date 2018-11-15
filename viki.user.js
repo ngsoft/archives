@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viki Subs
 // @namespace    https://github.com/ngsoft
-// @version      3.2
+// @version      3.3
 // @description  Get Viki Subtitles + Converter
 // @author       daedelus
 // @match        https://www.viki.com/*
@@ -26,9 +26,7 @@ window.eval = function() {};
         document.location.replace(url.href);
     }
 
-    if (document.location.pathname.match(/^\/videos\//i) === null) {
-        return;
-    }
+
 
     /**
      * Userscript library
@@ -211,7 +209,7 @@ window.eval = function() {};
         },
         //detect if jquery and subtitles are loaded
         init: function() {
-            interval = setInterval(function() {
+            let interval = setInterval(function() {
                 if (typeof subtitles !== 'undefined') {
                     vikisubs.run();
                     clearInterval(interval);
@@ -268,6 +266,21 @@ window.eval = function() {};
             }
         }
     };
+
+    /**
+     * CSS to inject
+     */
+    toolbox.ui.addcss(`
+        /* Hide ADS */
+        div.ads, div.ad, div.ad-1, div[id*="-ad-"]{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
+
+    `);
+
+
+    if (document.location.pathname.match(/^\/videos\//i) === null) {
+        return;
+    }
+
 
     //initialize everything
     toolbox.init(vikisubs.init);
