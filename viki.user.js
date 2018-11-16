@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viki Subs
 // @namespace    https://github.com/ngsoft
-// @version      4.0
+// @version      4.1
 // @description  Get Viki Subtitles + Converter
 // @author       daedelus
 // @match        https://www.viki.com/*
@@ -209,12 +209,15 @@
         //detect if jquery and subtitles are loaded
         init: function() {
             let interval = setInterval(function() {
-                if (typeof subtitles !== 'undefined') {
-                    vikisubs.subtitles = subtitles;
-                    vikisubs.run();
-                    clearInterval(interval);
-                } else if (typeof parsedSubtitles !== 'undefined') {
-                    vikisubs.subtitles = parsedSubtitles;
+                let subvar;
+                Object.keys(window).forEach(function(k) {
+                    if (k.match(/ubtitles$/) !== null && Array.isArray(window[k])) {
+                        subvar = k;
+                    }
+
+                });
+                if (typeof subvar !== 'undefined') {
+                    vikisubs.subtitles = window[subvar];
                     vikisubs.run();
                     clearInterval(interval);
                 }
