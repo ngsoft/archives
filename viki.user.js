@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viki Subs
 // @namespace    https://github.com/ngsoft
-// @version      4.0RC
+// @version      4.0
 // @description  Get Viki Subtitles + Converter
 // @author       daedelus
 // @match        https://www.viki.com/*
