@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         My ViKi
 // @namespace    https://github.com/ngsoft
-// @version      1.0b
+// @version      1.0.1b
 // @description  Viki+
 // @author       daedelus
 // @noframes
@@ -17,11 +17,14 @@
 (function(win, doc, $, undef) {
 
 
-    function downloadString(text, fileName, baseURI) {
+    function downloadString(text, fileName, baseURI, convert) {
         let form = $(`<form method="post" class="hidden" target="vikiconverter" action=""><textarea name="data"></textarea><input type="submit" /></form>`);
         form.attr('action', baseURI + fileName);
         form.find('textarea').text(text);
         $('body').append(form);
+        if (convert === true) {
+            form.append(`<input type="hidden" name="convert" value="true" />`);
+        }
         form.submit().remove();
 
     }
@@ -305,7 +308,7 @@
                     onload(xhr) {
                         let txt = xhr.responseText;
                         if (txt.length && txt.indexOf('WEBVTT') !== -1) {
-                            downloadString(txt, filename, settings.server);
+                            downloadString(txt, filename, settings.server, settings.converter);
 
                         }
                     }
