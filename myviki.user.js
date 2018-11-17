@@ -328,12 +328,12 @@
                         return;
                     }
                     let displaylang = x.label.split('<');
-                        displaylang = displaylang[0].trim();
-                        let opt = $('<option/>').val(x.src).dataset({
-                            locale: x.srclang,
-                            percent: x.percentage,
+                    displaylang = displaylang[0].trim();
+                    let opt = $('<option/>').val(x.src).dataset({
+                        locale: x.srclang,
+                        percent: x.percentage,
                         title: infos.container.titles[x.srclang] ? infos.container.titles[x.srclang] : infos.container.titles.en,
-                            number: infos.number,
+                        number: infos.number,
                         type: infos.type,
                         displaylang: displaylang
 
