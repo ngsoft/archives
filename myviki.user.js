@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        My ViKi
 // @namespace   https://github.com/ngsoft
-// @version     1.0
+// @version     1.1
 // @description Viki+
 // @author      daedelus
 // @noframes
@@ -55,6 +55,25 @@
         }
     }
 
+    class UserSettings {
+        constructor(defaults) {
+            if (typeof defaults === 'object') {
+                Object.keys(defaults).forEach(function(k) {
+                    if (typeof GMC.getValue(k) !== typeof defaults[k]) {
+                        this.set(k, defaults[k]);
+                    }
+                }, this);
+            }
+        }
+        get(key) {
+            return GMC.getValue(key);
+        }
+        set(key, val) {
+            GMC.setValue(key, val);
+            return this;
+        }
+    }
+
 
     let defaults = {
         locale: 'en',
@@ -62,20 +81,17 @@
         converter: false,
         server: 'http://127.0.0.1:8091/assets/srt/convert/'
 
-    }, settings = {};
+    }, settings = new UserSettings(defaults);
 
-    //load settings
-    Object.keys(defaults).forEach(function(k) {
-        if (typeof GMC.getValue(k) !== typeof defaults[k]) {
-            GMC.setValue(k, defaults[k]);
-        }
-        this[k] = GMC.getValue(k);
-    }, settings);
+
 
     /**
      * Use locale en on site load
      */
-    switchLocale(settings.locale);
+    if(settings.get('locale')){
+        switchLocale(settings.get('locale'));
+    }
+
 
     /**
      * Easy access to datasets
@@ -276,9 +292,8 @@
             target.prepend(sbox);
 
             let select = $('select[name="subdl"]'), convert = $('input[name="subconvert"]');
-            convert.dataset('default', settings.converter).on('change', function() {
-                settings.converter = this.checked;
-                GMC.setValue('converter', this.checked);
+            convert.dataset('default', settings.get('converter')).on('change', function() {
+                settings.set('converter', this.checked);
                 select.trigger('reset.form');
                 return false;
             });
@@ -301,7 +316,7 @@
                 }
 
                 filename += '.' + opt.dataset('locale');
-                if (settings.converter) {
+                if (settings.get('converter')) {
                     filename += '.srt';
                 } else {
                     filename += '.vtt';
@@ -313,7 +328,7 @@
                     onload(xhr) {
                         let txt = xhr.responseText;
                         if (txt.length && txt.indexOf('WEBVTT') !== -1) {
-                            downloadString(txt, filename, settings.server, settings.converter);
+                            downloadString(txt, filename, settings.get('server'), settings.get('converter'));
                             select.trigger('reset.form');
                         }
                     }
@@ -325,8 +340,8 @@
 
             if (typeof parsedSubtitles !== typeof undef && typeof video !== typeof undef) {
                 let subs = parsedSubtitles, infos = video, selection = [];
-                if (settings.langs && Array.isArray(settings.langs) && settings.langs.length > 0) {
-                    selection = settings.langs;
+                if (settings.get('langs') && Array.isArray(settings.get('langs')) && settings.get('langs').length > 0) {
+                    selection = settings.get('langs');
                 }
                 subs.forEach(function(x) {
                     if (selection.length > 0 && selection.indexOf(x.srclang) === -1) {
