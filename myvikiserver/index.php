@@ -9,7 +9,7 @@
 if (isset($_POST['data'])) {
 
     $txt = $_POST['data'];
-    if (preg_match('/.srt$/i', $_SERVER['REQUEST_URI'])) {
+    if (preg_match('/.srt$/i', $_SERVER['REQUEST_URI']) || isset($_POST['convert'])) {
         include_once __DIR__ . '/vtt2srt.php';
         $txt = vtt2srt($txt);
     }
