@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         My ViKi
 // @namespace    https://github.com/ngsoft
-// @version      1.0.1b
+// @version      1.0
 // @description  Viki+
 // @author       daedelus
 // @noframes
@@ -248,27 +248,32 @@
        .switch-lg .slider{transform: scale(1.1,1.1);}
 
         /** .dl-subs styles **/
-        .dl-subs{position: relative;}
-        .dl-subs .select-wrapper{width: 80%;}
-        .dl-subs .switch{float:right;}
+        .dl-subs{position: relative;margin-top: -.8rem;}
+        .dl-subs .select-wrapper{padding: 0;}
+        .dl-subs .select-wrapper select{font-size: 1.2rem;padding-top:0;font-style: normal !important;}
+        .dl-subs .select-wrapper:after{font-size: 1rem;}
+        .dl-subs .switch{padding:0; transform: translate(0,.25rem);}
         .dl-subs option{color: #000; font-weight: bold; }
+        .dl-subs + a{display: none;}
 
     `);
 
 
+
         $(doc).ready(function() {
             $('body').append(`<iframe id="vikiconverter" name="vikiconverter" class="hidden"></iframe>`);
-            var target = $('.card .card-content .row div.info');
+            //let target = $('.card .card-content .row div.info');
+            let target = $(`.video-meta .video-title`);
             let sbox = $(`<div class="dl-subs">
-                            <span class="select-wrapper">
+                            <span class="select-wrapper col s11 m11 l11">
                                 <label>Subtitles</label>
-                                <select title="Select Subtitles" data-placeholder="Select Subtitles ..." name="subdl"></select>
+                                <select title="Select Subtitles" name="subdl"></select>
                             </span>
-                            <span class="switch round switch-sm">
+                            <span class="switch round col s1 m1 l1">
                                 <input type="checkbox" name="subconvert" title="Convert SRT"/>
                             </span>
                         </div>`);
-            target.html(sbox);
+            target.prepend(sbox);
 
             let select = $('select[name="subdl"]'), convert = $('input[name="subconvert"]');
             convert.dataset('default', settings.converter).on('change', function() {
@@ -278,7 +283,7 @@
                 return false;
             });
 
-            select.on('change', function() {
+            select.dataset('placeholder', $('.video-meta .video-title a').text()).on('change', function() {
                 if (!this.value) {
                     return;
                 }
@@ -309,7 +314,7 @@
                         let txt = xhr.responseText;
                         if (txt.length && txt.indexOf('WEBVTT') !== -1) {
                             downloadString(txt, filename, settings.server, settings.converter);
-
+                            select.trigger('reset.form');
                         }
                     }
                 });
