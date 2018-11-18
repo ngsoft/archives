@@ -19,14 +19,25 @@
 
 
 function downloadString(text, fileName, baseURI, convert) {
-    let form = $(`<form method="post" class="hidden" target="vikiconverter" action=""><textarea name="data"></textarea><input type="submit" /></form>`);
-    form.attr('action', baseURI + fileName);
-    form.find('textarea').text(text);
-    $('body').append(form);
     if (convert === true) {
-        form.append(`<input type="hidden" name="convert" value="true" />`);
+        let form = $(`<form method="post" class="hidden" target="dlsubs" action=""><textarea name="data"></textarea><input type="submit" /></form>`);
+        form.attr('action', baseURI + fileName);
+        form.find('textarea').text(text);
+        $('body').append(form);
+        form.submit().remove();
+        return;
     }
-    form.submit().remove();
+
+    let blob = new Blob([text], {type: 'octet/stream'});
+    let link = document.createElement('a');
+    let href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.href = href;
+    link.style.opacity = 0;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(x => URL.revokeObjectURL(href), 2000);
 
 }
 
@@ -38,29 +49,6 @@ function getBaseFileName(playerModule) {
     }
     return title;
 
-}
-
-
-function getProxyUrl(href, lang) {
-    let matches, title, lng;
-    if ((matches = window.playerModule._title.match(/E([0-9]+) (.*?)$/i)) !== null) {
-        title = matches[2].replace(/[\|&;\$%@"\'’<>\(\)\ \+,]/g, ".");
-        title += '.1x' + matches[1];
-        if ((lng = href.match(/\_([A-Z\-]+).srt$/i)) !== null) {
-            lng = lng[1].toLowerCase();
-            title+='.'+lng;
-        }
-        title+='.srt';
-        /*let url = new URL('http://daedelus.uk.to');
-        url.searchParams.set('from', href);
-        url.pathname = '/proxy/' + title;*/
-        let url = new URL('http://127.0.0.1:8091');
-        url.searchParams.set('from', href);
-        url.pathname = '/assets/srt/' + title;
-
-
-        return url.href;
-    }
 }
 
 class UserSettings {
@@ -90,6 +78,8 @@ $(document).ready(function() {
         converter: false
     }, settings = new UserSettings(defaults);
 
+    $('body').append(`<iframe id="dlsubs" name="dlsubs" style="display: none;"></iframe>`);
+
 
 
     $(document).on('click', '.audio_subtitle_selector #playerModule__selector_toggle', function() {
@@ -108,24 +98,24 @@ $(document).ready(function() {
 
                     link.on('click', function(e) {
                         e.preventDefault();
+                        let filename = getBaseFileName(playerModule), lng;
+                        if ((lng = this.href.match(/\_([A-Z\-]+).srt$/i)) !== null) {
+                            lng = lng[1].toLowerCase();
+                            filename += '.' + lng;
+                        }
+                        filename += '.srt';
 
                         GMC.xmlHttpRequest({
                             method: 'GET',
                             url: this.href,
                             onload(xhr) {
-                                console.debug(xhr.response, xhr.responseText);
                                 let txt = xhr.responseText;
-                                if (txt.length && txt.indexOf('WEBVTT') !== -1) {
-                                    downloadString(txt, filename, settings.server, settings.converter);
-                                    select.trigger('reset.form');
+                                if (txt.length) {
+                                    downloadString(txt, filename, settings.get('server'), settings.get('converter'));
                                 }
                             }
                         });
-
-
                         return false;
-
-
                     });
                 }
             }
