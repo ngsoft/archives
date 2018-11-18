@@ -1,20 +1,20 @@
 // ==UserScript==
-// @name         My ViKi
-// @namespace    https://github.com/ngsoft
-// @version      1.0
-// @description  Viki+
-// @author       daedelus
+// @name        My ViKi
+// @namespace   https://github.com/ngsoft
+// @version     1.0
+// @description Viki+
+// @author      daedelus
 // @noframes
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/myviki.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/myviki.user.js
-// @require https://greasyfork.org/scripts/34527/code/GMCommonAPI.js
-// @match        *://www.viki.com/*
-// @grant   GM_setValue
-// @grant   GM_getValue
-// @grant GM_xmlhttpRequest
+// @require     https://greasyfork.org/scripts/34527/code/GMCommonAPI.js
+// @match       *://www.viki.com/*
+// @grant       GM_setValue
+// @grant       GM_getValue
+// @grant       GM_xmlhttpRequest
 // ==/UserScript==
 
-(function(win, doc, $, undef) {
+(function(doc, $, undef) {
 
 
     function downloadString(text, fileName, baseURI, convert) {
@@ -47,8 +47,8 @@
     }
 
     function switchLocale(newlocale) {
-        if (typeof win.sessionStorage.activesession === "undefined") {
-            win.sessionStorage.activesession = true;
+        if (typeof sessionStorage.activesession === "undefined") {
+            sessionStorage.activesession = true;
             let url = new URL(doc.location.href);
             url.searchParams.set('locale', newlocale);
             doc.location.replace(url.href);
@@ -353,5 +353,5 @@
     }
 
 
-})(window, document, jQuery);
+})(document, jQuery);
 
