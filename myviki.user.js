@@ -8,10 +8,10 @@
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/myviki.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/myviki.user.js
 // @require     https://greasyfork.org/scripts/34527/code/GMCommonAPI.js
-// @match       *://www.viki.com/*
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_xmlhttpRequest
+// @match       *://www.viki.com/*
 // ==/UserScript==
 
 (function(doc, $, undef) {
