@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        My ViKi
 // @namespace   https://github.com/ngsoft
-// @version     1.1
+// @version     1.2
 // @description Viki+
 // @author      daedelus
 // @noframes
@@ -16,18 +16,22 @@
 
 (function(doc, $, undef) {
 
-
-    function downloadString(text, fileName, baseURI, convert) {
-        let form = $(`<form method="post" class="hidden" target="vikiconverter" action=""><textarea name="data"></textarea><input type="submit" /></form>`);
-        form.attr('action', baseURI + fileName);
+    function downloadString(text, fileName, server, convert) {
+        if (convert === true) {
+            fileName += ".srt";
+        } else {
+            fileName += ".vtt";
+        }
+        let form = $(`<form method="post" class="hidden" target="dlsubs" action=""><textarea name="data"></textarea><input type="submit" /></form>`);
+        form.attr('action', server.replace(/%filename%/, fileName));
         form.find('textarea').text(text);
         $('body').append(form);
         if (convert === true) {
             form.append(`<input type="hidden" name="convert" value="true" />`);
         }
         form.submit().remove();
-
     }
+
 
     function onReady(fn) {
         if (doc.readyState != 'loading') {
@@ -46,7 +50,15 @@
         });
     }
 
+    function listLocales() {
+        return Array.from($('link[hreflang][href*="locale="]')).map(x => x.hreflang);
+    }
+
     function switchLocale(newlocale) {
+        if (newlocale.length < 1) {
+            doc.location.hash = '#modal-site-language';
+            return;
+        }
         if (typeof sessionStorage.activesession === "undefined") {
             sessionStorage.activesession = true;
             let url = new URL(doc.location.href);
@@ -76,22 +88,14 @@
 
 
     let defaults = {
-        locale: 'en',
-        langs: ['en', 'fr'],
+        locale: '',
+        langs: [
+            /*'en', 'fr'*/
+        ],
         converter: false,
-        server: 'http://127.0.0.1:8091/assets/srt/convert/'
+        server: 'http://127.0.0.1:8091/assets/srt/convert/%filename%'
 
     }, settings = new UserSettings(defaults);
-
-
-
-    /**
-     * Use locale en on site load
-     */
-    if(settings.get('locale')){
-        switchLocale(settings.get('locale'));
-    }
-
 
     /**
      * Easy access to datasets
@@ -168,74 +172,17 @@
         return this;
     };
 
-    /**
-     * .switch
-     */
-    $(doc).on('init.switch', '.switch [type="checkbox"]', function() {
-        this.checked = $(this).dataset('default') === true;
-        let input = $(this), slider;
-        if (input.length > 0) {
-            slider = input.next('.slider');
-            if (slider.length === 0) {
-                slider = $('<span class="slider" />');
-                input.after(slider);
-            }
-        }
-        $(this).trigger('ready.switch');
-
-    }).on('ready.doc', '.switch [type="checkbox"]', function() {
-        $(this).trigger('init.switch');
-        return false;
-    }).on('reset.form', '.switch [type="checkbox"]', function() {
-        this.checked = $(this).dataset('default') === true;
-    });
 
     /**
-     * .select-wrapper
+     * App Style
      */
-    $(doc).on('ready.doc', '.select-wrapper select', function(e) {
-        $(this).trigger('init.select');
-        return false;
-    }).on('init.select', '.select-wrapper select', function() {
-        let s = this;
-        let p = $(s).dataset('placeholder') || "";
-        if (p.length > 0) {
-            $(s).children('option[value=""]').remove();
-            $(s).addClass('placeholder');
-            $(s).children(':selected').removeAttr("selected");
-            let o = $(`<option value="" disabled hidden selected/>`);
-            $(s).prepend(o);
-            o.html(p);
-        }
-        $(s).trigger('ready.select');
-
-    }).on('reset.form', '.select-wrapper select', function() {
-        this.value = null;
-        $(this).children(':selected').removeAttr('selected');
-        $(this).trigger('init.select');
-    }).on('change', '.select-wrapper select', function() {
-        $(this).removeClass('placeholder');
-    });
-
-
-    /**
-     * Hide ADS
-     */
-    addCSS(`div.ads, div.ad, div.ad-1, div[id*="-ad-"], .hidden{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}`);
-
-    /**
-     * Subtitles download
-     */
-    if (doc.location.pathname.match(/^\/videos\//i) !== null) {
-
-        addCSS(`
+    addCSS(`
+        div.ads, div.ad, div.ad-1, div[id*="-ad-"], .hidden{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
         /* CustomSelect Box */
         .select-wrapper{display: inline-block;position: relative; width: 100%;}
         .select-wrapper:not(.custom) > *:not(select){position: absolute;width: 1px;height: 1px;padding: 0;overflow: hidden;clip: rect(0, 0, 0, 0);white-space: nowrap;border: 0;}
         .select-wrapper select, .search-wrapper [type="text"]{-webkit-appearance: none;-moz-appearance: none;-ms-appearance: none;-o-appearance: none;appearance: none;width: 100%!important;border: 1px solid;height: calc(2.25rem + 2px);display: inline-block;}
         .select-wrapper:not(.no-caret):after{content: "▼";position: absolute;right:.35rem;top: 50%;line-height:0;transform: translate(0, -50%);pointer-events: none;}
-        .select-wrapper select.placeholder , ::placeholder, .select-wrapper select option:disabled{font-weight: normal!important; font-style: italic!important;color: #6c757d!important;text-align: left;}
-        .select-wrapper select.placeholder option{font-style: normal;}
         .select-wrapper{color: #0D5995;}
         .select-wrapper select {min-width: 12.5rem; }
         .select-wrapper select:not(.form-control){ padding: .375rem .75rem;font-size: 1rem;text-align: center;color: inherit;border-color: #0D5995;background-color: rgba(255,255,255,1);}
@@ -271,13 +218,87 @@
         .dl-subs .switch{padding:0; transform: translate(0,.25rem);}
         .dl-subs option{color: #000; font-weight: bold; }
         .dl-subs + a{display: none;}
-
     `);
 
 
+    $(doc).ready(function() {
 
-        $(doc).ready(function() {
-            $('body').append(`<iframe id="vikiconverter" name="vikiconverter" class="hidden"></iframe>`);
+        switchLocale(settings.get('locale'));
+
+
+        /**
+         * .switch
+         */
+        $(doc).on('init.switch', '.switch [type="checkbox"]', function() {
+            this.checked = $(this).dataset('default') === true;
+            let input = $(this), slider;
+            if (input.length > 0) {
+                slider = input.next('.slider');
+                if (slider.length === 0) {
+                    slider = $('<span class="slider" />');
+                    input.after(slider);
+                }
+            }
+            $(this).trigger('ready.switch');
+
+        }).on('ready.doc', '.switch [type="checkbox"]', function() {
+            $(this).trigger('init.switch');
+            return false;
+        }).on('reset.form', '.switch [type="checkbox"]', function() {
+            this.checked = $(this).dataset('default') === true;
+        });
+
+        /**
+         * .select-wrapper
+         */
+        $(doc).on('ready.doc', '.select-wrapper select', function(e) {
+            $(this).trigger('init.select');
+            return false;
+        }).on('init.select', '.select-wrapper select', function() {
+            let s = this;
+            let p = $(s).dataset('placeholder') || "";
+            if (p.length > 0) {
+                $(s).children('option[value=""]').remove();
+                $(s).addClass('placeholder');
+                let o = $(`<option value="" disabled hidden selected/>`);
+                $(s).prepend(o);
+                o.html(p);
+                this.selectedIndex = 0;
+            }
+            $(s).trigger('ready.select');
+
+        }).on('reset.form', '.select-wrapper select', function() {
+            this.selectedIndex = 0;
+            $(this).trigger('init.select');
+        }).on('change', '.select-wrapper select', function() {
+            $(this).removeClass('placeholder');
+        });
+
+        /**
+         * Locale Selection
+         */
+        $(doc).on('click', `div[data-react-class="modalApp.ModalSiteLanguage"] a.pad.inline-block`, function(e) {
+            e.preventDefault();
+            let url = new URL(this.href);
+            let locale = url.searchParams.get('site_lang');
+            if (listLocales().indexOf(locale) !== -1) {
+                settings.set('locale', locale);
+                sessionStorage.removeItem('activesession');
+                setTimeout(x => switchLocale(locale), 200);
+            }
+            // Close Site Modal
+            $(this).parents('.modal').find('.icon-x').click();
+        });
+
+
+
+
+        /**
+         * Subtitles download
+         */
+        if (doc.location.pathname.match(/^\/videos\//i) !== null) {
+
+            $('body').append(`<iframe id="dlsubs" name="dlsubs" class="hidden"></iframe>`);
             //let target = $('.card .card-content .row div.info');
             let target = $(`.video-meta .video-title`);
             let sbox = $(`<div class="dl-subs">
@@ -316,11 +337,7 @@
                 }
 
                 filename += '.' + opt.dataset('locale');
-                if (settings.get('converter')) {
-                    filename += '.srt';
-                } else {
-                    filename += '.vtt';
-                }
+
 
                 GMC.xmlHttpRequest({
                     method: 'GET',
@@ -336,8 +353,10 @@
                 return false;
             });
 
-            $(doc).triggerAll('ready.doc');
 
+            /**
+             * Populate select box
+             */
             if (typeof parsedSubtitles !== typeof undef && typeof video !== typeof undef) {
                 let subs = parsedSubtitles, infos = video, selection = [];
                 if (settings.get('langs') && Array.isArray(settings.get('langs')) && settings.get('langs').length > 0) {
@@ -363,9 +382,10 @@
                 });
 
             }
+        }
+        $(doc).triggerAll('ready.doc');
+    });
 
-        });
-    }
 
 
 })(document, jQuery);
