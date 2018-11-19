@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      2.9a
+// @version      3.0
 // @description  Subtitle downloader (add button to subtitle selection)
 // @author       daedelus
 // @include     *://www.dimsum.my/*
@@ -18,10 +18,10 @@
 // ==/UserScript==
 
 
-function downloadString(text, fileName, baseURI, convert) {
+function downloadString(text, fileName, server, convert) {
     if (convert === true) {
         let form = $(`<form method="post" class="hidden" target="dlsubs" action=""><textarea name="data"></textarea><input type="submit" /></form>`);
-        form.attr('action', baseURI + fileName);
+        form.attr('action', server.replace(/%filename%/, fileName));
         form.find('textarea').text(text);
         $('body').append(form);
         form.submit().remove();
@@ -74,7 +74,7 @@ class UserSettings {
 $(document).ready(function() {
 
     let defaults = {
-        server: 'http://127.0.0.1:8091/assets/srt/convert/',
+        server: 'http://127.0.0.1:8091/assets/srt/convert/%filename%',
         converter: false
     }, settings = new UserSettings(defaults);
 
