@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         thevideo.me + mp4upload.com + uptoBOX + rapidvideo
 // @namespace    https://github.com/ngsoft
-// @version      1.6.1
+// @version      1.7
 // @description  jwplayer video downloader
 // @author       daedelus
 // @include     *://vev.io/embed*
@@ -15,6 +15,12 @@
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/thevideo.user.js
 // ==/UserScript==
+
+/**
+ * Works best with following line in hosts file
+ * 0.0.0.0 bodelen.com ceehimur.uk
+ * 0.0.0.0 p311425.clksite.com p311425.mycdn.co
+ */
 
 (function() {
     /* jshint expr: true */
@@ -57,14 +63,6 @@
 
 
 
-    /*let scriptname = (function() {
-        let o = "object", s = "string", n = null, info = (typeof GM_info === "object" && GM_info !== null) ? GM_info : (typeof GM === o && GM !== n && typeof GM.info === o) ? GM.info : {script: {namespace: "", name: "", author: "", version: ""}};
-        return info.script.name + ' ' + info.script.version;
-    })();*/
-
-
-
-
     let w = setInterval(function() {
 
         if (document.body !== null) {
@@ -83,15 +81,14 @@
                 div.dlvideo > span{position:absolute; right:5px; top:1em; width: auto;}
                 div.dlvideo span, div.dlvideo span *{cursor: pointer;}
                 div.dlvideo span label{margin-left: 5px;}
-                .hidden, .videologo, #dlframe, .hidden * {display: none !important;}
                 /* thevideo mods */
                 #home_video{position: relative;}
                 #home_video > div[style*="calc"]{height: calc(100% - 50px)!important;}
-
-
                 /* color theme */
                 div.dlvideo{color: #FFF; background-color: rgba(0,0,0,.4);}
                 div.dlvideo a{color: #FFF; text-decoration: none;}
+                /* utils */
+                .hidden, .videologo, #dlframe, #overlay, .hidden * {position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
 
             `);
             ondomready(function() {
@@ -125,16 +122,34 @@
                     }
                 }, 500);
 
+
                 /**
                  * Best Quality selector only available for rapidvideo
                  */
-                if (location.host.match(/rapidvideo/) !== null && location.href.match(/q=/) === null) {
+                if (location.host.match(/rapidvideo/i) !== null) {
+                    let quality = {}, best;
                     document.querySelectorAll('#home_video > div[style*="23px"]').forEach(function(x) {
-                        let best;
-                        x.querySelectorAll('a[href*="q="]').forEach(y => best = y.href);
-                        if (best !== document.location.href)
-                            location.replace(best);
+                        x.querySelectorAll('a[href*="q="]').forEach(function(y) {
+                            best = y;
+                            quality[y.innerText] = y;
+                            y.addEventListener('click', function() {
+                                localStorage.lastquality = this.innerText;
+                            });
+                        });
                     });
+
+
+                    if (document.location.href.match(/q=/) === null) {
+                        let last;
+                        if (last = localStorage.lastquality) {
+                            if (quality[last]) {
+                                document.location.replace(quality[last].href);
+                            }
+                            return;
+                        }
+                        document.location.replace(best.href);
+
+                    }
                     return;
                 }
 
