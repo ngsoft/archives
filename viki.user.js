@@ -7,8 +7,8 @@
 // @match        https://www.viki.com/*
 // @noframes
 // @grant none
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/viki.user.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/viki.user.js
+// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/myviki.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/myviki.user.js
 // ==/UserScript==
 
 
