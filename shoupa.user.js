@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SHOUPA and ESYY HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      1.1.1
+// @version      1.2
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @include     *.shoupa.com/v/*
@@ -75,6 +75,8 @@
                 let regex = /#EXT-X-STREAM-INF.*\n([^#].*)/, matches;
                 if ((matches = regex.exec(m3u8)) !== null) {
                     callback(matches[1].trim());
+                } else {
+                    callback(src);
                 }
             }
         });
