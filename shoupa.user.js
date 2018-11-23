@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SHOUPA and ESYY HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.1
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @include     *.shoupa.com/v/*
@@ -72,7 +72,6 @@
             url: src,
             onload(xhr) {
                 let m3u8 = xhr.response.replace(/\n([^#].*)/g, `\n${dirname(src)}$1`);
-                console.debug(m3u8);
                 let regex = /#EXT-X-STREAM-INF.*\n([^#].*)/, matches;
                 if ((matches = regex.exec(m3u8)) !== null) {
                     callback(matches[1].trim());
@@ -109,13 +108,14 @@
         });
 
     }
+    let isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 
     addCSS(`
-        video.native_mode{width:100%;height: 100%;}
+        video.native_mode{width:100%;height: ${ isChrome ? '95' : '100'}%;}
         button.dl-video{margin-left: 1rem;margin-top: 13px;}
         div.video-message, span.clip{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 999; padding: 1em 0;}
-        button.dl-btn{position: absolute; bottom:4.5rem;right:4rem;}
-        span.clip{top: 50%; transform: translate(0,-50%); padding: 2rem;}
+        button.dl-btn{position: absolute; bottom:10rem;right:4rem;}
+        span.clip{top: 50%; transform: translate(0,-50%); padding: 2rem;margin: 2rem;}
         span.clip code{white-space:normal; text-align: left; display:block;}
         /* color theme */
         .unicon{font-family: "Segoe UI Symbol";}
@@ -127,10 +127,9 @@
         button.dl-btn{display: none;}
         td#playleft:hover button.dl-btn{display: inline;}
         div.video-message{display: none;}
-        video + div.video-message{display: block;}
+        video + div.video-message, object + div.video-message{display: block;}
         .hidden{display: none !important;}
     `);
-
 
     if (location.origin.match(/shoupa.com/) !== null) {
 
@@ -144,6 +143,11 @@
                     node.after(video);
                     node.remove();
                     playM3u8(src, video);
+                }
+                if (node.is('object#ckplayer_cms_player')) {
+                    let params = new URLSearchParams(node.children('[name="flashvars"]').val());
+                    let src = params.get('a');
+                    node.attr('data-original', src);
                 }
                 if (node.is('#detail-content a')) {
                     node.removeAttr('target')
@@ -168,12 +172,13 @@
                     $('.clip').removeClass('hidden');
                     return false;
                 }
-                $('video.native_mode').trigger('download');
+                $('video.native_mode, object#ckplayer_cms_player').trigger('download');
                 return false;
             }).on('click', '.clip', function(e) {
                 $(this).addClass('hidden');
             });
-            $(doc).on('download', 'video.native_mode', function() {
+
+            $(doc).on('download', 'video.native_mode, object#ckplayer_cms_player', function() {
                 let src = this.dataset.original, self = this;
 
                 getSteamURL(src, function(url) {
@@ -237,8 +242,6 @@
                 show: $('.tag-title-sm a').last().text(),
                 number: $('.player .video-play-src a.current-episode').attr('data-number') + ""
             };
-
-            console.debug(infos);
 
             let dlbt = $('<button type="button" class="btn dl-btn"><img src=" data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAArklEQVR4AXWRJVgEURRGD+7eJ+FOhjYZh4r13nDtGV1v67tp+zcNb9OxSsPG9fGf5/ekdwEkVH7xk6ER7CyiMO3jkE8itNvCKkX8WeeZVyr0AMAKZfyZIUWSD+bCwpSGnQKrYeFMw06ZlbBwoPGvUEsNOxo11IoFmRwXGjlksdDEHt8aezSKBYAtDUAk9DGqMaCh7fSFhRx3HnK2YH+1KEVWxc2yUVgEUbttVCT4A+GLTZ5S0nQvAAAAAElFTkSuQmCC" style="filter:invert(100%);"/>  Download  </button>');
             $('video').parent().append(dlbt);
