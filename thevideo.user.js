@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         thevideo.me + mp4upload.com + uptoBOX + rapidvideo
 // @namespace    https://github.com/ngsoft
-// @version      1.7
+// @version      1.7.1
 // @description  jwplayer video downloader
 // @author       daedelus
 // @include     *://vev.io/embed*
@@ -115,6 +115,10 @@
                                 dl.querySelector('a').href = el.src;
                             });
                             el.addEventListener("pause", function() {
+                                dl.classList.remove('hidden');
+                                dl.querySelector('a').href = el.src;
+                            });
+                            el.addEventListener("loadeddata", function() {
                                 dl.classList.remove('hidden');
                                 dl.querySelector('a').href = el.src;
                             });
