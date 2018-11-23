@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SHOUPA and ESYY HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      1.1
+// @version      1.1.1
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @include     *.shoupa.com/v/*
@@ -87,7 +87,7 @@
             title += "E" + infos.number + ".";
         }
         title += infos.provider + ".mp4";
-        let cmd = `ffmpeg -protocol_whitelist "file,http,https,tcp,tls" -y -i "${infos.url} -c copy "${title}"`;
+        let cmd = `ffmpeg -protocol_whitelist "file,http,https,tcp,tls" -y -i "${infos.url}" -c copy "${title}"`;
 
         let clip = $(`<span class="clip"><code>${cmd}</code></span>`);
 
