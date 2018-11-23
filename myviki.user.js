@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        My ViKi
 // @namespace   https://github.com/ngsoft
-// @version     5.0
+// @version     1.2
 // @description Viki+
 // @author      daedelus
 // @noframes
