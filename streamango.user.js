@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         streamango
 // @namespace    https://github.com/ngsoft
-// @version      2.3.2
+// @version      2.3.3
 // @description  Add remover + autoplay
 // @author       daedelus
 // @include     *://streamango.*/embed/*
 // @grant none
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/streamango.user.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/streamango.user.js
+// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
 // ==/UserScript==
 
 (function() {

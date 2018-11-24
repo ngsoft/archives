@@ -1,11 +1,12 @@
 // ==UserScript==
-// @name         Openload Embed
+// @name         Openload + StreamMango
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      3.0
-// @description  Openload
+// @version      3.1
+// @description  Helps to download streams
 // @include     *://openload.co/embed/*
 // @include     *://oload.fun/embed/*
+// @include     *://streamango.*/embed/*
 // @grant        none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
@@ -101,7 +102,7 @@
             div.dlvideo span a:before{content:"";text-indent: 99999px;position: absolute;top:0;left: 0;}
             div.dlvideo > a, div.dlvideo > span, div.dlvideo .clipboard{padding: 0 2rem;cursor:pointer;}
             .unicon{font-family: "Segoe UI Symbol";font-style: normal;}
-            .hidden, #dlframe, .hidden *{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
+            .hidden, #videooverlay, .hidden *{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
 
             /* color theme */
             div.dlvideo{color: #FFF; background-color: rgba(0,0,0,.4);}
@@ -111,11 +112,23 @@
             div.dlvideo .dl-icon{background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAArklEQVR4AXWRJVgEURRGD+7eJ+FOhjYZh4r13nDtGV1v67tp+zcNb9OxSsPG9fGf5/ekdwEkVH7xk6ER7CyiMO3jkE8itNvCKkX8WeeZVyr0AMAKZfyZIUWSD+bCwpSGnQKrYeFMw06ZlbBwoPGvUEsNOxo11IoFmRwXGjlksdDEHt8aezSKBYAtDUAk9DGqMaCh7fSFhRx3HnK2YH+1KEVWxc2yUVgEUbttVCT4A+GLTZ5S0nQvAAAAAElFTkSuQmCC');}
             div.dlvideo span a {width: 1.25rem;height: 1.25rem;}
             div.dlvideo .dl-icon{width: 1rem;height: 1rem;margin: -.25rem .5rem 0 .5rem;}
+
             div.dlvideo:hover span a, div.dlvideo .dl-icon{filter: invert(100%);}
+            div.dlvideo:hover a, div.dlvideo:hover span, div.dlvideo:hover > i{filter: drop-shadow(.25rem .25rem .5rem #000);}
             /* animations */
             @keyframes flash {0% { opacity: 1; } 50% { opacity: .1; } 100% { opacity: 1; }}
             .flash{animation: flash linear .25s infinite;-webkit-animation: flash linear .25s infinite;}
         `);
+        if (document.location.origin.match(/mango/i) !== null) {
+            addstyle(`
+                /* color theme */
+                div.dlvideo, div.dlvideo:hover{color: rgba(116, 44, 161,1); background-color: rgba(253, 250, 250,1);}
+                div.dlvideo a{color: rgba(116, 44, 161,1); text-decoration: none;}
+                /*div.dlvideo:hover a, div.dlvideo:hover span, div.dlvideo:hover > i{filter: drop-shadow(.25rem .25rem .5rem);}*/
+                div.dlvideo:hover span a{filter: none;}
+                div.dlvideo .dl-icon{filter: opacity(85%);}
+            `);
+        }
     });
 
     function createToolbar(target, video) {
@@ -183,17 +196,35 @@
                     clearInterval(worker);
 
                     jQuery('body').off('mouseup');
-                    if (videojs && videojs("olvideo").vast) {
-                        vasturl = null;
-                        videojs("olvideo").vast.disable();
-                    }
-
+                    let vjs;
                     document.querySelectorAll('video').forEach(function(video) {
+
+                        let id;
+                        if ((id = video.parentNode.id)) {
+                            try {
+                                if (videojs && videojs(id)) {
+                                    vjs = videojs(id);
+                                    /** Disable VAST **/
+                                    if (typeof vjs.vast !== "undefined") {
+                                        if (typeof vasturl !== "undefined") {
+                                            vasturl = null;
+                                        }
+                                        vjs.vast.disable();
+                                    }
+                                }
+                            } catch (e) {
+                                return;
+                            }
+                        }
                         video.addEventListener("loadeddata", function() {
                             if (this.src) {
                                 createToolbar(document.body, this);
                             }
                         });
+                    });
+
+                    document.querySelector('#videooverlay').addEventListener('click', function() {
+                        vjs.load();
                     });
 
                     trigger("click", document.querySelector('#videooverlay'));
