@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SHOUPA and ESYY HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      1.2
+// @version      1.2.1
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @include     *.shoupa.com/v/*
@@ -169,6 +169,10 @@
 
         $(doc).ready(function() {
 
+            $(doc).on("play pause", "video", function() {
+                $('.clip').addClass('hidden');
+            });
+
             $(doc).on('click', 'button.dl-video', function() {
                 if ($('.clip').length > 0) {
                     $('.clip').removeClass('hidden');
@@ -247,6 +251,13 @@
 
             let dlbt = $('<button type="button" class="btn dl-btn"><img src=" data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAArklEQVR4AXWRJVgEURRGD+7eJ+FOhjYZh4r13nDtGV1v67tp+zcNb9OxSsPG9fGf5/ekdwEkVH7xk6ER7CyiMO3jkE8itNvCKkX8WeeZVyr0AMAKZfyZIUWSD+bCwpSGnQKrYeFMw06ZlbBwoPGvUEsNOxo11IoFmRwXGjlksdDEHt8aezSKBYAtDUAk9DGqMaCh7fSFhRx3HnK2YH+1KEVWxc2yUVgEUbttVCT4A+GLTZ5S0nQvAAAAAElFTkSuQmCC" style="filter:invert(100%);"/>  Download  </button>');
             $('video').parent().append(dlbt);
+
+            $(doc).on("play pause", "video", function() {
+                $('.clip').addClass('hidden');
+                $('button.dl-btn').addClass('hidden');
+            }).on("pause", "video", function() {
+                $('button.dl-btn').removeClass('hidden');
+            });
 
 
             $(doc).on('click', 'button.dl-btn', function() {
