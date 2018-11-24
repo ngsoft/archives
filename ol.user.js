@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Openload + StreamMango
+// @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @version      3.2
