@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SHOUPA and ESYY HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      2.0
+// @version      2.0.1
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @include     *.shoupa.com/v/*
@@ -412,7 +412,7 @@
             this.elements.settings.code.addEventListener("change", this.events.switchsetting);
             this.elements.settings.container.addEventListener("click", this.events.scriptcontainerclick);
             this.elements.settings.container.querySelector('.video-form-title').addEventListener("click", this.events.settingstitlebar);
-            //this.elements.container.oncontextmenu = x => false;
+            this.elements.container.oncontextmenu = x => false;
 
             //create hls object
             this.hls = new Hls();
