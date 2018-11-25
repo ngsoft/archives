@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SHOUPA and ESYY HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      2.0.1
+// @version      2.1
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @include     *.shoupa.com/v/*
@@ -197,7 +197,8 @@
     let defaults = {
         autoplay: false,
         jd: true,
-        code: true
+        code: true,
+        flash: true
     };
 
     let app = {
@@ -207,13 +208,12 @@
             a.pop();
             return a.pop().match(/([a-z]+)/i)[1].toUpperCase();
         }()),
-        src: "",
-        show: "",
-        number: "",
+        src: "", show: "", number: "",
         video: "",
         enable: true,
         started: false,
         title: "",
+        realsrc: "",
         code: "",
         hls: "",
         elements: {
@@ -227,18 +227,18 @@
                 code: html2element(`<code></code>`)
             },
             toolbar: {
-                container: html2element(`<div class="video-toolbar"><i class="fav-icon" title="Open Settings ..."></i></div>`),
+                container: html2element(`<div class="video-toolbar"><i class="fav-icon" title="Open Settings ..."></i>&nbsp;</div>`),
                 title: html2element(`<span class="video-title" title="Play Video"></span>`),
-                jd: html2element(`<a class="jd-plugin" href="#" title="Copy to jDownloader ..."><i class="jd-icon"></i></a>`),
+                jd: html2element(`<a class="jd-plugin" href="#" title="Copy to jDownloader ..." data-href=""><i class="jd-icon"></i></a>`),
                 code: html2element(`<a class="code-plugin" href="#" title="Display ffmpeg command ..."><i class="script-icon"></i></a>`)
             },
             settings: {
                 container: html2element(`<div class="video-settings hidden"><div class="video-form"><div class="video-form-title">Settings</div>
-<div class="setting"><span class="switch round"><input type="checkbox" name="autoplay" /><span class="slider"></span><span class="description">Enable Autoplay</span></span></div><div class="setting"><span class="switch round"><input type="checkbox" name="jd" /><span class="slider"></span><span class="description">Enable jDownloader</span></span></div><div class="setting"><span class="switch round"><input type="checkbox" name="code" /><span class="slider"></span><span class="description">Enable ffmpeg command</span></span></div></div></div>`),
+<div class="setting"><span class="switch round"><input type="checkbox" name="autoplay" /><span class="slider"></span><span class="description">Enable Autoplay</span></span></div><div class="setting"><span class="switch round"><input type="checkbox" name="jd" /><span class="slider"></span><span class="description">Enable jDownloader</span></span></div><div class="setting"><span class="switch round"><input type="checkbox" name="code" /><span class="slider"></span><span class="description">Enable ffmpeg command</span></span></div><div class="setting"><span class="switch round"><input type="checkbox" name="flash" /><span class="slider"></span><span class="description">Enable Flash Player</span></span></div></div></div>`),
                 autoplay: "",
                 jd: "",
-                code: ""
-
+                code: "",
+                flash: ""
             }
         },
         events: {
@@ -274,13 +274,14 @@
 
             },
             jdclick(e) {
-                let url = new URL(app.src);
+                e.preventDefault();
+                this.href = app.src;
+                let url = new URL(app.realsrc.length > 0 ? app.realsrc : app.src);
                 url.searchParams.set('title', app.title);
-                this.href = url.href;
-                if (copyToClipboard(this.href)) {
+                this.dataset.href = url.href;
+                if (copyToClipboard(url.href)) {
                     app.notify("Link sent to Clipboard ...", 1000);
                 }
-                e.preventDefault();
                 return false;
             },
             scriptclick(e) {
@@ -292,15 +293,24 @@
                 return false;
             },
             scriptcontainerclick(e) {
-                if (this === e.target) {
+                if (this === e.target || e.target === this.querySelector('.video-form-title')) {
                     app.hide(this);
                 }
                 return false;
             },
             codeclick(e) {
-                app.hide(app.elements.settings.container);
-                app.toggle(app.elements.code.container);
                 e.preventDefault();
+                app.hide(app.elements.settings.container);
+                if (app.elements.code.container.classList.contains('hidden')) {
+                    if (app.code.length === 0) {
+                        //set ffmpeg code
+                        app.code = `ffmpeg -protocol_whitelist "file,http,https,tcp,tls" -y -i "${app.realsrc.length > 0 ? app.realsrc : app.src}" -c copy "${app.title}"`;
+                        app.elements.code.code.appendChild(text2element(app.code));
+                    }
+                    app.unhide(app.elements.code.container);
+                    return false;
+                }
+                app.hide(app.elements.code.container);
                 return false;
             },
             titleclick() {
@@ -331,10 +341,6 @@
                 app.toggle(app.elements.settings.container);
                 e.preventDefault();
                 return false;
-            },
-            settingstitlebar(e) {
-                app.hide(app.elements.settings.container);
-                return false;
             }
         },
         init() {
@@ -357,6 +363,7 @@
             this.started = true;
             console.debug(`${scriptname} Started`);
             this.build();
+
         },
         build() {
             //insert all elements into the dom
@@ -370,50 +377,28 @@
                 }
             }
 
+            this.buildtoolbar(this.elements.container);
+            this.buildcode(this.elements.container);
+            this.buildnotify(this.elements.container);
+            this.buildsettings(this.elements.container);
+            this.buildtitle();
+            if (this.enable) {
+                this.buildvideo(this.elements.container);
+            }
+        },
+        buildvideo() {
             //assemble elements
-            this.elements.container.appendChild(this.elements.video);
-            this.elements.container.appendChild(this.elements.errormessage);
-            this.elements.container.appendChild(this.elements.toolbar.container);
-            this.elements.toolbar.container.appendChild(this.elements.toolbar.title);
-            this.elements.toolbar.container.appendChild(this.elements.toolbar.code);
-            this.elements.toolbar.container.appendChild(this.elements.toolbar.jd);
-            this.elements.container.appendChild(this.elements.code.container);
-            this.elements.code.container.appendChild(this.elements.code.codebar);
-            this.elements.code.codebar.appendChild(this.elements.code.code);
-            this.elements.container.appendChild(this.elements.notification);
-            //settings
-            this.elements.container.appendChild(this.elements.settings.container);
-            this.elements.settings.autoplay = this.elements.settings.container.querySelector('[name="autoplay"]');
-            this.elements.settings.jd = this.elements.settings.container.querySelector('[name="jd"]');
-            this.elements.settings.code = this.elements.settings.container.querySelector('[name="code"]');
-            this.elements.settings.autoplay.checked = this.settings.get('autoplay') === true;
-            this.elements.settings.jd.checked = this.settings.get('jd') === true;
-            this.elements.settings.code.checked = this.settings.get('code') === true;
-
-
+            insertBefore(this.elements.video, this.elements.toolbar.container);
+            insertBefore(this.elements.errormessage, this.elements.toolbar.container);
 
             //remove old video element
             this.video.parentNode.removeChild(this.video);
-
             //register events
             this.elements.video.addEventListener("loadeddata", this.events.videoload);
             this.elements.video.addEventListener("click", this.events.videoclick);
             this.elements.video.addEventListener("play", this.events.videoplay);
             this.elements.video.addEventListener("pause", this.events.videopause);
-            this.elements.toolbar.container.querySelector('.fav-icon').addEventListener("click", this.events.settings);
-            this.elements.toolbar.title.addEventListener("click", this.events.titleclick);
-            this.elements.toolbar.jd.addEventListener("click", this.events.jdclick);
-            this.elements.toolbar.code.addEventListener("click", this.events.codeclick);
-            this.elements.code.code.addEventListener("click", this.events.scriptclick);
-            this.elements.code.container.addEventListener("click", this.events.scriptcontainerclick);
-            this.elements.notification.addEventListener("click", this.events.notifyclick);
-            this.elements.settings.autoplay.addEventListener("change", this.events.switchsetting);
-            this.elements.settings.jd.addEventListener("change", this.events.switchsetting);
-            this.elements.settings.code.addEventListener("change", this.events.switchsetting);
-            this.elements.settings.container.addEventListener("click", this.events.scriptcontainerclick);
-            this.elements.settings.container.querySelector('.video-form-title').addEventListener("click", this.events.settingstitlebar);
-            this.elements.container.oncontextmenu = x => false;
-
+            this.elements.video.oncontextmenu = this.elements.errormessage.oncontextmenu = x => false;
             //create hls object
             this.hls = new Hls();
             this.hls.on(Hls.Events.ERROR, this.events.videoerror);
@@ -421,7 +406,66 @@
             let m3u8Url = decodeURIComponent(this.src);
             this.hls.loadSource(m3u8Url);
             this.hls.attachMedia(this.elements.video);
+        },
+        buildnotify(target) {
+            if (!(target instanceof Element)) {
+                return;
+            }
+            target.appendChild(this.elements.notification);
+            this.elements.notification.addEventListener("click", this.events.notifyclick);
+            this.elements.notification.oncontextmenu = x => false;
 
+        },
+        buildcode(target) {
+            if (!(target instanceof Element)) {
+                return;
+            }
+            target.appendChild(this.elements.code.container);
+            this.elements.code.container.appendChild(this.elements.code.codebar);
+            this.elements.code.codebar.appendChild(this.elements.code.code);
+            this.elements.code.code.addEventListener("click", this.events.scriptclick);
+            this.elements.code.container.addEventListener("click", this.events.scriptcontainerclick);
+            this.elements.code.container.oncontextmenu = x => false;
+        },
+        buildtoolbar(target) {
+            if (!(target instanceof Element)) {
+                return;
+            }
+            target.appendChild(this.elements.toolbar.container);
+            this.elements.toolbar.container.appendChild(this.elements.toolbar.title);
+            this.elements.toolbar.container.appendChild(this.elements.toolbar.code);
+            this.elements.toolbar.container.appendChild(this.elements.toolbar.jd);
+            //register events
+            this.elements.toolbar.container.querySelector('.fav-icon').addEventListener("click", this.events.settings);
+            this.elements.toolbar.title.addEventListener("click", this.events.titleclick);
+            this.elements.toolbar.jd.addEventListener("click", this.events.jdclick);
+            this.elements.toolbar.code.addEventListener("click", this.events.codeclick);
+        },
+        buildsettings(target) {
+            if (!(target instanceof Element)) {
+                return;
+            }
+            //settings
+            target.appendChild(this.elements.settings.container);
+            this.elements.settings.autoplay = this.elements.settings.container.querySelector('[name="autoplay"]');
+            this.elements.settings.jd = this.elements.settings.container.querySelector('[name="jd"]');
+            this.elements.settings.code = this.elements.settings.container.querySelector('[name="code"]');
+            this.elements.settings.flash = this.elements.settings.container.querySelector('[name="flash"]');
+
+            Object.keys(defaults).forEach(function(x) {
+                if ((app.elements.settings[x].checked = app.settings.get(x) === true) === false) {
+                    if (app.elements.toolbar[x]) {
+                        app.hide(app.elements.toolbar[x]);
+                    }
+                }
+                app.elements.settings[x].addEventListener("change", app.events.switchsetting);
+            });
+            //register events
+            this.elements.settings.container.addEventListener("click", this.events.scriptcontainerclick);
+            this.elements.settings.container.oncontextmenu = x => false;
+        },
+
+        buildtitle() {
             //set title
             let title = this.show + ".";
             if (this.number > 0) {
@@ -434,19 +478,6 @@
             title += this.provider;
             this.title = title + ".mp4";
             this.elements.toolbar.title.appendChild(text2element(this.title));
-
-            //set ffmpeg code
-            this.code = `ffmpeg -protocol_whitelist "file,http,https,tcp,tls" -y -i "${this.src}" -c copy "${this.title}"`;
-            this.elements.code.code.appendChild(text2element(this.code));
-
-            //read settings
-            Object.keys(defaults).forEach(function(k) {
-                if (k !== "autoplay") {
-                    if (this.settings.get(k) !== true) {
-                        this.hide(this.elements.toolbar[k]);
-                    }
-                }
-            }.bind(this));
         },
         toggle(element) {
             if (element instanceof Element) {
@@ -499,13 +530,13 @@
             .video-container video{width:100%;height:100%;z-index:1;}
             .video-container .play{padding:0;background: none;color: inherit;}
             .video-container .video-error-message,
-            .video-container .video-toolbar,
-            .video-container .video-code-container,
-            .video-container .video-settings
+            .video-toolbar,
+            .video-code-container,
+            .video-settings
             {position: absolute; top:0;left:0;right:0; z-index:999;background-color: #000; padding: 1rem;}
-            .video-container .video-error-message, .video-container .video-code,
-            .video-container .video-toolbar{background-color: rgba(0,0,0,.4);color: #FFF; text-align:center;}
-            .video-container a{color: #FFF; text-decoration: none;}
+            .video-container .video-error-message, .video-code,
+            .video-toolbar{background-color: rgba(0,0,0,.4);color: #FFF; text-align:center;}
+            .video-toolbar a{color: #FFF; text-decoration: none;}
             .video-toolbar [class*="-icon"]{position: absolute;top:50%; transform: translate(0,-50%); margin: 0 1rem;}
             .video-toolbar .jd-icon{right:3.5rem;}.video-toolbar .script-icon{right:0;}.video-toolbar .fav-icon{left:0;}
             .video-error-message, .video-toolbar, .video-notify, .video-settings
@@ -513,18 +544,18 @@
             .video-container .video-error-message{bottom:0;cursor: auto;}
             .video-error-message .noentry-icon
             {font-size:7rem; color:rgb(187,64,64); position: absolute;top:50%;left:50%; line-height: 0;transform: translate(-3.5rem,-.5rem);}
-            .video-container .video-code-container, .video-container .video-settings{z-index: 900;bottom:0;padding:3rem 0 0 0; background: transparent;cursor: auto;}
+            .video-code-container, .video-settings{bottom:0;padding:3rem 0 0 0; background: transparent;cursor: auto;}
             .video-code-container .video-code, .video-settings .video-form{background-color: rgba(0,0,0,.4); padding: 1rem;}
             .video-code code{color:#74aa04; background-color: rgba(0,43,54,.9); display: block;padding: 3rem 1rem;}
-            .video-container .video-settings{padding: 15% 20% 0 20%; }
+            .video-settings{padding: 15% 20% 0 20%; }
             .video-settings .video-form{text-align:left;border: 1px solid;border-radius: .5rem;background-color: rgba(0,0,0,.9);color: #FFF;}
-            .video-form .setting{transform:translate(33%, 0);padding: 1rem 0;}
+            .video-form .setting{padding: 1rem 0 1rem 33%;}
             .video-form .video-form-title{text-align: right;border-bottom: 1px solid;padding: 0 1rem 1rem 1rem;cursor: pointer;}
-            .video-container .video-notify
+            .video-notify
             {position: absolute; bottom:7rem;right:2rem;color:rgb(34, 34, 34);background-color: rgba(255, 255, 255, .8);font-size:.95rem;padding:1rem 2rem; border-radius: .25rem;z-index:1000;}
             .video-container video:not(.error) + .video-error-message,
             .video-container video.play + .video-error-message + .video-toolbar,
-            .video-container video.error + .video-error-message + .video-toolbar
+            .video-container video.error + .video-error-message + .video-toolbar .video-title
             {display: none;}
             /* switch */
            .switch,.switch .slider {position: relative;display: inline-block;}
@@ -561,6 +592,8 @@
             .unicon{font-family: "Segoe UI Symbol";font-style: normal;}
             .invert{filter: invert(100%);}
             .hidden, .hidden *, #playleft{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
+            /* Flash player integration */
+            #ckplayer_cms_player embed{position: absolute; top: 3rem;bottom:0; right:0; left:0;height:calc(675px - 3rem);}
         `);
 
         if (doc.location.host.match(/esyy/i)) {
@@ -570,6 +603,7 @@
                 .fav-icon{background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAADhklEQVRYha3XS2hdVRQG4K/HUoKEEkqQUkRLkUhBpUrrs4Oroq3iwEFGvqhWq9VBRS0OqriholaRiu/aqEUUhM5Eamk13j50oGmd1NiWEoJIkSAlSAgx1NTBPifZN7n35tzEf7TP2o9/7X32XutfC7SC4FLchjVYgTaMYxR/4hf0CgbKLrmgBOki3IfHcT2yEusex27sEYzN3YGgG29geQnSejiLbbkjLTgQtGOXuPPpOInDOIW/clsnrsTNuKrOnK/xoGB4dgeCTnyD1Yl1HJ/gPcGJuk5Pze/CU3gUFyc9/Vgn+KOxA8FiHMKqxHoUDwvONCWe6chy8RTvTKxncItgqDBkyQT4Yhr5u7i1ZfK43iDuwiuJ9QrsFSwsDBdNdlU8gWeSwW9hi2CiZfICVRdU9ar4V3y+cDn+UXWE4gSCJXg1mbofz9a9ucE1c3DlZXyZfG/LY8rkL9iCjrw9jI1Ndv6pYG+xQCkEsFkMVsTL+Xx0IP6PTcnwNwVnZ1myG78Knk7/5yxODGN7YtkgaM9QwdLcOIb3Sy3IYuzEz4IbS87Zg3N5ux3rM9yRDDggTA4oi1X4QbA7v0uNEYziq8SyLlMbcL5rkbxAJgaeU4JHhKb5IuVYnamN86fn6ECBTnyMQ0LdkDyd47JM/JcFRufpQIG1OCbYIdSEY9Rkx6xMap0rFuEBMYU3RIaR5LvtfyI/j7exUlCt41iBiYUYMHUPunBgnuQ/YbPgeIP+rqT9e4a+xHD7PIjPidHupibk0zn6MrXPYv2sb3kmJvCZeNwfNk1eQRvuTSwHF6IXQ7hEvAOb8FpJ8n7xuA+XHP8Qkxscwb5McB49yaCtuSpqhhExmVxbmjyKnZcSy+eCkeIZ7sTfeXsJdjUSkdiHqwWvC8ZLkUe8g2V5e0ye/qMgqRpVMYK78wEr0aZaJzRXfa86U1w2RfActiaW7ULMCaki6sMNomyCtSo6VBxUdaElwiliKl5QK3Z+xEbVeFmni9IOHFErrXtFgTLYIvkyUZTek1gHRFFaCJO6snypKMtTcTqKj/CBMEvCimp4M54Uc36B06IsH0yHNypMFotZrbtO7wlRqv8mFiYT4sUtCpPrzCzf9uP+elqjcWkWECujHbSg/2oxhBfR0yhAlSlO27ABj4m7K4N+sTjtEWqS3RwcqHVmhVjprBHfdJE9x8VC9Bi+FZwsu+R/dPvakN2rMrEAAAAASUVORK5CYII=');
             `);
         }
+
 
 
     });
@@ -587,14 +621,16 @@
                             src = this.firstChild.src;
                             break;
                         case "object":
-                            app.enable = false;
+                            app.enable = app.settings.get('flash') === false;
                             let p = new URLSearchParams(this.querySelector('[name="flashvars"]').value);
                             src = p.get('a');
                             break;
                     }
                     if (src.length > 0) {
+                        app.src = src;
+
                         utils.getSteamURL(src, function(u) {
-                            app.src = u;
+                            app.realsrc = u;
                         });
                     }
                 });
@@ -624,8 +660,9 @@
                     app.video = this;
                     let url = new URL(this.src);
                     utils.getSteamURL(url.searchParams.get('url'), function(u) {
-                        app.src = u;
+                        app.realsrc = u;
                     });
+                    app.src = url.searchParams.get('url');
                 });
                 getElement('.player .video-play-src a', function() {
 
