@@ -1,13 +1,12 @@
 // ==UserScript==
 // @name        My ViKi
 // @namespace   https://github.com/ngsoft
-// @version     5.0
+// @version     5.1
 // @description Viki+
 // @author      daedelus
 // @noframes
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/myviki.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/myviki.user.js
-// @require     https://greasyfork.org/scripts/34527/code/GMCommonAPI.js
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_xmlhttpRequest
@@ -71,17 +70,17 @@
         constructor(defaults) {
             if (typeof defaults === 'object') {
                 Object.keys(defaults).forEach(function(k) {
-                    if (typeof GMC.getValue(k) !== typeof defaults[k]) {
+                    if (typeof GM_getValue(k) !== typeof defaults[k]) {
                         this.set(k, defaults[k]);
                     }
                 }, this);
             }
         }
         get(key) {
-            return GMC.getValue(key);
+            return GM_getValue(key);
         }
         set(key, val) {
-            GMC.setValue(key, val);
+            GM_setValue(key, val);
             return this;
         }
     }
@@ -211,13 +210,14 @@
        .switch-lg .slider{transform: scale(1.1,1.1);}
 
         /** .dl-subs styles **/
-        .dl-subs{position: relative;margin-top: -.8rem;}
+        .dl-subs{position: relative;margin-top: -.8rem;font-size: 1.2rem;}
         .dl-subs .select-wrapper{padding: 0;}
-        .dl-subs .select-wrapper select{font-size: 1.2rem;padding-top:0;font-style: normal !important;}
+        .dl-subs .select-wrapper select{font-size: 1.2rem;padding-top:0;font-style: normal !important;cursor: pointer;}
         .dl-subs .select-wrapper:after{font-size: 1rem;}
         .dl-subs .switch{padding:0; transform: translate(0,.25rem);}
         .dl-subs option{color: #000; font-weight: bold; }
-        .dl-subs + a{display: none;}
+        .dl-subs + a, .dl-subs .switch .label{display: none;}
+        .dl-subs .switch:hover .label{display: inline-block;}
     `);
 
 
@@ -302,12 +302,13 @@
             //let target = $('.card .card-content .row div.info');
             let target = $(`.video-meta .video-title`);
             let sbox = $(`<div class="dl-subs">
-                            <span class="select-wrapper col s11 m11 l11">
+                            <span class="select-wrapper col s9 m9 l9">
                                 <label>Subtitles</label>
                                 <select title="Select Subtitles" name="subdl"></select>
                             </span>
-                            <span class="switch round col s1 m1 l1">
+                            <span class="switch round col s3 m3 l3">
                                 <input type="checkbox" name="subconvert" title="Convert SRT"/>
+                                <span class="label">Use SRT</span>
                             </span>
                         </div>`);
             target.prepend(sbox);
@@ -339,7 +340,7 @@
                 filename += '.' + opt.dataset('locale');
 
 
-                GMC.xmlHttpRequest({
+                GM_xmlhttpRequest({
                     method: 'GET',
                     url: this.value,
                     onload(xhr) {
