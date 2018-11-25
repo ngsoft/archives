@@ -8,6 +8,8 @@
 // @include     *://esyy007.com/*src*num*
 // @run-at      document-body
 // @noframes
+// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/shoupa.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/shoupa.user.js
 // @require     https://cdn.jsdelivr.net/npm/hls.js@latest
 // @grant       GM_xmlhttpRequest
 // @grant       GM_setValue
