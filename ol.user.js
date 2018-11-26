@@ -11,6 +11,9 @@
 // @include     *://*mp4upload.com/embed*
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
+// @compatible   firefox+greasemonkey(3.17)
+// @compatible   firefox+tampermonkey
+// @compatible   chrome+tampermonkey
 // @grant        none
 // @run-at      document-start
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
@@ -18,7 +21,7 @@
 // ==/UserScript==
 
 
-(function() {
+(function(doc, undef) {
     /* jshint expr: true */
     /* jshint -W018 */
 
@@ -118,20 +121,19 @@
             div.dlvideo .clipboard{position:absolute; left:0; top:1rem; width: auto;cursor:pointer;}
             div.dlvideo span a, div.dlvideo span a:before, .dl-icon{position: relative;display: inline-block;vertical-align: middle;}
             div.dlvideo span a{white-space: nowrap;overflow: hidden;text-indent: -99999px;}
-            div.dlvideo span a:before, .dl-icon{-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;}
-            div.dlvideo span a:before{content:"";text-indent: 99999px;position: absolute;top:0;left: 0;}
             div.dlvideo > a, div.dlvideo > span, div.dlvideo .clipboard{padding: 0 2rem;cursor:pointer;}
-            .unicon{font-family: "Segoe UI Symbol";font-style: normal;}
+            [class*="-icon"]{-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;display:inline-block;vertical-align: middle;font-style: normal!important;vertical-align: middle;display: inline-block;width: 1rem;height: 1rem;}
+            [class*="-icon"] svg{width:87.5%;height:100%;}
+
+
             .hidden, #videooverlay, .videologo, .jw-dock , #overlay, .hidden *{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
 
             /* color theme */
+            [class*="-icon"]{width: 1.25rem;height: 1.25rem;}
             div.dlvideo{color: #FFF; background-color: rgba(0,0,0,.4);}
             div.dlvideo a{color: #FFF; text-decoration: none;}
             div.dlvideo span a:before{background-image: url('${getIcon()}');width: 100%;height: 100%;}
-            div.dlvideo .dl-icon{background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAArklEQVR4AXWRJVgEURRGD+7eJ+FOhjYZh4r13nDtGV1v67tp+zcNb9OxSsPG9fGf5/ekdwEkVH7xk6ER7CyiMO3jkE8itNvCKkX8WeeZVyr0AMAKZfyZIUWSD+bCwpSGnQKrYeFMw06ZlbBwoPGvUEsNOxo11IoFmRwXGjlksdDEHt8aezSKBYAtDUAk9DGqMaCh7fSFhRx3HnK2YH+1KEVWxc2yUVgEUbttVCT4A+GLTZ5S0nQvAAAAAElFTkSuQmCC');}
             div.dlvideo span a {width: 1.25rem;height: 1.25rem;}
-            div.dlvideo .dl-icon{width: 1rem;height: 1rem;margin: -.25rem .5rem 0 .5rem;}
-            div.dlvideo .dl-icon{filter: invert(100%);}
             div.dlvideo:hover a, div.dlvideo:hover span, div.dlvideo:hover > i{filter: drop-shadow(.25rem .25rem .5rem #000);}
             /* animations */
             @keyframes flash {0% { opacity: 1; } 50% { opacity: .1; } 100% { opacity: 1; }}
@@ -142,9 +144,8 @@
                 /* color theme */
                 div.dlvideo, div.dlvideo:hover{color: rgba(116, 44, 161,1); background-color: rgba(253, 250, 250,1);}
                 div.dlvideo a{color: rgba(116, 44, 161,1); text-decoration: none;}
-                /*div.dlvideo:hover a, div.dlvideo:hover span, div.dlvideo:hover > i{filter: drop-shadow(.25rem .25rem .5rem);}*/
                 div.dlvideo:hover span a{filter: none;}
-                div.dlvideo .dl-icon{filter: opacity(85%);}
+
             `);
         }
         if (document.location.origin.match(/openload|oload/i) !== null) {
@@ -162,30 +163,33 @@
         }
 
         let toolbar = {
-            root: html2element(`<div class="dlvideo"><span><a href="" target="_blank" title="Open in a new tab">🔗</a></span></div>`),
-            link: html2element(`<a href="" target="_blank" title="Download Video"><i class="unicon dl-icon"></i>VIDEO LINK</a>`),
-            clip: html2element(`<i class="unicon clipboard" title="Copy to Clipboard">&#128203;</i>`)
+            root: html2element(`<div class="dlvideo-toolbar">&nbsp;</div>`),
+            newtab: html2element(`<a href="" target="_blank" title="Open in a new tab" class="newtab-btn"><span class="fav-icon"></span></a>`),
+            download: html2element(`<a href="" target="_blank" title="Download Video" class="dl-btn"><span class="dl-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M230.9 64c8.8 0 16 7.2 16 16v144h93.9c7.1 0 10.7 8.6 5.7 13.6L203.3 381.2c-6.3 6.3-16.4 6.3-22.7 0l-143-143.6c-5-5-1.5-13.6 5.7-13.6h93.9V80c0-8.8 7.2-16 16-16h77.7m0-32h-77.7c-26.5 0-48 21.5-48 48v112H43.3c-35.5 0-53.5 43-28.3 68.2l143 143.6c18.8 18.8 49.2 18.8 68 0l143.1-143.5c25.1-25.1 7.3-68.2-28.3-68.2h-61.9V80c0-26.5-21.6-48-48-48zM384 468v-8c0-6.6-5.4-12-12-12H12c-6.6 0-12 5.4-12 12v8c0 6.6 5.4 12 12 12h360c6.6 0 12-5.4 12-12z"></path></svg></span>VIDEO LINK</a>`),
+            clipboard: html2element(`<a href="" class="clipboard-btn"><span class="clipboard-icon" title="Copy to Clipboard"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M433.941 193.941l-51.882-51.882A48 48 0 0 0 348.118 128H320V80c0-26.51-21.49-48-48-48h-61.414C201.582 13.098 182.294 0 160 0s-41.582 13.098-50.586 32H48C21.49 32 0 53.49 0 80v288c0 26.51 21.49 48 48 48h80v48c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V227.882a48 48 0 0 0-14.059-33.941zm-84.066-16.184l48.368 48.368a6 6 0 0 1 1.757 4.243V240h-64v-64h9.632a6 6 0 0 1 4.243 1.757zM160 38c9.941 0 18 8.059 18 18s-8.059 18-18 18-18-8.059-18-18 8.059-18 18-18zm-32 138v192H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h55.414c9.004 18.902 28.292 32 50.586 32s41.582-13.098 50.586-32H266a6 6 0 0 1 6 6v42h-96c-26.51 0-48 21.49-48 48zm266 288H182a6 6 0 0 1-6-6V182a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v170a6 6 0 0 1-6 6z"></path></svg></span></a>`)
         };
+
         target.appendChild(toolbar.root);
-        toolbar.root.appendChild(toolbar.clip);
-        toolbar.root.appendChild(toolbar.link);
+        toolbar.root.appendChild(toolbar.clipboard);
+        toolbar.root.appendChild(toolbar.download);
+        toolbar.root.appendChild(toolbar.newtab);
 
-        toolbar.link.href = video.src;
+        toolbar.download.href = video.src;
 
-        toolbar.root.querySelector('span a').addEventListener('click', function() {
+        toolbar.root.newtab.addEventListener('click', function() {
             this.href = document.location.href;
             return false;
         });
 
-        toolbar.link.addEventListener("click", function() {
+        toolbar.download.addEventListener("click", function() {
             this.href = video.src;
             return false;
         });
-        toolbar.clip.addEventListener("click", function() {
-            if (copyToClipboard(toolbar.link.href)) {
-                toolbar.clip.classList.add('flash');
+        toolbar.clipboard.addEventListener("click", function() {
+            if (copyToClipboard(toolbar.download.href)) {
+                toolbar.clipboard.classList.add('flash');
                 setTimeout(function() {
-                    toolbar.clip.classList.remove('flash');
+                    toolbar.clipboard.classList.remove('flash');
                 }, 1500);
 
             }
@@ -300,11 +304,8 @@
             }
 
         }
-
-
-
     });
 
 
 
-})();
+})(document);
