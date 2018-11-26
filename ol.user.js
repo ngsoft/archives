@@ -2,7 +2,7 @@
 // @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      3.2
+// @version      3.2.1
 // @description  Helps to download streams (videojs based sites)
 // @include     *://openload.co/embed/*
 // @include     *://oload.fun/embed/*
@@ -122,7 +122,7 @@
             div.dlvideo span a:before{content:"";text-indent: 99999px;position: absolute;top:0;left: 0;}
             div.dlvideo > a, div.dlvideo > span, div.dlvideo .clipboard{padding: 0 2rem;cursor:pointer;}
             .unicon{font-family: "Segoe UI Symbol";font-style: normal;}
-            .hidden, #videooverlay, #overlay, .hidden *{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
+            .hidden, #videooverlay, .videologo, .jw-dock , #overlay, .hidden *{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
 
             /* color theme */
             div.dlvideo{color: #FFF; background-color: rgba(0,0,0,.4);}
