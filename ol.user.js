@@ -219,7 +219,7 @@
             body{max-width:100%; max-height:100%;margin-right:-100px;padding-right:100px;}
             video.vjs-tech{object-fit: fill;}
             .video-toolbar, .video-notifications{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; padding: 16px 0;font-size: 16px;z-index: 9999;}
-            .video-toolbar a {text-decoration: none;padding: 0 32px;}
+            .video-toolbar a {text-decoration: none;padding: 0 16px;}
             .video-toolbar [class*="-icon"]{-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;display:inline-block;vertical-align: middle;display: inline-block;width: 20px;height: 20px;margin:0 8px;}
             .video-toolbar [class*="-icon"] svg{width:87.5%;height:100%;}.video-toolbar [class*="-icon"] img{width:100%;height:100%;}
             .video-toolbar .clipboard-btn, .video-toolbar .newtab-btn{position: absolute;top: 16px;}.video-toolbar .clipboard-btn{left:0;}.video-toolbar .newtab-btn{right:0;}
