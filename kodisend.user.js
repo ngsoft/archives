@@ -13,6 +13,9 @@
 // @include     *://*yourupload.com/embed/*
 // @include     *://vev.io/*
 // @include     *://thevideo.me/*
+// @compatible   firefox+greasemonkey(3.17)
+// @compatible   firefox+tampermonkey
+// @compatible   chrome+tampermonkey
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/kodisend.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/kodisend.user.js
 // @run-at      document-body
