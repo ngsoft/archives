@@ -126,7 +126,7 @@
             [class*="-icon"] svg{width:87.5%;height:100%;}
 
 
-            .hidden, #videooverlay, .videologo, .jw-dock , #overlay, .hidden *{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
+            .hidden, #videooverlay, .videologo, .jw-dock , #overlay, .hidden *{position: fixed!important; top:-100%!important;right: -100%!important; height:1px!important; width:1px!important; opacity: 0!important;}
 
             /* color theme */
             [class*="-icon"]{width: 1.25rem;height: 1.25rem;}
