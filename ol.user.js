@@ -2,7 +2,7 @@
 // @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      4.0.2
+// @version      4.0.3
 // @description  Helps to download streams (videojs based sites)
 // @include     *://openload.co/embed/*
 // @include     *://oload.fun/embed/*
@@ -423,8 +423,10 @@
 
         }
         new ElementObserver('video.vjs-tech, video.jw-video', function(el, obs) {
-            obs.stop();
-            application.start(this);
+            if (this.src.length > 0) {
+                obs.stop();
+                application.start(this);
+            }
         });
     });
     onDocEnd(function() {
@@ -443,12 +445,10 @@
                 obs.stop();
                 triggerEvent(el, 'click');
             },
-            timeout: 700
+            timeout: 2000
         });
 
 
     });
-
-
 
 })(document);
