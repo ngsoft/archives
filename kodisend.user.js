@@ -204,7 +204,7 @@
         elements: {
             container: html2element(`<span class="kodisend-container"></span>`),
             button: html2element(`<a href="" class="kodisend" title="Send to Kodi"><i class="kodisend-icon"></i></a>`),
-            iframe: html2element(`<iframe id="kodi" name="kodi" class="hidden"></iframe>`)
+            iframe: html2element(`<iframe id="kodi" name="kodi" class="hidden"></iframe>`),
         },
         show(target) {
             if (!(target instanceof Element)) {

@@ -2,7 +2,7 @@
 // @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      4.0.3
+// @version      4.0.4
 // @description  Helps to download streams (videojs based sites)
 // @include     *://openload.co/embed/*
 // @include     *://oload.fun/embed/*
@@ -225,9 +225,8 @@
             .video-toolbar [class*="-icon"] svg, .video-notify [class*="-icon"] svg{width:87.5%;height:100%;}
             .video-toolbar [class*="-icon"] img, .video-notify [class*="-icon"] img{width:100%;height:100%;}
             .video-toolbar .clipboard-btn, .video-toolbar .newtab-btn{position: absolute;top: 16px;}.video-toolbar .clipboard-btn{left:0;}.video-toolbar .newtab-btn{right:0;}
-            .video-notifications{padding: 64px; left: 75%; top: 60%;}
-            .video-notify {display: block; text-align:center; width:100%; max-width: 100%; color:rgb(34, 34, 34);background-color: rgba(255, 255, 255, .8);font-size:16px;padding:16px; border-radius: 4px; margin: 8px 0;}
-            .video-notify + .video-notify{}
+            .video-notifications{right: 64px; left: auto; top: 60%;text-align: right;}
+            .video-notify {display: block; text-align:center; width:100%; max-width: 100%; color:rgb(34, 34, 34);background-color: rgba(255, 255, 255, .8);font-size:16px;padding:16px; border-radius: 4px; margin: 8px 0;max-width:256px;width:256px;}
             @keyframes fadeInRight {0% {opacity: 0;-webkit-transform: translate3d(100%, 0, 0);transform: translate3d(100%, 0, 0);}100% {opacity: 1;-webkit-transform: none;transform: none;}}
             .fadeIn {animation-name: fadeInRight;animation-duration: .5s;animation-fill-mode: both;}
             @keyframes bounceOut {20% {-webkit-transform: scale3d(.9, .9, .9);transform: scale3d(.9, .9, .9);}50%, 55% {opacity: 1;-webkit-transform: scale3d(1.1, 1.1, 1.1);transform: scale3d(1.1, 1.1, 1.1);}100% {opacity: 0;-webkit-transform: scale3d(.3, .3, .3);transform: scale3d(.3, .3, .3);}}
