@@ -2,7 +2,7 @@
 // @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      3.2.1
+// @version      4.0
 // @description  Helps to download streams (videojs based sites)
 // @include     *://openload.co/embed/*
 // @include     *://oload.fun/embed/*
@@ -15,196 +15,368 @@
 // @compatible   firefox+tampermonkey
 // @compatible   chrome+tampermonkey
 // @grant        none
-// @run-at      document-start
+// @run-at      document-body
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
 // ==/UserScript==
-
 
 (function(doc, undef) {
     /* jshint expr: true */
     /* jshint -W018 */
 
-    window.adblock = false;
-    window.adblock2 = false;
-    window.sadbl = false;
-    window.turnoff = true;
-    window.open = function() {};
+    let GMinfo = (GM_info ? GM_info : (typeof GM === 'object' && GM !== null && typeof GM.info === 'object' ? GM.info : null));
+    let scriptname = `${GMinfo.script.name} version ${GMinfo.script.version}`;
 
-    document.addEventListener = (function(old) {
-        return function(type, listener, capture) {
-            if (type !== 'contextmenu')
-                old(type, listener, !!capture);
-        };
-    })(document.addEventListener);
+    /**
+     * Prevent Adds
+     */
+    let on = EventTarget.prototype.addEventListener;
+    window.addEventListener = doc.addEventListener = function(t) {
+        let e = [
+            "contextmenu", "click", "mouseup"
+        ];
+        if (e.indexOf(t) !== -1) {
+            return;
+        }
 
+        return on(...arguments);
 
-    const addstyle = this.addstyle = function(css) {
-        return !css ? null : function() {
-            let s = document.createElement('style');
-            s.setAttribute('type', "text/css");
-            s.appendChild(document.createTextNode('<!-- ' + css + ' -->'));
-            document.body.appendChild(s);
-        }();
     };
 
-    const html2element = function(html) {
+    function onBody(callback, binding) {
+        if (typeof callback !== "function") {
+            return;
+        }
+        let worker = setInterval(function() {
+            if (doc.body === null) {
+                return;
+            }
+            clearInterval(worker);
+            if (binding) {
+                callback.bind(binding);
+            }
+            callback();
+        }, 1);
+    }
+    function onDocIddle(callback, binding) {
+        if (typeof callback === "function") {
+            if (binding) {
+                callback.bind(binding);
+            }
+            if (doc.readyState === 'loading') {
+                doc.addEventListener('DOMContentLoaded', callback);
+                return;
+            }
+            callback();
+        }
+
+    }
+    function onDocEnd(callback, binding) {
+        if (typeof callback === "function") {
+            if (binding) {
+                callback.bind(binding);
+            }
+            if (doc.readyState !== 'complete') {
+                window.addEventListener('load', callback);
+                return;
+            }
+            callback();
+        }
+
+    }
+    function triggerEvent(element, type) {
+        if (element instanceof EventTarget && typeof type === "string" && type.length > 0) {
+            let event = new Event(type, {bubbles: true, cancelable: true});
+            element.dispatchEvent(event);
+        }
+    }
+    function html2element(html) {
         if (typeof html === "string") {
-            let template = document.createElement('template');
+            let template = doc.createElement('template');
             html = html.trim();
             template.innerHTML = html;
             return template.content.firstChild;
         }
-        return null;
-    };
+    }
+    function text2element(text) {
+        if (typeof text === "string") {
+            return doc.createTextNode(text);
+        }
+    }
+    function addcss(css) {
+        if (typeof css === "string" && css.length > 0) {
+            let s = doc.createElement('style');
+            s.setAttribute('type', "text/css");
+            s.appendChild(doc.createTextNode('<!-- ' + css + ' -->'));
+            doc.body.appendChild(s);
+        }
+    }
+    function copyToClipboard(text) {
+        let r = false;
+        if (typeof text === "string" && text.length > 0) {
+            let el = html2element(`<textarea>${text}</textarea>"`);
+            doc.body.appendChild(el);
+            el.style.opacity = 0;
+            el.select();
+            r = doc.execCommand("copy");
+            doc.body.removeChild(el);
+        }
+        return r;
+    }
+    class ElementObserver {
 
-    const onDocStart = function(fn, binding) {
-        let w = function() {
-            if (document.body !== null) {
-                !w.i || clearInterval(w.i);
-                fn();
-                return true;
+        start() {
+            if (this.worker !== undef) {
+                return this;
             }
-            return false;
-        };
-        w() || (w.i = setInterval(w, 20));
-    };
+            let self = this;
+            if (this.params.interval === 0) {
+                throw new Error("ElementObserver : invalid interval");
+            }
+            if (typeof this.params.onload !== "function") {
+                throw new Error("ElementObserver : no callback set");
+            }
+            if (this.params.selector.length === 0) {
+                throw new Error("ElementObserver : no selector set");
+            }
+            this.worker = setInterval(function() {
+                doc.querySelectorAll(self.params.selector).forEach(function(el) {
+                    self.params.onload.apply(el, [el, self]);
+                });
+            }, this.params.interval);
+            if (this.params.timeout > 0) {
+                this.tworker = setTimeout(function() {
+                    self.stop();
+                }, this.params.timeout);
+            }
+            return this;
+        }
+        stop() {
+            if (this.worker === undef) {
+                return this;
+            }
+            if (this.tworker !== undef) {
+                clearTimeout(this.tworker);
+                delete(this.tworker);
+            }
+            clearInterval(this.worker);
+            delete(this.worker);
+            return this;
+        }
 
-    const onDocEnd = function(fn, binding) {
-        if (binding)
-            fn.bind(binding);
-        onDocStart(function() {
-            if (document.readyState !== 'loading') {
-                return fn();
+        constructor(selector, options) {
+            let self = this;
+            this.params = {
+                selector: "",
+                onload: null,
+                interval: 10,
+                timeout: 0,
+            };
+            if (typeof selector === "string" && selector.length > 0) {
+                this.params.selector = selector;
+            } else if (selector instanceof Object) {
+                options = selector;
             }
-            document.addEventListener('DOMContentLoaded', fn);
+
+            if (typeof options === "function") {
+                this.params.onload = options;
+            } else if (options instanceof Object) {
+                Object.keys(options).forEach(function(x) {
+                    if (self.params[x] !== undef) {
+                        if (typeof options[x] === typeof self.params[x]) {
+                            self.params[x] = options[x];
+                        } else if (x === "onload" && typeof options[x] === "function") {
+                            self.params[x] = options[x];
+                        }
+
+                    }
+                });
+            }
+
+            if (typeof this.params.onload === "function" && this.params.interval > 0 && this.params.selector.length > 0) {
+                this.start();
+            }
+
+        }
+    }
+    function favicon() {
+        let r = '/favicon.ico';
+        doc.querySelectorAll('[rel*="icon"]').forEach(function(el) {
+            r = el.href;
         });
-    };
-
-    function trigger(type, el) {
-        type += "";
-        if (!(el instanceof EventTarget)) {
-            return;
-        }
-        if (type.length === 0) {
-            return;
-        }
-        el.dispatchEvent(new Event(type, {bubbles: true, cancelable: true}));
+        return r;
     }
 
-    const copyToClipboard = function(text = "") {
-        let clip = html2element(`<textarea>${text}</textarea>"`);
-        document.body.appendChild(clip);
-        clip.style.opacity = 0;
-        clip.select();
-        let retval = document.execCommand("copy");
-        document.body.removeChild(clip);
-        return retval;
+    console.debug(scriptname, 'Started.');
+
+    let app = function() {
+        if (this === undef || this === window) {
+            return;
+        }
+        let self = this, video;
+
+        let styles = `
+            body{max-width:100%; max-height:100%;margin-right:-100px;padding-right:100px;}
+            video.vjs-tech{object-fit: fill;}
+            .video-toolbar, .video-notifications{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; padding: 16px 0;font-size: 16px;z-index: 9999;}
+            .video-toolbar a {text-decoration: none;padding: 0 32px;}
+            .video-toolbar [class*="-icon"]{-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;display:inline-block;vertical-align: middle;display: inline-block;width: 20px;height: 20px;margin:0 8px;}
+            .video-toolbar [class*="-icon"] svg{width:87.5%;height:100%;}.video-toolbar [class*="-icon"] img{width:100%;height:100%;}
+            .video-toolbar .clipboard-btn, .video-toolbar .newtab-btn{position: absolute;top: 16px;}.video-toolbar .clipboard-btn{left:0;}.video-toolbar .newtab-btn{right:0;}
+            .video-notifications{padding: 64px; left: 75%; top: 60%;}
+            .video-notify {display: block; text-align:center; width:100%; max-width: 100%; color:rgb(34, 34, 34);background-color: rgba(255, 255, 255, .8);font-size:16px;padding:16px; border-radius: 4px; margin: 8px 0;}
+            .video-notify + .video-notify{}
+            @keyframes fadeInRight {0% {opacity: 0;-webkit-transform: translate3d(100%, 0, 0);transform: translate3d(100%, 0, 0);}100% {opacity: 1;-webkit-transform: none;transform: none;}}
+            .fadeIn {animation-name: fadeInRight;animation-duration: .5s;animation-fill-mode: both;}
+            @keyframes bounceOut {20% {-webkit-transform: scale3d(.9, .9, .9);transform: scale3d(.9, .9, .9);}50%, 55% {opacity: 1;-webkit-transform: scale3d(1.1, 1.1, 1.1);transform: scale3d(1.1, 1.1, 1.1);}100% {opacity: 0;-webkit-transform: scale3d(.3, .3, .3);transform: scale3d(.3, .3, .3);}}
+            .bounceOut {animation-name: bounceOut;animation-duration: .75s;animation-duration: 1s;animation-fill-mode: both;}
+            .hidden, #videooverlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay ,[style*="2000;"] , #overlay, .hidden *{position: fixed; right: auto; bottom: auto;top:-100%;left: -100%; height:1px; width:1px; opacity: 0;max-height:1px; max-width:1px;display:inline;}
+
+            /** Default Theme **/
+            .video-toolbar{background-color: rgba(0,0,0,.4);}
+            .video-toolbar, .video-toolbar a {color:#FFF;}
+            .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #fff);}`;
+
+        if (doc.location.origin.match(/mango/i) !== null) {
+            styles += `
+                /* color theme */
+                .video-toolbar{color: rgb(116, 44, 161); background-color: rgb(253, 250, 250);}
+                .video-toolbar, .video-toolbar a {color:rgb(116, 44, 161);}
+                .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px rgb(116, 44, 161));}`;
+        }
+        if (doc.location.origin.match(/openload|oload/i) !== null) {
+            styles += `
+                /* color theme */
+                .video-toolbar:hover, .video-js:hover button.vjs-big-play-button{background-color: rgba(0,170,255,.9);}
+                .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #000);}
+                .video-toolbar:hover .fav-icon{filter: invert(100%);}`;
+        }
+        if (doc.location.host.match(/rapidvideo/i) !== null) {
+            styles += `
+                #home_video, #home_video *{z-index:3000;}`;
+        }
+
+        onBody(function() {
+            addcss(styles);
+        });
+
+        let template = {
+            toolbar: `<div class="video-toolbar">&nbsp;</div>`,
+            clipboard: `<a href="" class="clipboard-btn"><span class="clipboard-icon" title="Copy to Clipboard"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M433.941 193.941l-51.882-51.882A48 48 0 0 0 348.118 128H320V80c0-26.51-21.49-48-48-48h-61.414C201.582 13.098 182.294 0 160 0s-41.582 13.098-50.586 32H48C21.49 32 0 53.49 0 80v288c0 26.51 21.49 48 48 48h80v48c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V227.882a48 48 0 0 0-14.059-33.941zm-84.066-16.184l48.368 48.368a6 6 0 0 1 1.757 4.243V240h-64v-64h9.632a6 6 0 0 1 4.243 1.757zM160 38c9.941 0 18 8.059 18 18s-8.059 18-18 18-18-8.059-18-18 8.059-18 18-18zm-32 138v192H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h55.414c9.004 18.902 28.292 32 50.586 32s41.582-13.098 50.586-32H266a6 6 0 0 1 6 6v42h-96c-26.51 0-48 21.49-48 48zm266 288H182a6 6 0 0 1-6-6V182a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v170a6 6 0 0 1-6 6z"></path></svg></span></a>`,
+            download: `<a href="" target="_blank" title="Download Video" class="dl-btn"><span class="dl-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M230.9 64c8.8 0 16 7.2 16 16v144h93.9c7.1 0 10.7 8.6 5.7 13.6L203.3 381.2c-6.3 6.3-16.4 6.3-22.7 0l-143-143.6c-5-5-1.5-13.6 5.7-13.6h93.9V80c0-8.8 7.2-16 16-16h77.7m0-32h-77.7c-26.5 0-48 21.5-48 48v112H43.3c-35.5 0-53.5 43-28.3 68.2l143 143.6c18.8 18.8 49.2 18.8 68 0l143.1-143.5c25.1-25.1 7.3-68.2-28.3-68.2h-61.9V80c0-26.5-21.6-48-48-48zM384 468v-8c0-6.6-5.4-12-12-12H12c-6.6 0-12 5.4-12 12v8c0 6.6 5.4 12 12 12h360c6.6 0 12-5.4 12-12z"></path></svg></span>VIDEO LINK</a>`,
+            newtab: `<a href="" target="_blank" title="Open in a new tab" class="newtab-btn"><span class="fav-icon"><img src="${favicon()}" /></span></a>`,
+            notifications: `<div class="video-notifications"></div>`
+        };
+
+        let videoevents = {
+            play() {
+                self.toolbar.classList.add('hidden');
+                self.download.href = self.clipboard.href = this.src;
+            },
+            pause() {
+                self.toolbar.classList.remove('hidden');
+                self.download.href = self.clipboard.href = this.src;
+            },
+            loadeddata() {
+                self.download.href = self.clipboard.href = this.src;
+            }
+        };
+        let appevents = {
+            toolbar(e) {
+                e.stopPropagation();
+                return false;
+            },
+            clipboard(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (copyToClipboard(this.href)) {
+                    self.notify('Link copied to clipboard.');
+                }
+                return false;
+            },
+            download() {
+                this.href = video.src;
+
+            },
+            newtab() {
+                this.href = doc.location.href;
+            }
+        };
+
+        this.notify = function(message) {
+            if (typeof message === "string" && message.length > 0) {
+                let el = html2element(`<div class="video-notify fadeIn">${message}</div>`);
+                setTimeout(function() {
+                    el.classList.remove('fadeIn');
+                    setTimeout(function() {
+                        el.classList.add('bounceOut');
+                        setTimeout(function() {
+                            el.parentNode.removeChild(el);
+                        }, 1000);
+                    }, 1000);
+                }, 500);
+                self.notifications.appendChild(el);
+            }
+        };
+
+
+
+
+        this.start = function(videoelement) {
+            let target = doc.body;
+            if (videoelement instanceof Element) {
+                video = videoelement;
+                if (video.classList.contains('vjs-tech')) {
+                    target = video.parentNode;
+                    try {
+                        let id, vjs;
+                        if ((id = video.parentNode.id)) {
+                            if (typeof videojs !== "undefined" && (vjs = videojs(id)) && typeof vjs.vast !== "undefined") {
+                                vjs.vast.disable();
+                            }
+                        }
+                    } catch (e) {
+                    }
+                }
+                //build elements
+                this.toolbar = html2element(template.toolbar);
+                this.clipboard = html2element(template.clipboard);
+                this.download = html2element(template.download);
+                this.newtab = html2element(template.newtab);
+                this.notifications = html2element(template.notifications);
+                //assemble elements
+                target.appendChild(this.toolbar);
+                this.toolbar.appendChild(this.clipboard);
+                this.toolbar.appendChild(this.download);
+                this.toolbar.appendChild(this.newtab);
+                target.appendChild(this.notifications);
+                //register events
+                Object.keys(appevents).forEach(function(x) {
+                    self[x].addEventListener('click', appevents[x]);
+                });
+                Object.keys(videoevents).forEach(function(evt) {
+                    video.addEventListener(evt, videoevents[evt]);
+                });
+                if (video.src && video.src.length > 0) {
+                    this.download.href = this.clipboard.href = video.src;
+                }
+            }
+        };
+
+
+        return this;
     };
 
-    function getIcon() {
-        let result = '/favicon.ico';
-        if (document.querySelector('[rel*="icon"]') instanceof Element) {
-            result = document.querySelector('[rel*="icon"]').href;
-        }
-        return result;
-    }
+    let application = window.oltoolbar = new app();
 
-
-
-    onDocStart(function() {
-        getIcon();
-
-        addstyle(`
-            div.dlvideo{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; z-index: 9999; background-color: #000; padding: 1em 0;}
-            div.dlvideo span{position:absolute; right:0; top:1rem; width: auto;}
-            div.dlvideo .clipboard{position:absolute; left:0; top:1rem; width: auto;cursor:pointer;}
-            div.dlvideo span a, div.dlvideo span a:before, .dl-icon{position: relative;display: inline-block;vertical-align: middle;}
-            div.dlvideo span a{white-space: nowrap;overflow: hidden;text-indent: -99999px;}
-            div.dlvideo > a, div.dlvideo > span, div.dlvideo .clipboard{padding: 0 2rem;cursor:pointer;}
-            [class*="-icon"]{-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;display:inline-block;vertical-align: middle;font-style: normal!important;vertical-align: middle;display: inline-block;width: 1rem;height: 1rem;}
-            [class*="-icon"] svg{width:87.5%;height:100%;}
-
-
-            .hidden, #videooverlay, .videologo, .jw-dock , #overlay, .hidden *{position: fixed!important; top:-100%!important;right: -100%!important; height:1px!important; width:1px!important; opacity: 0!important;}
-
-            /* color theme */
-            [class*="-icon"]{width: 1.25rem;height: 1.25rem;}
-            div.dlvideo{color: #FFF; background-color: rgba(0,0,0,.4);}
-            div.dlvideo a{color: #FFF; text-decoration: none;}
-            div.dlvideo span a:before{background-image: url('${getIcon()}');width: 100%;height: 100%;}
-            div.dlvideo span a {width: 1.25rem;height: 1.25rem;}
-            div.dlvideo:hover a, div.dlvideo:hover span, div.dlvideo:hover > i{filter: drop-shadow(.25rem .25rem .5rem #000);}
-            /* animations */
-            @keyframes flash {0% { opacity: 1; } 50% { opacity: .1; } 100% { opacity: 1; }}
-            .flash{animation: flash linear .25s infinite;-webkit-animation: flash linear .25s infinite;}
-        `);
-        if (document.location.origin.match(/mango/i) !== null) {
-            addstyle(`
-                /* color theme */
-                div.dlvideo, div.dlvideo:hover{color: rgba(116, 44, 161,1); background-color: rgba(253, 250, 250,1);}
-                div.dlvideo a{color: rgba(116, 44, 161,1); text-decoration: none;}
-                div.dlvideo:hover span a{filter: none;}
-
-            `);
-        }
-        if (document.location.origin.match(/openload|oload/i) !== null) {
-            addstyle(`
-                /* color theme */
-                div.dlvideo:hover, .video-js:hover button.vjs-big-play-button{background-color: rgba(0,170,255,.9);}
-                div.dlvideo:hover span a{filter: invert(100%);}
-            `);
-        }
+    onBody(function() {
+        window.adblock = false;
+        window.adblock2 = false;
+        window.sadbl = false;
+        window.turnoff = true;
     });
 
-    function createToolbar(target, video) {
-        if (!(target instanceof Element)) {
-            return undefined;
-        }
-
-        let toolbar = {
-            root: html2element(`<div class="dlvideo-toolbar">&nbsp;</div>`),
-            newtab: html2element(`<a href="" target="_blank" title="Open in a new tab" class="newtab-btn"><span class="fav-icon"></span></a>`),
-            download: html2element(`<a href="" target="_blank" title="Download Video" class="dl-btn"><span class="dl-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M230.9 64c8.8 0 16 7.2 16 16v144h93.9c7.1 0 10.7 8.6 5.7 13.6L203.3 381.2c-6.3 6.3-16.4 6.3-22.7 0l-143-143.6c-5-5-1.5-13.6 5.7-13.6h93.9V80c0-8.8 7.2-16 16-16h77.7m0-32h-77.7c-26.5 0-48 21.5-48 48v112H43.3c-35.5 0-53.5 43-28.3 68.2l143 143.6c18.8 18.8 49.2 18.8 68 0l143.1-143.5c25.1-25.1 7.3-68.2-28.3-68.2h-61.9V80c0-26.5-21.6-48-48-48zM384 468v-8c0-6.6-5.4-12-12-12H12c-6.6 0-12 5.4-12 12v8c0 6.6 5.4 12 12 12h360c6.6 0 12-5.4 12-12z"></path></svg></span>VIDEO LINK</a>`),
-            clipboard: html2element(`<a href="" class="clipboard-btn"><span class="clipboard-icon" title="Copy to Clipboard"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M433.941 193.941l-51.882-51.882A48 48 0 0 0 348.118 128H320V80c0-26.51-21.49-48-48-48h-61.414C201.582 13.098 182.294 0 160 0s-41.582 13.098-50.586 32H48C21.49 32 0 53.49 0 80v288c0 26.51 21.49 48 48 48h80v48c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V227.882a48 48 0 0 0-14.059-33.941zm-84.066-16.184l48.368 48.368a6 6 0 0 1 1.757 4.243V240h-64v-64h9.632a6 6 0 0 1 4.243 1.757zM160 38c9.941 0 18 8.059 18 18s-8.059 18-18 18-18-8.059-18-18 8.059-18 18-18zm-32 138v192H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h55.414c9.004 18.902 28.292 32 50.586 32s41.582-13.098 50.586-32H266a6 6 0 0 1 6 6v42h-96c-26.51 0-48 21.49-48 48zm266 288H182a6 6 0 0 1-6-6V182a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v170a6 6 0 0 1-6 6z"></path></svg></span></a>`)
-        };
-
-        target.appendChild(toolbar.root);
-        toolbar.root.appendChild(toolbar.clipboard);
-        toolbar.root.appendChild(toolbar.download);
-        toolbar.root.appendChild(toolbar.newtab);
-
-        toolbar.download.href = video.src;
-
-        toolbar.root.newtab.addEventListener('click', function() {
-            this.href = document.location.href;
-            return false;
-        });
-
-        toolbar.download.addEventListener("click", function() {
-            this.href = video.src;
-            return false;
-        });
-        toolbar.clipboard.addEventListener("click", function() {
-            if (copyToClipboard(toolbar.download.href)) {
-                toolbar.clipboard.classList.add('flash');
-                setTimeout(function() {
-                    toolbar.clipboard.classList.remove('flash');
-                }, 1500);
-
-            }
-            return false;
-        });
-        video.addEventListener("play", function() {
-            toolbar.root.classList.add('hidden');
-        });
-        video.addEventListener("pause", function() {
-            toolbar.root.classList.remove('hidden');
-        });
-        return toolbar;
-    }
-
-    onDocEnd(function() {
+    onDocIddle(function() {
         window.BetterJsPop = {
             checkEventTrusted() {
                 return true;
@@ -219,66 +391,12 @@
         window.popAdsLoaded = true;
         window.noPopunder = true;
 
-        let worker = setInterval(function() {
-            //if (typeof jQuery !== undefined) {
-                if (document.querySelectorAll('video').length > 0) {
-                    clearInterval(worker);
-
-                //jQuery('body').off('mouseup');
-                    let vjs;
-                    document.querySelectorAll('video').forEach(function(video) {
-
-                        let id;
-                        if ((id = video.parentNode.id)) {
-                            try {
-                                if (videojs && videojs(id)) {
-                                    vjs = videojs(id);
-                                    /** Disable VAST **/
-                                    if (typeof vjs.vast !== "undefined") {
-                                        if (typeof vasturl !== "undefined") {
-                                            vasturl = null;
-                                        }
-                                        vjs.vast.disable();
-                                    }
-                                }
-                            } catch (e) {
-                                return;
-                            }
-                        }
-                        if (video.src && video.src.length > 0) {
-                            createToolbar(document.body, video);
-                        } else {
-                            video.addEventListener("loadeddata", function() {
-                                if (this.src) {
-                                    createToolbar(document.body, this);
-                                }
-                            });
-                        }
-
-                    });
-
-                    if (document.querySelector('#videooverlay') instanceof Element) {
-                        /*document.querySelector('#videooverlay').addEventListener('click', function() {
-                            vjs.load();
-                        });*/
-
-                        trigger("click", document.querySelector('#videooverlay'));
-                    }
-                    if (document.querySelector('#home_video') instanceof Element) {
-                        document.querySelector('#home_video').oncontextmenu = x => false;
-                    }
-
-
-                }
-            //}
-        }, 20);
-
         /**
          * Auto Quality selector only available for rapidvideo
          */
-        if (location.host.match(/rapidvideo/i) !== null) {
+        if (doc.location.host.match(/rapidvideo/i) !== null) {
             let quality = {}, best;
-            document.querySelectorAll('#home_video > div[style*="23px"]').forEach(function(x) {
+            doc.querySelectorAll('#home_video > div[style*="23px"]').forEach(function(x) {
                 x.querySelectorAll('a[href*="q="]').forEach(function(y) {
                     best = y;
                     quality[y.innerText] = y;
@@ -289,21 +407,44 @@
             });
 
 
-            if (document.location.href.match(/q=/) === null) {
+            if (doc.location.href.match(/q=/) === null) {
                 let last;
                 if (last = localStorage.lastquality) {
                     if (quality[last]) {
-                        document.location.replace(quality[last].href);
+                        doc.location.replace(quality[last].href);
                     }
                     return;
                 }
-                document.location.replace(best.href);
+                doc.location.replace(best.href);
 
-            }else{
-                executed = true;
             }
 
         }
+        new ElementObserver('video.vjs-tech, video.jw-video', function(el, obs) {
+            obs.stop();
+            application.start(this);
+        });
+    });
+    onDocEnd(function() {
+        window.executed = true;
+        window.f6AA = function() {};
+        if (typeof vasturl !== "undefined") {
+            vasturl = null;
+        }
+        if (typeof vasturlfallback !== "undefined") {
+            vasturlfallback = null;
+        }
+
+        new ElementObserver({
+            selector: '#videooverlay',
+            onload(el, obs) {
+                obs.stop();
+                triggerEvent(el, 'click');
+            },
+            timeout: 700
+        });
+
+
     });
 
 
