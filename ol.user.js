@@ -223,7 +223,6 @@
 
         let styles = `
             .video-toolbar{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; padding: 16px 8px;font-size: 16px;z-index: 9999;}
-            /*.video-toolbar:after{content:"";display:inline-block;float:none;clear:both;}*/
             [class*="video-"] [class*="-icon"]:not([class*="vjs-"])
             {vertical-align: middle;display: inline-block;width: 20px;height: 20px;margin:0 8px;line-height:0;}
             [class*="video-"] [class*="-icon"]:not([class*="vjs-"]) svg{width:87.5%;height:100%;}
@@ -250,10 +249,10 @@
 
         styles += `
             /** Default Theme **/
-            .video-toolbar{background-color: rgba(0,0,0,.4);}
+            .video-toolbar{background-color: rgba(0,0,0,.4);font-family: Arial,Helvetica,sans-serif;}
             .video-toolbar, .video-toolbar a {color:#FFF;}.video-toolbar a {text-decoration: none;padding: 0 8px;}
             .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #fff);}
-            .video-notify{color:rgb(34, 34, 34);background-color: rgba(255, 255, 255, .8);}`;
+            .video-notify{color:rgb(34, 34, 34);background-color: rgba(255, 255, 255, .8);font-family: Arial,Helvetica,sans-serif;}`;
 
         if (doc.location.origin.match(/mango/i) !== null) {
             styles += `
