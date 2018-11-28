@@ -2,15 +2,15 @@
 // @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      4.0.4
+// @version      5.0
 // @description  Helps to download streams (videojs based sites)
 // @include     *://openload.co/embed/*
-// @include     *://oload.fun/embed/*
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
 // @include     *://*mp4upload.com/embed*
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
+// @include     *://oload.fun/embed/*
 // @compatible   firefox+greasemonkey(3.17)
 // @compatible   firefox+tampermonkey
 // @compatible   chrome+tampermonkey
@@ -42,6 +42,12 @@
         return on(...arguments);
 
     };
+
+    if (typeof Notification === "function") {
+        Notification = function() {};
+    }
+
+
 
     function onBody(callback, binding) {
         if (typeof callback !== "function") {
@@ -216,56 +222,71 @@
         let self = this, video;
 
         let styles = `
-            body{max-width:100%; max-height:100%;margin-right:-100px;padding-right:100px;}
-            video.vjs-tech{object-fit: fill;}
-            .video-toolbar, .video-notifications{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; padding: 16px 0;font-size: 16px;z-index: 9999;}
-            .video-toolbar a {text-decoration: none;padding: 0 16px;}
-            .video-toolbar [class*="-icon"], .video-notify [class*="-icon"]{vertical-align: middle;display: inline-block;width: 20px;height: 20px;margin:0 8px;line-height:0;}
-            .video-notify [class*="-icon"]{width: 32px;height: 32px;margin:-8px -16px 0 0; float:left;}
-            .video-toolbar [class*="-icon"] svg, .video-notify [class*="-icon"] svg{width:87.5%;height:100%;}
-            .video-toolbar [class*="-icon"] img, .video-notify [class*="-icon"] img{width:100%;height:100%;}
-            .video-toolbar .clipboard-btn, .video-toolbar .newtab-btn{position: absolute;top: 16px;}.video-toolbar .clipboard-btn{left:0;}.video-toolbar .newtab-btn{right:0;}
-            .video-notifications{right: 64px; left: auto; top: 60%;text-align: right;}
-            .video-notify {display: block; text-align:center; width:100%; max-width: 100%; color:rgb(34, 34, 34);background-color: rgba(255, 255, 255, .8);font-size:16px;padding:16px; border-radius: 4px; margin: 8px 0;max-width:256px;width:256px;}
-            @keyframes fadeInRight {0% {opacity: 0;-webkit-transform: translate3d(100%, 0, 0);transform: translate3d(100%, 0, 0);}100% {opacity: 1;-webkit-transform: none;transform: none;}}
-            .fadeIn {animation-name: fadeInRight;animation-duration: .5s;animation-fill-mode: both;}
-            @keyframes bounceOut {20% {-webkit-transform: scale3d(.9, .9, .9);transform: scale3d(.9, .9, .9);}50%, 55% {opacity: 1;-webkit-transform: scale3d(1.1, 1.1, 1.1);transform: scale3d(1.1, 1.1, 1.1);}100% {opacity: 0;-webkit-transform: scale3d(.3, .3, .3);transform: scale3d(.3, .3, .3);}}
-            .bounceOut {animation-name: bounceOut;animation-duration: .75s;animation-duration: 1s;animation-fill-mode: both;}
-            .hidden, #videooverlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay ,[style*="2000;"] , #overlay, .hidden *{position: fixed; right: auto; bottom: auto;top:-100%;left: -100%; height:1px; width:1px; opacity: 0;max-height:1px; max-width:1px;display:inline;}
+            .video-toolbar{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; padding: 16px 8px;font-size: 16px;z-index: 9999;}
+            /*.video-toolbar:after{content:"";display:inline-block;float:none;clear:both;}*/
+            [class*="video-"] [class*="-icon"]:not([class*="vjs-"])
+            {vertical-align: middle;display: inline-block;width: 20px;height: 20px;margin:0 8px;line-height:0;}
+            [class*="video-"] [class*="-icon"] svg{width:87.5%;height:100%;}
+            [class*="video-"] [class*="-icon"] img {width:100%;height:100%;}
+            [class*="video-"] .left{float:left;}[class*="video-"] .right{float: right;}
+            [class*="video-"] .center{position: absolute;left: 50%;top: 16px;transform: translate(-50%);}`;
 
+        //notifications
+        styles += `
+                .video-notifications{position: absolute;right: 64px; left: auto; top: 60%;text-align: right;font-size: 16px;z-index: 9999;}
+                .video-notify{display: block; text-align:center;font-size:16px;padding:16px; border-radius: 4px; margin: 8px 0;max-width:256px;width:256px;}
+                .video-notify [class*="-icon"]{width: 32px;height: 32px;margin:-8px -16px 0 0; float:left;}
+                @keyframes fadeInRight {
+                    0% {opacity: 0;-webkit-transform: translate3d(100%, 0, 0);transform: translate3d(100%, 0, 0);}
+                    100% {opacity: 1;-webkit-transform: none;transform: none;}
+                }
+                @keyframes bounceOut {
+                    20% {-webkit-transform: scale3d(.9, .9, .9);transform: scale3d(.9, .9, .9);}
+                    50%, 55% {opacity: 1;-webkit-transform: scale3d(1.1, 1.1, 1.1);transform: scale3d(1.1, 1.1, 1.1);}
+                    100% {opacity: 0;-webkit-transform: scale3d(.3, .3, .3);transform: scale3d(.3, .3, .3);}
+                }
+                .bounceOut {animation-name: bounceOut;animation-duration: .75s;animation-duration: 1s;animation-fill-mode: both;}
+                .fadeIn {animation-name: fadeInRight;animation-duration: .5s;animation-fill-mode: both;}`;
+
+        styles += `
             /** Default Theme **/
             .video-toolbar{background-color: rgba(0,0,0,.4);}
-            .video-toolbar, .video-toolbar a {color:#FFF;}
-            .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #fff);}`;
+            .video-toolbar, .video-toolbar a {color:#FFF;}.video-toolbar a {text-decoration: none;padding: 0 8px;}
+            .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #fff);}
+            .video-notify{color:rgb(34, 34, 34);background-color: rgba(255, 255, 255, .8);}`;
 
         if (doc.location.origin.match(/mango/i) !== null) {
             styles += `
-                /* color theme */
+                /* color theme streammango*/
                 .video-toolbar{color: rgb(116, 44, 161); background-color: rgb(253, 250, 250);}
                 .video-toolbar, .video-toolbar a {color:rgb(116, 44, 161);}
                 .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px rgb(116, 44, 161));}`;
         }
         if (doc.location.origin.match(/openload|oload/i) !== null) {
-            styles += `
-                /* color theme */
+            styles += `/* color theme openload */
                 .video-toolbar:hover, .video-js:hover button.vjs-big-play-button{background-color: rgba(0,170,255,.9);}
-                .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #000);}
-                .video-toolbar:hover .fav-icon{filter: invert(100%);}`;
+                .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #000);}.video-toolbar:hover .fav-icon{filter: invert(100%);}`;
         }
         if (doc.location.host.match(/rapidvideo/i) !== null) {
-            styles += `
-                #home_video, #home_video *{z-index:3000;}`;
+            styles += `#home_video, #home_video *{z-index:3000;}`;
         }
+        //Stretch video and prevent scrollbar
+        styles += `body{width:100%; max-height:100%;margin-right:-100px;padding-right:100px;overflow:hidden;}video.vjs-tech{object-fit: fill;}`;
+        //hides some elements
+        styles += `
+                .hidden, .hidden *,
+                #videooverlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay , #overlay
+                {position: fixed; right: auto; bottom: auto;top:-100%;left: -100%; height:1px; width:1px; opacity: 0;max-height:1px; max-width:1px;display:inline;}`;
 
         onBody(function() {
             addcss(styles);
         });
 
         let template = {
-            toolbar: `<div class="video-toolbar">&nbsp;</div>`,
-            clipboard: `<a href="" class="clipboard-btn" title="Copy to Clipboard"><span class="clipboard-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M433.941 193.941l-51.882-51.882A48 48 0 0 0 348.118 128H320V80c0-26.51-21.49-48-48-48h-61.414C201.582 13.098 182.294 0 160 0s-41.582 13.098-50.586 32H48C21.49 32 0 53.49 0 80v288c0 26.51 21.49 48 48 48h80v48c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V227.882a48 48 0 0 0-14.059-33.941zm-84.066-16.184l48.368 48.368a6 6 0 0 1 1.757 4.243V240h-64v-64h9.632a6 6 0 0 1 4.243 1.757zM160 38c9.941 0 18 8.059 18 18s-8.059 18-18 18-18-8.059-18-18 8.059-18 18-18zm-32 138v192H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h55.414c9.004 18.902 28.292 32 50.586 32s41.582-13.098 50.586-32H266a6 6 0 0 1 6 6v42h-96c-26.51 0-48 21.49-48 48zm266 288H182a6 6 0 0 1-6-6V182a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v170a6 6 0 0 1-6 6z"></path></svg></span></a>`,
-            download: `<a href="" target="_blank" title="Download Video" class="dl-btn"><span class="dl-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M230.9 64c8.8 0 16 7.2 16 16v144h93.9c7.1 0 10.7 8.6 5.7 13.6L203.3 381.2c-6.3 6.3-16.4 6.3-22.7 0l-143-143.6c-5-5-1.5-13.6 5.7-13.6h93.9V80c0-8.8 7.2-16 16-16h77.7m0-32h-77.7c-26.5 0-48 21.5-48 48v112H43.3c-35.5 0-53.5 43-28.3 68.2l143 143.6c18.8 18.8 49.2 18.8 68 0l143.1-143.5c25.1-25.1 7.3-68.2-28.3-68.2h-61.9V80c0-26.5-21.6-48-48-48zM384 468v-8c0-6.6-5.4-12-12-12H12c-6.6 0-12 5.4-12 12v8c0 6.6 5.4 12 12 12h360c6.6 0 12-5.4 12-12z"></path></svg></span>VIDEO LINK</a>`,
-            newtab: `<a href="" target="_blank" title="Open in a new tab" class="newtab-btn"><span class="fav-icon"><img src="${favicon()}" /></span></a>`,
+            toolbar: `<div class="video-toolbar"></div>`,
+            clipboard: `<a href="" class="clipboard-btn left" title="Copy to Clipboard"><span class="clipboard-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M433.941 193.941l-51.882-51.882A48 48 0 0 0 348.118 128H320V80c0-26.51-21.49-48-48-48h-61.414C201.582 13.098 182.294 0 160 0s-41.582 13.098-50.586 32H48C21.49 32 0 53.49 0 80v288c0 26.51 21.49 48 48 48h80v48c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V227.882a48 48 0 0 0-14.059-33.941zm-84.066-16.184l48.368 48.368a6 6 0 0 1 1.757 4.243V240h-64v-64h9.632a6 6 0 0 1 4.243 1.757zM160 38c9.941 0 18 8.059 18 18s-8.059 18-18 18-18-8.059-18-18 8.059-18 18-18zm-32 138v192H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h55.414c9.004 18.902 28.292 32 50.586 32s41.582-13.098 50.586-32H266a6 6 0 0 1 6 6v42h-96c-26.51 0-48 21.49-48 48zm266 288H182a6 6 0 0 1-6-6V182a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v170a6 6 0 0 1-6 6z"></path></svg></span></a>`,
+            download: `<a href="" target="_blank" title="Download Video" class="dl-btn center"><span class="dl-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M230.9 64c8.8 0 16 7.2 16 16v144h93.9c7.1 0 10.7 8.6 5.7 13.6L203.3 381.2c-6.3 6.3-16.4 6.3-22.7 0l-143-143.6c-5-5-1.5-13.6 5.7-13.6h93.9V80c0-8.8 7.2-16 16-16h77.7m0-32h-77.7c-26.5 0-48 21.5-48 48v112H43.3c-35.5 0-53.5 43-28.3 68.2l143 143.6c18.8 18.8 49.2 18.8 68 0l143.1-143.5c25.1-25.1 7.3-68.2-28.3-68.2h-61.9V80c0-26.5-21.6-48-48-48zM384 468v-8c0-6.6-5.4-12-12-12H12c-6.6 0-12 5.4-12 12v8c0 6.6 5.4 12 12 12h360c6.6 0 12-5.4 12-12z"></path></svg></span>VIDEO LINK</a>`,
+            newtab: `<a href="" target="_blank" title="Open in a new tab" class="newtab-btn right"><span class="fav-icon"><img src="${favicon()}" /></span></a>`,
             notifications: `<div class="video-notifications"></div>`
         };
 
