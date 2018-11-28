@@ -226,8 +226,8 @@
             /*.video-toolbar:after{content:"";display:inline-block;float:none;clear:both;}*/
             [class*="video-"] [class*="-icon"]:not([class*="vjs-"])
             {vertical-align: middle;display: inline-block;width: 20px;height: 20px;margin:0 8px;line-height:0;}
-            [class*="video-"] [class*="-icon"] svg{width:87.5%;height:100%;}
-            [class*="video-"] [class*="-icon"] img {width:100%;height:100%;}
+            [class*="video-"] [class*="-icon"]:not([class*="vjs-"]) svg{width:87.5%;height:100%;}
+            [class*="video-"] [class*="-icon"]:not([class*="vjs-"]) img {width:100%;height:100%;}
             [class*="video-"] .left{float:left;}[class*="video-"] .right{float: right;}
             [class*="video-"] .center{position: absolute;left: 50%;top: 16px;transform: translate(-50%);}`;
 
