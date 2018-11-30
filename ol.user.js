@@ -387,8 +387,8 @@
 
         return this;
     };
-
-    let application = window.userscript.toolbar = new app();
+    window.userscript = {};
+    let application = window.userscript = new app();
 
     onBody(function() {
         window.adblock = false;
