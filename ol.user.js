@@ -387,7 +387,6 @@
 
         return this;
     };
-    window.userscript = {};
     let application = window.userscript = new app();
 
     onBody(function() {
