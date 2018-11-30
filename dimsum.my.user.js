@@ -168,4 +168,6 @@
         }
     });
 
+    console.debug(scriptname, 'Started');
+
 })(document);
