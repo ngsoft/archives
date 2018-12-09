@@ -34,7 +34,7 @@
 
     function onReady(fn) {
         if (doc.readyState != 'loading') {
-            fn()
+            fn();
         } else {
             doc.addEventListener('DOMContentLoaded', fn);
         }
