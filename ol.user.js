@@ -177,7 +177,7 @@
                 selector: "",
                 onload: null,
                 interval: 10,
-                timeout: 0,
+                timeout: 0
             };
             if (typeof selector === "string" && selector.length > 0) {
                 this.params.selector = selector;
