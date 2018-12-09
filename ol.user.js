@@ -2,7 +2,7 @@
 // @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      5.0.1
+// @version      5.0.2
 // @description  Helps to download streams (videojs based sites)
 // @include     *://openload.co/embed/*
 // @include     *://streamango.*/embed/*
@@ -19,6 +19,7 @@
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
 // ==/UserScript==
+
 
 (function(doc, undef) {
     /* jshint expr: true */
@@ -415,7 +416,7 @@
          * Auto Quality selector only available for rapidvideo
          */
         if (doc.location.host.match(/rapidvideo/i) !== null) {
-            let quality = {}, best;
+            let quality = {}, best, found;
             doc.querySelectorAll('#home_video > div[style*="23px"]').forEach(function(x) {
                 x.querySelectorAll('a[href*="q="]').forEach(function(y) {
                     best = y;
@@ -423,11 +424,12 @@
                     y.addEventListener('click', function() {
                         localStorage.lastquality = this.innerText;
                     });
+                    found = true;
                 });
             });
 
 
-            if (doc.location.href.match(/q=/) === null) {
+            if (doc.location.href.match(/q=/) === null && found === true) {
                 let last;
                 if (last = localStorage.lastquality) {
                     if (quality[last]) {

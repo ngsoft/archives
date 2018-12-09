@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        My ViKi
 // @namespace   https://github.com/ngsoft
-// @version     5.1
+// @version     5.1.1
 // @description Viki+
 // @author      daedelus
 // @noframes
@@ -358,8 +358,8 @@
             /**
              * Populate select box
              */
-            if (typeof parsedSubtitles !== typeof undef && typeof video !== typeof undef) {
-                let subs = parsedSubtitles, infos = video, selection = [];
+            if (typeof parsedSubtitles !== typeof undef && typeof video_json !== typeof undef) {
+                let subs = parsedSubtitles, infos = video_json, selection = [];
                 if (settings.get('langs') && Array.isArray(settings.get('langs')) && settings.get('langs').length > 0) {
                     selection = settings.get('langs');
                 }
