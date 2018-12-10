@@ -358,7 +358,7 @@
             static get available() {
                 return ["GM_getValue", "GM_setValue", "GM_deleteValue", "GM_listValues"].every((fn) => {
                     try {
-                        if (typeof eval(fn) !== f) {
+                        if (typeof eval(fn) === f) {
                             return true;
                         }
                     } catch (e) {
