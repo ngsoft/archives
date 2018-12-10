@@ -2211,4 +2211,4 @@
     //((doc, win, undef) => {
     //})(document, window);
 
-})(document, window, undefined);
+})(document, window, this);
