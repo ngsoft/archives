@@ -1550,7 +1550,11 @@
         }
 
         w.extend({
-            xhRequest: xhRequest
+            xhRequest: xhRequest,
+            ajax(options) {
+                let xhRequest = new this.xhRequest(options);
+                return xhRequest.send();
+            }
         });
 
     })(document, window);
@@ -1942,8 +1946,8 @@
 
 
 
-    ((doc, win, undef) => {
-    })(document, window);
+    //((doc, win, undef) => {
+    //})(document, window);
 
 
 })(document, window, this);
