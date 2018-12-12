@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      5.0
+// @version      5.0.1
 // @description  Subtitle downloader
 // @author       daedelus
 // @include     /^https?://(www.)?dimsum.my//
@@ -476,6 +476,7 @@
     });
 
     findNode(doc.body, '#playerModule__subtitles .playerModule__subtitle-tracks:not([data-id="0"])', function() {
+        new downloadButton(this);
         if (this.innerText.trim().toLowerCase() === "english") {
             notify.success(`English subtitles are available.`, 2.5);
         }
