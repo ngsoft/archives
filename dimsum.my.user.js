@@ -412,7 +412,7 @@
             e.preventDefault();
             const self = this.bdata;
             if (self !== undef) {
-                if(self.xhr === null){
+                if (self.xhr === null || (self.xhr.readyState === 4 && self.xhr.status !== 200)) {
                     let xhr = self.xhr = new XMLHttpRequest();
                     xhr.open("GET", self.src, true);
                     xhr.timeout = self.timeout;
