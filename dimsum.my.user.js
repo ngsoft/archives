@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      5.0.1
+// @version      5.0.2
 // @description  Subtitle downloader
 // @author       daedelus
 // @include     /^https?://(www.)?dimsum.my//
@@ -168,23 +168,21 @@
     const notifications = (() => {
 
         const styles = `
-            .user-notifications{position: absolute;right: 64px; left: auto; top: 27.5%;text-align: right;font-size: 16px;z-index: 9999; min-width: 256px;}
-             body > .user-notifications{position: fixed;}
-            .user-notify{display: block; text-align:center;font-size:16px;padding:16px 24px; border-radius: 4px; margin: 8px 0;}
-            .user-notify [class*="-icon"]{width: 32px;height: 32px;margin:-4px 8px 0 -8px; float:left;}
-            .user-notify{color:rgb(34, 34, 34);background-color: rgba(255, 255, 255, .8);font-family: Arial,Helvetica,sans-serif; border: 1px solid rgba(0,0,0,0);}
-            .user-notify .error-icon{color: rgb(220, 53, 69);}.user-notify .success-icon{color: rgb(40, 167, 69);}
-            @keyframes fadeInRight {
-                0% {opacity: 0;-webkit-transform: translate3d(100%, 0, 0);transform: translate3d(100%, 0, 0);}
-                100% {opacity: 1;-webkit-transform: none;transform: none;}
-            }
-            @keyframes bounceOut {
-                20% {-webkit-transform: scale3d(.9, .9, .9);transform: scale3d(.9, .9, .9);}
-                50%, 55% {opacity: 1;-webkit-transform: scale3d(1.1, 1.1, 1.1);transform: scale3d(1.1, 1.1, 1.1);}
-                100% {opacity: 0;-webkit-transform: scale3d(.3, .3, .3);transform: scale3d(.3, .3, .3);}
-            }
+            /* Animations */
+            @keyframes fadeInRight {0% {opacity: 0;-webkit-transform: translate3d(100%, 0, 0);transform: translate3d(100%, 0, 0);}100% {opacity: 1;-webkit-transform: none;transform: none;}}
+            @keyframes bounceOut {20% {-webkit-transform: scale3d(.9, .9, .9);transform: scale3d(.9, .9, .9);}50%, 55% {opacity: 1;-webkit-transform: scale3d(1.1, 1.1, 1.1);transform: scale3d(1.1, 1.1, 1.1);}100% {opacity: 0;-webkit-transform: scale3d(.3, .3, .3);transform: scale3d(.3, .3, .3);}}
             .bounceOut {animation-name: bounceOut;animation-duration: .75s;animation-duration: 1s;animation-fill-mode: both;}
-            .fadeIn {animation-name: fadeInRight;animation-duration: .5s;animation-fill-mode: both;}`;
+            .fadeIn {animation-name: fadeInRight;animation-duration: .5s;animation-fill-mode: both;}
+            /* Position & Size */
+            .user-notifications{position: absolute;right: 64px; left: auto; bottom: 27.5%;text-align: right;font-size: 16px;z-index: 9999; min-width: 256px;}
+             body > .user-notifications{position: fixed;}
+            .user-notify{display: block; text-align:center;padding:16px 24px; border-radius: 4px; margin: 8px 0;}
+            .user-notify [class*="-icon"]{width: 32px;height: 32px;margin:-4px 8px 0 -8px; float:left;}
+             /* Colors & Fonts */
+            .user-notifications{font-family: Arial,Helvetica,sans-serif;font-size:16px;}
+            .user-notify{color:rgba(52, 58, 64, 1);background-color: rgba(248, 249, 250, .8); border: 1px solid rgba(34, 34, 34, 1);}
+            .user-notify .error-icon{color: rgba(220, 53, 69, .8);}.user-notify .success-icon{color: rgba(40, 167, 69, .8);}`;
+
         const template = {
             notify: `<div class="user-notify"></div>`,
             success: `<div class="user-notify notify-success"><span class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 464c-118.664 0-216-96.055-216-216 0-118.663 96.055-216 216-216 118.664 0 216 96.055 216 216 0 118.663-96.055 216-216 216zm141.63-274.961L217.15 376.071c-4.705 4.667-12.303 4.637-16.97-.068l-85.878-86.572c-4.667-4.705-4.637-12.303.068-16.97l8.52-8.451c4.705-4.667 12.303-4.637 16.97.068l68.976 69.533 163.441-162.13c4.705-4.667 12.303-4.637 16.97.068l8.451 8.52c4.668 4.705 4.637 12.303-.068 16.97z"></path></svg></span></div>`,
@@ -320,9 +318,6 @@
         .download-button:hover{border-color: #ec1c24; background: #ec1c24;}
         .download-button + [data-id="0"]{margin-left:54px!important;}
         .player-fullscreen{z-index: 9000;}
-        .user-notify .error-icon, .user-notify .success-icon{color: inherit;}
-        .user-notify.notify-error, .user-notify.notify-success{background-color: rgba(220, 53, 69, .4); border-color: rgb(34,34,34); color: #eee; }
-        .user-notify.notify-success{background-color: rgba(40, 167, 69, .4);}
     `;
     addcss(styles);
 
