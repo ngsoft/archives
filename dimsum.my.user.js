@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      5.0.2
+// @version      6.0
 // @description  Subtitle downloader
 // @author       daedelus
 // @include     /^https?://(www.)?dimsum.my//
@@ -311,8 +311,9 @@
     const notify = new notifications(doc.body);
 
     let styles = `
+        .jw-settings-content-item{width: 80%;}
         .download-button
-        {text-decoration: none;width:32px;height:31px;line-height:0;vertical-align: middle;display: inline-block;float: right;margin: -35px 8px 3px -8px;padding: 4px;}
+        {text-decoration: none;width:24px;height:23px;line-height:0;vertical-align: middle;display: inline-block;float: right;padding: 4px;}
         .download-button > * {width:100%;height:100%;}
         .download-button{color: #fff!important;border-radius: 3px;border: 1px solid rgba(0,0,0,0);}
         .download-button:hover{border-color: #ec1c24; background: #ec1c24;}
@@ -327,7 +328,7 @@
         }
         if (!(subtrack instanceof Element) || typeof subtrack.matches !== "function" ||
                 !subtrack.matches('[data-id]') || typeof playerModule === "undefined" ||
-                !Array.isArray(playerModule.subtitles)) return;
+                !Array.isArray(playerModuleJw.subtitles)) return;
 
         this.subtrack = subtrack;
         Object.assign(this, {
@@ -358,9 +359,10 @@
             return parseInt(this.subtrack.dataset.id);
         },
         get title() {
+            //playerModuleJw
             if (this.__title === null) {
-                let type = playerModule.engageData.type,
-                        baseTitle = playerModule.engageData.title,
+                let type = playerModuleJw.engageData.type,
+                        baseTitle = playerModuleJw.engageData.title,
                         matches, title = "", season, episode;
 
                 switch (type) {
@@ -368,9 +370,9 @@
                         title = baseTitle.replace(/[\|&;\$%@"\'’<>\(\)\+,]/g, ".");
                         break;
                     case "episode":
-                        if ((matches = playerModule._title.match(/E([0-9]+) (.*?)$/i)) !== null) {
+                        if ((matches = playerModuleJw._title.match(/E([0-9]+) (.*?)$/i)) !== null) {
                             title = matches[2].replace(/[\|&;\$%@"\'’<>\(\)\+,]/g, ".").replace(/S[0-9]+$/, "").trim() + ".";
-                            season = parseInt(playerModule.gtmData.seasonNumber);
+                            season = parseInt(playerModuleJw.gtmData.seasonNumber);
                             episode = parseInt(matches[1]);
                             if (season > 1) {
                                 title += "S" + (season > 9 ? season : "0" + season);
@@ -395,7 +397,7 @@
         get subinfo() {
             if (this.__subinfo === null) {
                 let self = this;
-                this.__subinfo = Object.assign({}, playerModule.subtitles.filter(x => x.id === self.id)[0]);
+                this.__subinfo = Object.assign({}, playerModuleJw.subtitles.filter(x => x.id === self.id)[0]);
             }
             return this.__subinfo;
         },
@@ -459,23 +461,33 @@
 
     doc.addEventListener('click', function(e) {
         let target = e.target, button;
-        if (matches(target, '.audio_subtitle_selector #playerModule__selector_toggle') !== null) {
-            if (doc.querySelector('#playerModule__subtitles .download-button') !== null) {
-                return;
-            }
-            doc.querySelectorAll('#playerModule__subtitles .playerModule__subtitle-tracks:not([data-id="0"])').forEach(function(el) {
-                new downloadButton(el);
+        if (matches(target, '.jw-icon-settings.jw-settings-submenu-button') && Array.isArray(playerModuleJw.subtitles)) {
+            doc.querySelectorAll('.jw-settings-topbar .jw-settings-captions').forEach(
+                    x => x.dispatchEvent(new Event("pointerdown", {bubbles: true, cancelable: true}))
+            );
+            if (doc.querySelector('#playerModule__player .jw-settings-menu .jw-settings-submenu .download-button') !== null) return;
+            let subindex = 0;
+            doc.querySelectorAll('#playerModule__player .jw-settings-menu .jw-settings-submenu').forEach(function(jwsettings, n) {
+                if (n > 0) return;
+                jwsettings.querySelectorAll('button.jw-settings-content-item').forEach(function(el, index) {
+                    if (index === 0) return;
+                    if (/^([0-9]+)p/.test(el.innerHTML)) return;
+                    el.dataset.id = playerModuleJw.subtitles[subindex].id;
+                    new downloadButton(el);
+                    subindex++;
+                });
             });
-            return;
+
         }
     });
 
-    findNode(doc.body, '#playerModule__subtitles .playerModule__subtitle-tracks:not([data-id="0"])', function() {
-        new downloadButton(this);
+    findNode(doc.body, '#playerModule__player .jw-settings-menu .jw-settings-submenu button.jw-settings-content-item', function() {
+
         if (this.innerText.trim().toLowerCase() === "english") {
             notify.success(`English subtitles are available.`, 2.5);
         }
     }, false);
+
 
     console.debug(scriptname, 'Started');
 
