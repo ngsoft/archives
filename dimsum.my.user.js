@@ -311,13 +311,12 @@
     const notify = new notifications(doc.body);
 
     let styles = `
-        .jw-settings-content-item{width: 80%;}
+        .jw-settings-content-item{width: 80% !important;}
         .download-button
         {text-decoration: none;width:24px;height:23px;line-height:0;vertical-align: middle;display: inline-block;float: right;padding: 4px;}
         .download-button > * {width:100%;height:100%;}
         .download-button{color: #fff!important;border-radius: 3px;border: 1px solid rgba(0,0,0,0);}
         .download-button:hover{border-color: #ec1c24; background: #ec1c24;}
-        .download-button + [data-id="0"]{margin-left:54px!important;}
         .player-fullscreen{z-index: 9000;}
     `;
     addcss(styles);
@@ -461,10 +460,7 @@
 
     doc.addEventListener('click', function(e) {
         let target = e.target, button;
-        if (matches(target, '.jw-icon-settings.jw-settings-submenu-button') && Array.isArray(playerModuleJw.subtitles)) {
-            doc.querySelectorAll('.jw-settings-topbar .jw-settings-captions').forEach(
-                    x => x.dispatchEvent(new Event("pointerdown", {bubbles: true, cancelable: true}))
-            );
+        if (matches(target, '.jw-icon.jw-settings-submenu-button') && Array.isArray(playerModuleJw.subtitles)) {
             if (doc.querySelector('#playerModule__player .jw-settings-menu .jw-settings-submenu .download-button') !== null) return;
             let subindex = 0;
             doc.querySelectorAll('#playerModule__player .jw-settings-menu .jw-settings-submenu').forEach(function(jwsettings, n) {
@@ -477,7 +473,6 @@
                     subindex++;
                 });
             });
-
         }
     });
 
