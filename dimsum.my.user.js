@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      6.0
+// @version      6.1
 // @description  Subtitle downloader
 // @author       daedelus
 // @include     /^https?://(www.)?dimsum.my//
@@ -313,11 +313,12 @@
     let styles = `
         .jw-settings-content-item{width: 80% !important;}
         .download-button
-        {text-decoration: none;width:24px;height:23px;line-height:0;vertical-align: middle;display: inline-block;float: right;padding: 4px;}
+        {text-decoration: none;width:32px;height:31px;line-height:0;vertical-align: middle;display: inline-block;float: right;padding: 4px;}
         .download-button > * {width:100%;height:100%;}
         .download-button{color: #fff!important;border-radius: 3px;border: 1px solid rgba(0,0,0,0);}
         .download-button:hover{border-color: #ec1c24; background: #ec1c24;}
         .player-fullscreen{z-index: 9000;}
+        button.jw-settings-content-item + .download-button{width:24px;height:23px;}
     `;
     addcss(styles);
 
@@ -458,31 +459,37 @@
         return null;
     }
 
-    doc.addEventListener('click', function(e) {
-        let target = e.target, button;
-        if (matches(target, '.jw-icon.jw-settings-submenu-button') && Array.isArray(playerModuleJw.subtitles)) {
-            if (doc.querySelector('#playerModule__player .jw-settings-menu .jw-settings-submenu .download-button') !== null) return;
-            let subindex = 0;
-            doc.querySelectorAll('#playerModule__player .jw-settings-menu .jw-settings-submenu').forEach(function(jwsettings, n) {
-                if (n > 0) return;
-                jwsettings.querySelectorAll('button.jw-settings-content-item').forEach(function(el, index) {
-                    if (index === 0) return;
-                    if (/^([0-9]+)p/.test(el.innerHTML)) return;
-                    el.dataset.id = playerModuleJw.subtitles[subindex].id;
-                    new downloadButton(el);
-                    subindex++;
-                });
+    findNode(doc.body, '#playerModule__player .jw-settings-menu', function() {
+        if (this.querySelector('.download-button') !== null) return;
+        if(!Array.isArray(playerModuleJw.subtitles)) return;
+        let subindex = 0, ccbtn = doc.querySelector('.jw-icon-cc.jw-settings-submenu-button');
+        this.querySelectorAll('.jw-settings-submenu').forEach(function(jwsettings, n) {
+            if (n > 0) return;
+            jwsettings.querySelectorAll('button.jw-settings-content-item').forEach(function(el, index) {
+                if (index === 0) return;
+                if (/^([0-9]+)p/.test(el.innerHTML)) return;
+                el.dataset.id = playerModuleJw.subtitles[subindex].id;
+                let button = new downloadButton(el);
+                subindex++;
+                if (button.bdata.langcode === 'en') {
+                    if(ccbtn !== null){
+                        let clone = button.cloneNode(true);
+                        ccbtn.parentElement.insertBefore(clone, ccbtn);
+                        clone.addEventListener("click", function(e) {
+                            const self = this;
+                            e.preventDefault();
+                            doc.querySelectorAll(`.download-button[href="${this.href}"]`).forEach(function(el) {
+                                if (el === self) return;
+                                el.click();
+                            });
+                        });
+                    }
+                    notify.success(`English subtitles are available.`, 2.5);
+                }
             });
-        }
-    });
+        });
 
-    findNode(doc.body, '#playerModule__player .jw-settings-menu .jw-settings-submenu button.jw-settings-content-item', function() {
-
-        if (this.innerText.trim().toLowerCase() === "english") {
-            notify.success(`English subtitles are available.`, 2.5);
-        }
     }, false);
-
 
     console.debug(scriptname, 'Started');
 
