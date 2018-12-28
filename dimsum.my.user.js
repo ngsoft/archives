@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      6.1
+// @version      6.1.1
 // @description  Subtitle downloader
 // @author       daedelus
 // @include     /^https?://(www.)?dimsum.my//
@@ -465,6 +465,10 @@
         let subindex = 0, ccbtn = doc.querySelector('.jw-icon-cc.jw-settings-submenu-button');
         this.querySelectorAll('.jw-settings-submenu').forEach(function(jwsettings, n) {
             if (n > 0) return;
+            //disables: autoplay
+            doc.querySelector('video').addEventListener('loadeddata', function() {
+                this.pause();
+            });
             jwsettings.querySelectorAll('button.jw-settings-content-item').forEach(function(el, index) {
                 if (index === 0) return;
                 if (/^([0-9]+)p/.test(el.innerHTML)) return;
