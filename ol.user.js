@@ -2,15 +2,17 @@
 // @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      5.0.3
+// @version      5.1
 // @description  Helps to download streams (videojs based sites)
-// @include     *://openload.co/embed/*
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
 // @include     *://*mp4upload.com/embed*
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
 // @include     *://oload.fun/embed/*
+// @include     *://openload.co/embed/*
+// @include     *://oload.download/embed/*
+// @include     *://openload.pw/embed/*
 // @compatible   firefox+greasemonkey(3.17)
 // @compatible   firefox+tampermonkey
 // @compatible   chrome+tampermonkey
