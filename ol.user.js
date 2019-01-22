@@ -275,6 +275,11 @@
         if (doc.location.host.match(/rapidvideo/i) !== null) {
             styles += `#home_video, #home_video *{z-index:3000;}`;
         }
+
+        //#list-server-more
+        if (doc.location.host.match(/vidcloud/i) !== null) {
+            styles += `#list-server-more{top: 96px;}`;
+        }
         //Stretch video and prevent scrollbar
         styles += `body{width:100%; max-height:100%;margin-right:-100px;padding-right:100px;overflow:hidden;}video.vjs-tech{object-fit: fill;}`;
         //hides some elements
