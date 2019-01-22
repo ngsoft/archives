@@ -24,6 +24,7 @@
 // @include     *://oload.download/embed/*
 // @include     *://openload.pw/embed/*
 // @include     *://k-vid.net/*
+// @include     *://vidcloud.icu/*
 // ==/UserScript==
 
 (function(doc, undef) {

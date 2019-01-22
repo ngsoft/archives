@@ -14,6 +14,7 @@
 // @include     *://oload.download/embed/*
 // @include     *://openload.pw/embed/*
 // @include     *://k-vid.net/*
+// @include     *://vidcloud.icu/*
 // @icon        https://openload.co/favicon.ico
 // @compatible   firefox+greasemonkey(3.17)
 // @compatible   firefox+tampermonkey
@@ -297,7 +298,10 @@
         function updlnk() {
             self.download.href = self.clipboard.href = video.src;
             if (/k-vid/.test(doc.location.host) && typeof playerInstance === "object") {
-                self.download.href = self.clipboard.href = playerInstance.getPlaylist()[0].file
+                self.download.href = self.clipboard.href = playerInstance.getPlaylist()[0].file;
+            }
+            if (/vidcloud/.test(doc.location.host) && typeof playerInstance === "object") {
+                self.download.href = self.clipboard.href = playerInstance.getPlaylist()[0].file;
             }
         }
 
