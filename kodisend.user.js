@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KodiSend
 // @namespace    https://github.com/ngsoft
-// @version      2.2
+// @version      2.2.1
 // @description  Send Stream URL to Kodi using jsonRPC (Works with ol.user.js)
 // @author       daedelus
 // @icon        data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADhUExURQAAAAAAAAAAAAAAAFq/5////wAAAAAAAAEGBwABAQEFBgIGCAIGCBNDVwIFBwAAAA83RxA3RydASwAAAAQGBwUHCDQ0NFq/51q/51W95lq/5yubxyuYxFa+5v///yyeyyycyFq/52jE6f3//y6j0i6j0i6k0yaHrjaRteLl5t/i4+Pk5EC14zKt3j+041q/5zCt3jOv4DGv4Vq/5yqWwjCt3jGv4TSw4Tedxjeexjqx4Duz4j6040O240O25I7T7pPV75zY8JzY8ZzZ8aHQ477c6L/d6cDd6cDe6cLg6////zRLWWYAAAA0dFJOUwADBAYQEB0fIScnJygpKjAyMjIzR0dOj5KVn6Kor6+wscHBw8nKzdHV1djY5u/v7/L0/v77n8h1AAABGUlEQVQ4y5XS2VbCQAyA4VTAFcUFcUfqMi51F6K44YZo3v+BnLSdJiNtz7G339/TZDoA/3qqa5e362W+83KHz2GJP6F9HsNyLywyLyhq4rlFra0c8XV/zEn7gMgvqm0i3+lnz5uPdMD+ff8Q6vl1kHhPJuX9VOA82yXeXwJxV2zwflnAPkrdFps2OEMV+I54YYNrFbDTpzie22BXgtiJ3iTYssG0cQH711AXB/M85axJgtj7XS7eU18K4kXnDAeJ9zAuPrQD1E3y8VGf53OFuC0iSt/HrNAO0Iz0/lycLAfeD29G+ny6w9PWxJ8rs3qszgePWpWxS7dgxA8XKznXtm7Eg9yL74oid0WxA8x0bq62SxxgaqUx6fsvOX95dVWRzekAAAAASUVORK5CYII=
@@ -437,45 +437,6 @@
                     this.enable();
                 }
             }
-
-            /*
-
-            if (typeof toolbar === "object") {
-                ol = toolbar;
-
-                Object.keys(template).forEach(function(k) {
-                    self[k] = html2element(template[k]);
-
-                });
-                ol.toolbar.insertBefore(this.button, ol.toolbar.firstChild);
-                doc.body.insertBefore(this.settings, doc.body.firstChild);
-                this.settings.appendChild(this.form);
-                //map settings
-                Object.keys(defaults).forEach(function(x) {
-                    self[x] = self.settings.querySelector(`input[name="${x}"]`);
-                    if (typeof settings.get(x) !== "boolean") {
-                        self[x].value = settings.get(x);
-                    }
-                });
-                self.server = self.settings.querySelector(`input[name="server"]`);
-
-                //events
-                Object.keys(setevents).forEach(function(x) {
-                    Object.keys(setevents[x]).forEach(function(evt) {
-                        self[x].addEventListener(evt, setevents[x][evt]);
-
-                    });
-                });
-                this.settings.querySelectorAll('.close-btn').forEach(function(el) {
-                    el.addEventListener("click", events.closebutton);
-                });
-                this.button.addEventListener("click", events.toggle);
-                this.button.addEventListener("contextmenu", events.button);
-
-                if (enabled === true) {
-                    this.enable();
-                }
-            }*/
         };
 
 
@@ -497,22 +458,13 @@
                 w = undef;
                 kodisend.start(tb);
             }
-
-
-            /*let userscript = unsafeWindow.userscript ? unsafeWindow.userscript : window.userscript;
-            if (typeof userscript === "object" && typeof userscript.toolbar !== "undefined") {
-                console.debug(scriptname, 'started');
-                clearInterval(w);
-                w = undef;
-                kodisend.start(userscript);
-            }*/
         }, 20);
         setTimeout(function() {
             if (w !== undef) {
                 clearInterval(w);
                 throw new Error(scriptname + ' Cannot start ol.user.js not running.');
             }
-        }, 15000);
+        }, 5000);
     });
 
 })(document);
