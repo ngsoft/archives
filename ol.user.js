@@ -2,7 +2,7 @@
 // @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      5.2
+// @version      5.3
 // @description  Helps to download streams (videojs based sites)
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
