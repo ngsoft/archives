@@ -2,7 +2,7 @@
 // @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      5.1.1
+// @version      5.2
 // @description  Helps to download streams (videojs based sites)
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
@@ -13,6 +13,7 @@
 // @include     *://openload.co/embed/*
 // @include     *://oload.download/embed/*
 // @include     *://openload.pw/embed/*
+// @include     *://k-vid.net/*
 // @icon        https://openload.co/favicon.ico
 // @compatible   firefox+greasemonkey(3.17)
 // @compatible   firefox+tampermonkey
@@ -293,17 +294,24 @@
             notifications: `<div class="video-notifications"></div>`
         };
 
+        function updlnk() {
+            self.download.href = self.clipboard.href = video.src;
+            if (/k-vid/.test(doc.location.host) && typeof playerInstance === "object") {
+                self.download.href = self.clipboard.href = playerInstance.getPlaylist()[0].file
+            }
+        }
+
         let videoevents = {
             play() {
                 self.toolbar.classList.add('hidden');
-                self.download.href = self.clipboard.href = this.src;
+                updlnk.call(this);
             },
             pause() {
                 self.toolbar.classList.remove('hidden');
-                self.download.href = self.clipboard.href = this.src;
+                updlnk.call(this);
             },
             loadeddata() {
-                self.download.href = self.clipboard.href = this.src;
+                updlnk.call(this);
             }
         };
         let appevents = {
@@ -320,7 +328,8 @@
                 return false;
             },
             download() {
-                this.href = video.src;
+                //this.href = video.src;
+                updlnk();
 
             },
             newtab() {
