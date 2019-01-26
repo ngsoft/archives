@@ -2,7 +2,7 @@
 // @name         Google Search AddFree
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.1
 // @description  Removes Adds From Google Search
 // @include     *://*.google.*/search?*
 // @icon        https://www.google.com/favicon.ico
@@ -18,7 +18,7 @@
 ((doc, win, undef) => {
     setInterval(() => {
         let btn = doc.querySelector('span[id][onclick*="none"]');
-        if (btn instanceof Element) {
+        if (btn instanceof Element && btn.innerText === "X") {
             btn.click();
         }
     }, 100);
