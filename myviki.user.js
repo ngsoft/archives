@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        My ViKi
 // @namespace   https://github.com/ngsoft
-// @version     5.1.1
+// @version     5.2
 // @description Viki+
 // @author      daedelus
 // @noframes
@@ -11,6 +11,7 @@
 // @grant       GM_getValue
 // @grant       GM_xmlhttpRequest
 // @match       *://www.viki.com/*
+// @icon        https://www.viki.com/favicon.ico
 // ==/UserScript==
 
 (function(doc, $, undef) {
@@ -280,7 +281,7 @@
         $(doc).on('click', `div[data-react-class="modalApp.ModalSiteLanguage"] a.pad.inline-block`, function(e) {
             e.preventDefault();
             let url = new URL(this.href);
-            let locale = url.searchParams.get('site_lang');
+            let locale = url.searchParams.get('locale');
             if (listLocales().indexOf(locale) !== -1) {
                 settings.set('locale', locale);
                 sessionStorage.removeItem('activesession');
