@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.7.1
+// @version      2.8.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -258,7 +258,7 @@
 
                 let addrm3 = setInterval(function() {
                     if (document.querySelector('.content > div[id*="p_"]') !== null) {
-                        clearInterval(addrm2);
+                        clearInterval(addrm3);
                         document.querySelectorAll('.content > div[id*="p_"]').forEach(x => x.remove());
                     }
                 }, 10);
