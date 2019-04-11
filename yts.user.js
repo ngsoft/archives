@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YTS
 // @namespace    https://github.com/ngsoft
-// @version      1.4
+// @version      1.5
 // @description  Anti ads
 // @author       daedelus
 // @include     *://yts.*/*
@@ -37,7 +37,7 @@ function onready(fn, domloaded = false, binding) {
 
 
     onready(function() {
-        document.querySelectorAll('.ibox-bordered').forEach(x => x.style.display = "none");
+        document.querySelectorAll('.ibox-bordered, .ybox-bordered').forEach(x => x.style.display = "none");
     });
 
 })();
