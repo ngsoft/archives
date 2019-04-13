@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
+// @name         Stream Downloader
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      6.0
-// @description  Helps to download streams (videojs based sites)
+// @version      6.0.1
+// @description  Helps to download streams (videojs and jwvideo based sites)
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
 // @include     *://*mp4upload.com/embed*
@@ -35,17 +35,21 @@
      * Prevent Adds
      */
     let on = EventTarget.prototype.addEventListener;
-    window.addEventListener = doc.addEventListener = function(t) {
-        let e = [
-            "contextmenu", "click", "mouseup"
-        ];
-        if (e.indexOf(t) !== -1) {
-            return;
-        }
+    if (doc.location.host.match(/xstreamcdn/i) === null) {
+        window.addEventListener = doc.addEventListener = function(t) {
+            let e = [
+                "contextmenu", "click", "mouseup"
+            ];
+            if (e.indexOf(t) !== -1) {
+                return;
+            }
 
-        return on(...arguments);
+            return on(...arguments);
 
-    };
+        };
+    }
+
+
 
     if (typeof Notification === "function") {
         Notification = function() {};
@@ -274,8 +278,12 @@
             styles += `#home_video, #home_video *{z-index:3000;}`;
         }
 
+        if (doc.location.host.match(/xstreamcdn/i) !== null) {
+            styles += `.video-toolbar .newtab-btn {margin-right: 116px;}`;
+        }
+
         //Stretch video and prevent scrollbar
-        styles += `body{width:100%; max-height:100%;margin-right:-100px;padding-right:100px;overflow:hidden;}video.vjs-tech{object-fit: fill;}`;
+        styles += `body{width:100%; max-height:100%;margin-right:-100px;padding-right:100px;overflow:hidden;}video.vjs-tech, .jwplayer.jw-stretch-uniform video{object-fit: fill;}`;
         //hides some elements
         styles += `
                 .hidden, .hidden *,
@@ -463,6 +471,7 @@
         if (typeof vasturlfallback !== "undefined") {
             vasturlfallback = null;
         }
+
         if (doc.location.host.match(/xstreamcdn/i) !== null) {
             new ElementObserver({
                 selector: '#loading .fakeplaybutton',
