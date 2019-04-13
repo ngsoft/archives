@@ -2,7 +2,7 @@
 // @name         Stream Downloader
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      6.1
+// @version      6.1.1
 // @description  Helps to download streams (videojs and jwvideo based sites)
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
@@ -279,7 +279,7 @@
         }
 
         if (doc.location.host.match(/xstreamcdn/i) !== null) {
-            styles += `.video-toolbar .newtab-btn {margin-right: 116px;}`;
+            styles += `body {margin-right: 0!important;padding-right: 0!important;}`;
         }
 
         //Stretch video and prevent scrollbar
