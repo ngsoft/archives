@@ -2,7 +2,7 @@
 // @name         Stream Downloader
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      6.0.1
+// @version      6.1
 // @description  Helps to download streams (videojs and jwvideo based sites)
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
