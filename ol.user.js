@@ -2,7 +2,7 @@
 // @name         Openload + StreamMango + RapidVideo + UpToBox + YourUpload
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      5.5.3
+// @version      6.0
 // @description  Helps to download streams (videojs based sites)
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
@@ -10,7 +10,9 @@
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
 // @include     /^https?:\/\/openload.(co|pw)\/embed\//
-// @include     /^https?:\/\/oload.(club|download|fun|live)\/embed\//
+// @include     /^https?:\/\/oload.(cc|cloud|club|download|info|fun|live|site|space|stream|tv|win)\/embed\//
+// @include     /^https?:\/\/oladblock\.(me|services|xyz)\/embed\//
+// @include     *://*xstreamcdn.com/v/*
 // @icon        https://openload.co/favicon.ico
 // @compatible   firefox+greasemonkey(3.17)
 // @compatible   firefox+tampermonkey
@@ -461,6 +463,26 @@
         if (typeof vasturlfallback !== "undefined") {
             vasturlfallback = null;
         }
+        if (doc.location.host.match(/xstreamcdn/i) !== null) {
+            new ElementObserver({
+                selector: '#loading .fakeplaybutton',
+                onload(el, obs) {
+                    obs.stop();
+                    clientSide.setup();
+                    doc.querySelector('#loading').remove();
+                },
+                timeout: 2000
+            });
+            new ElementObserver({
+                selector: '#resume',
+                onload(el, obs) {
+
+                    el.remove();
+
+                },
+                timeout: 2000
+            });
+        }
 
         new ElementObserver({
             selector: '#videooverlay',
@@ -474,6 +496,7 @@
         doc.querySelectorAll('body > div[style*="z-index: 300"]').forEach(function(el) {
             el.parentElement.removeChild(el);
         });
+
 
 
 

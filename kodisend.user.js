@@ -20,7 +20,9 @@
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
 // @include     /^https?:\/\/openload.(co|pw)\/embed\//
-// @include     /^https?:\/\/oload.(club|download|fun|live)\/embed\//
+// @include     /^https?:\/\/oload.(cc|cloud|club|download|info|fun|live|site|space|stream|tv|win)\/embed\//
+// @include     /^https?:\/\/oladblock\.(me|services|xyz)\/embed\//
+// @include     *://*xstreamcdn.com/v/*
 // ==/UserScript==
 
 (function(doc, undef) {
