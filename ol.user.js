@@ -2,7 +2,7 @@
 // @name         Stream Downloader
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      6.1.1
+// @version      6.1.2
 // @description  Helps to download streams (videojs and jwvideo based sites)
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
@@ -287,7 +287,7 @@
         //hides some elements
         styles += `
                 .hidden, .hidden *,
-                #videooverlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay , #overlay
+                #videooverlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay , #overlay, .vjs-resize-manager
                 {position: fixed; right: auto; bottom: auto;top:-100%;left: -100%; height:1px; width:1px; opacity: 0;max-height:1px; max-width:1px;display:inline;}`;
 
         onBody(function() {
