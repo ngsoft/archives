@@ -2,7 +2,7 @@
 // @name         Stream Downloader
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      6.1.2
+// @version      6.1.3
 // @description  Helps to download streams (videojs and jwvideo based sites)
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
@@ -492,7 +492,16 @@
                 timeout: 2000
             });
         }
-
+        if (doc.location.host.match(/mp4upload/i) !== null) {
+            new ElementObserver({
+                selector: 'body > div[style*="fixed;"]',
+                onload(el, obs) {
+                    obs.stop();
+                    el.classList.add('hidden');
+                },
+                timeout: 2000
+            });
+        }
         new ElementObserver({
             selector: '#videooverlay',
             onload(el, obs) {
