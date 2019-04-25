@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.8.1
+// @version      2.8.2
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
 // @include     *://*.9anime.*/*
+// @icon        https://9anime.to/assets/favicons/favicon.png
 // @grant none
 // @run-at      document-start
 // @noframes
@@ -257,9 +258,9 @@
                 }, 10);
 
                 let addrm3 = setInterval(function() {
-                    if (document.querySelector('.content > div[id*="p_"]') !== null) {
+                    if (document.querySelector('.content div[id*="p_"]') !== null) {
                         clearInterval(addrm3);
-                        document.querySelectorAll('.content > div[id*="p_"]').forEach(x => x.remove());
+                        document.querySelectorAll('.content div[id*="p_"]').forEach(x => x.remove());
                     }
                 }, 10);
 
