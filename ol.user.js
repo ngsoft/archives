@@ -2,7 +2,7 @@
 // @name         Stream Downloader
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      6.1.3
+// @version      6.2
 // @description  Helps to download streams (videojs and jwvideo based sites)
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
@@ -10,7 +10,7 @@
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
 // @include     /^https?:\/\/openload.(co|pw)\/embed\//
-// @include     /^https?:\/\/oload.(cc|cloud|club|download|info|fun|live|site|space|stream|tv|win)\/embed\//
+// @include     /^https?:\/\/oload.(cc|cloud|club|download|info|fun|live|network|services|site|space|stream|tv|win)\/embed\//
 // @include     /^https?:\/\/oladblock\.(me|services|xyz)\/embed\//
 // @include     *://*xstreamcdn.com/v/*
 // @icon        https://openload.co/favicon.ico
@@ -502,6 +502,18 @@
                 timeout: 2000
             });
         }
+
+        if (doc.location.host.match(/rapidvideo/i) !== null) {
+            new ElementObserver({
+                selector: 'div[id][style*="1px dotted lightgrey"]',
+                onload(el, obs) {
+                    obs.stop();
+                    el.remove();
+                },
+                timeout: 0
+            });
+        }
+
         new ElementObserver({
             selector: '#videooverlay',
             onload(el, obs) {
