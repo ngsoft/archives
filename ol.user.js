@@ -1,17 +1,17 @@
 // ==UserScript==
-// @name         Stream Downloader
+// @name         Embed Stream Downloader
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      6.2
+// @version      6.3
 // @description  Helps to download streams (videojs and jwvideo based sites)
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
 // @include     *://*mp4upload.com/embed*
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
-// @include     /^https?:\/\/openload.(co|pw)\/embed\//
-// @include     /^https?:\/\/oload.(cc|cloud|club|download|info|fun|live|network|services|site|space|stream|tv|win)\/embed\//
-// @include     /^https?:\/\/oladblock\.(me|services|xyz)\/embed\//
+// @include     *://openload.*/embed/*
+// @include     *://oload.*/embed/*
+// @include     *://oloadblock.*/embed/*
 // @include     *://*xstreamcdn.com/v/*
 // @icon        https://openload.co/favicon.ico
 // @compatible   firefox+greasemonkey(3.17)
