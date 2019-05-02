@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9
+// @version      2.9.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -88,7 +88,7 @@
                  .adsbox, #controls div.report.control.tip, body > div > div[style*="fixed"], :not(#player) > iframe:not([title="recaptcha challenge"]), .grecaptcha-badge,
                 .content div[id*="p_"]{visibility: hidden!important; opacity: 0;position: fixed;}
                 .widget.crop, .widget.comment ,body.watch #sidebar{visibility: hidden!important;}
-                #main > .content > .widget.slider + div,
+                /*#main > .content > .widget.slider + div,*/
                 .content > .alert-warning ,.hidden{display: none !important;}
                 body.watch #main{margin: 0!important; padding: 0!important;}
                 .widget.quickfilter .widget-title > span:first-child + *{float: right;}
