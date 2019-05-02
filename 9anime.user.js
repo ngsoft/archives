@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.8.2
+// @version      2.9
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -73,12 +73,22 @@
         if (document.body !== null) {
             window.open = function() {};
             clearInterval(w);
+
+            //waf-verify
+            if (document.querySelector('form[action*="/waf-verify"]') !== null) {
+                return;
+            }
+
+
+
+            //site
             addstyle(`
                 div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"], div[id*="-ps"],
                 .ads-outsite, #disqus_thread, .this-message-does-not-harm-to-you-dont-remove-it,
                  .adsbox, #controls div.report.control.tip, body > div > div[style*="fixed"], :not(#player) > iframe:not([title="recaptcha challenge"]), .grecaptcha-badge{visibility: hidden!important; opacity: 0;}
                 .widget.crop, .widget.comment ,body.watch #sidebar{visibility: hidden!important;}
-                #main > .content > .widget.slider + div,.content > .alert-warning ,.hidden{display: none !important;}
+                #main > .content > .widget.slider + div,
+                .content > .alert-warning ,.hidden{display: none !important;}
                 body.watch #main{margin: 0!important; padding: 0!important;}
                 .widget.quickfilter .widget-title > span:first-child + *{float: right;}
                 .widget.quickfilter .widget-title ul{display:inline!important;padding: 4px!important;}
