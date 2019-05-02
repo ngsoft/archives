@@ -85,7 +85,8 @@
             addstyle(`
                 div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"], div[id*="-ps"],
                 .ads-outsite, #disqus_thread, .this-message-does-not-harm-to-you-dont-remove-it,
-                 .adsbox, #controls div.report.control.tip, body > div > div[style*="fixed"], :not(#player) > iframe:not([title="recaptcha challenge"]), .grecaptcha-badge{visibility: hidden!important; opacity: 0;}
+                 .adsbox, #controls div.report.control.tip, body > div > div[style*="fixed"], :not(#player) > iframe:not([title="recaptcha challenge"]), .grecaptcha-badge,
+                .content div[id*="p_"]{visibility: hidden!important; opacity: 0;position: fixed;}
                 .widget.crop, .widget.comment ,body.watch #sidebar{visibility: hidden!important;}
                 #main > .content > .widget.slider + div,
                 .content > .alert-warning ,.hidden{display: none !important;}
@@ -264,13 +265,6 @@
                     if (document.querySelector('body > div[id*="-ps"]') !== null) {
                         clearInterval(addrm2);
                         document.querySelectorAll('body > div[id*="-ps"]').forEach(x => x.remove());
-                    }
-                }, 10);
-
-                let addrm3 = setInterval(function() {
-                    if (document.querySelector('.content div[id*="p_"]') !== null) {
-                        clearInterval(addrm3);
-                        document.querySelectorAll('.content div[id*="p_"]').forEach(x => x.remove());
                     }
                 }, 10);
 
