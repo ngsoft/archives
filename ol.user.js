@@ -1,9 +1,17 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
+// @description  Helps to download streams (videojs and jwvideo based sites)
+// @version      6.4
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
-// @version      6.3
-// @description  Helps to download streams (videojs and jwvideo based sites)
+// @grant       none
+// @run-at      document-body
+// @compatible  firefox+greasemonkey(3.17)
+// @compatible  firefox+tampermonkey
+// @compatible  chrome+tampermonkey
+// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
+// @icon        https://openload.co/favicon.ico
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
 // @include     *://*mp4upload.com/embed*
@@ -13,14 +21,7 @@
 // @include     *://oload.*/embed/*
 // @include     *://oloadblock.*/embed/*
 // @include     *://*xstreamcdn.com/v/*
-// @icon        https://openload.co/favicon.ico
-// @compatible   firefox+greasemonkey(3.17)
-// @compatible   firefox+tampermonkey
-// @compatible   chrome+tampermonkey
-// @grant        none
-// @run-at      document-body
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/ol.user.js
+// @include     *://*vidstreaming.io/*
 // ==/UserScript==
 
 
@@ -282,6 +283,11 @@
             styles += `body {margin-right: 0!important;padding-right: 0!important;}`;
         }
 
+        if (doc.location.host.match(/vidstreaming/i) !== null) {
+            styles += `.wrapper .videocontent #list-server-more {padding: 0; top: 14px; text-align: left; right: auto; z-index: 99999;}
+                       .video-toolbar .clipboard-btn {margin-left: 20px;}`;
+        }
+
         //Stretch video and prevent scrollbar
         styles += `body{width:100%; max-height:100%;margin-right:-100px;padding-right:100px;overflow:hidden;}video.vjs-tech, .jwplayer.jw-stretch-uniform video{object-fit: fill;}`;
         //hides some elements
@@ -470,6 +476,16 @@
         }
         if (typeof vasturlfallback !== "undefined") {
             vasturlfallback = null;
+        }
+
+        if (doc.location.host.match(/vidstreaming/i) !== null) {
+            new ElementObserver({
+                selector: 'div[style*="pointer-events: none;"]',
+                onload(el, obs) {
+                    el.remove();
+                },
+                timeout: 2000
+            });
         }
 
         if (doc.location.host.match(/xstreamcdn/i) !== null) {
