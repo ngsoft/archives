@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
 // @description  Helps to download streams (videojs and jwvideo based sites)
-// @version      6.4.1
+// @version      6.4.2
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @grant       none
