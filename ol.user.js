@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
 // @description  Helps to download streams (videojs and jwvideo based sites)
-// @version      6.4.2
+// @version      6.5
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @grant       none
@@ -284,8 +284,7 @@
         }
 
         if (doc.location.host.match(/vidstreaming/i) !== null) {
-            styles += `.wrapper .videocontent #list-server-more {padding: 0 8px; top: 14px; text-align: left; right: auto; z-index: 99999;}
-                       .video-toolbar .left {margin-left: 32px;} .video-toolbar .left + .left {margin-left: 0;}`;
+            styles += `.wrapper .videocontent #list-server-more {padding: 8px 0 0 16px; top: 56px; text-align: left; right: auto; z-index: 99999;}`;
         }
 
         //Stretch video and prevent scrollbar
@@ -370,7 +369,7 @@
         this.start = function(videoelement) {
             let target = doc.body;
             if (videoelement instanceof Element) {
-                video = videoelement;
+                this.video = video = videoelement;
                 if (video.classList.contains('vjs-tech')) {
                     target = video.parentNode;
                     try {
@@ -408,10 +407,10 @@
             }
         };
 
-
         return this;
     };
     let application = window.userscript = new app();
+
 
     onBody(function() {
         window.adblock = false;
@@ -461,10 +460,39 @@
             }
 
         }
+
+        /**
+         * Do not display toolbar for external streams for vidstreaming
+         */
+
+        doc.querySelectorAll('#list-server-more .linkserver').forEach(function(el) {
+
+            el.addEventListener('click', function() {
+                application.toolbar.style.display = null;
+                if (el.dataset.status !== "0") {
+                    application.toolbar.style.display = "none";
+                }
+            });
+
+        });
+
+
+
         new ElementObserver('video.vjs-tech, video.jw-video', function(el, obs) {
             if (this.src.length > 0) {
                 obs.stop();
                 application.start(this);
+                /**
+                 * Do not display server selection for vidstreaming when playing video
+                 */
+                if (doc.location.host.match(/vidstreaming/i) !== null) {
+                    application.video.addEventListener('play', function() {
+                        doc.querySelector('#list-server-more').style.display = 'none';
+                    });
+                    application.video.addEventListener('pause', function() {
+                        doc.querySelector('#list-server-more').style.display = null;
+                    });
+                }
             }
         });
     });
@@ -479,12 +507,12 @@
         }
 
         if (doc.location.host.match(/vidstreaming/i) !== null) {
+
             new ElementObserver({
                 selector: 'div[style*="pointer-events: none;"]',
                 onload(el, obs) {
                     el.remove();
-                },
-                timeout: 2000
+                }
             });
         }
 
