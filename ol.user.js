@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
 // @description  Helps to download streams (videojs and jwvideo based sites)
-// @version      6.4
+// @version      6.4.1
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @grant       none
@@ -285,7 +285,7 @@
 
         if (doc.location.host.match(/vidstreaming/i) !== null) {
             styles += `.wrapper .videocontent #list-server-more {padding: 0; top: 14px; text-align: left; right: auto; z-index: 99999;}
-                       .video-toolbar .clipboard-btn {margin-left: 20px;}`;
+                       .video-toolbar .left {margin-left: 32px;} .video-toolbar .left + .left {margin-left: 0;}`;
         }
 
         //Stretch video and prevent scrollbar
