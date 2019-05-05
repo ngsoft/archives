@@ -284,7 +284,7 @@
         }
 
         if (doc.location.host.match(/vidstreaming/i) !== null) {
-            styles += `.wrapper .videocontent #list-server-more {padding: 0; top: 14px; text-align: left; right: auto; z-index: 99999;}
+            styles += `.wrapper .videocontent #list-server-more {padding: 0 8px; top: 14px; text-align: left; right: auto; z-index: 99999;}
                        .video-toolbar .left {margin-left: 32px;} .video-toolbar .left + .left {margin-left: 0;}`;
         }
 
