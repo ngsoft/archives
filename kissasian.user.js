@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.8
+// @version      5.9
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
+// @icon        https://kissasian.sh/Content/images/favicon.ico
 // @include     *://*kissasian.*/*
 // @include     *://*kissanime.*/*
 // @include     *://*kissmanga.*/*
@@ -14,7 +15,7 @@
 // ==/UserScript==
 window.open = function() {};
 window.eval = function() {};
-(function() {
+(function(doc, undef) {
     window.adblock = false;
     window.adblock2 = false;
     window.turnoff = true;
@@ -206,6 +207,86 @@ window.eval = function() {};
         }
     };
 
+    class ElementObserver {
+
+        start() {
+            if (this.worker !== undef) {
+                return this;
+            }
+            let self = this;
+            if (this.params.interval === 0) {
+                throw new Error("ElementObserver : invalid interval");
+            }
+            if (typeof this.params.onload !== "function") {
+                throw new Error("ElementObserver : no callback set");
+            }
+            if (this.params.selector.length === 0) {
+                throw new Error("ElementObserver : no selector set");
+            }
+            this.worker = setInterval(function() {
+                doc.querySelectorAll(self.params.selector).forEach(function(el) {
+                    self.params.onload.apply(el, [el, self]);
+                });
+            }, this.params.interval);
+            if (this.params.timeout > 0) {
+                this.tworker = setTimeout(function() {
+                    self.stop();
+                }, this.params.timeout);
+            }
+            return this;
+        }
+        stop() {
+            if (this.worker === undef) {
+                return this;
+            }
+            if (this.tworker !== undef) {
+                clearTimeout(this.tworker);
+                delete(this.tworker);
+            }
+            clearInterval(this.worker);
+            delete(this.worker);
+            return this;
+        }
+
+        constructor(selector, options) {
+            let self = this;
+            this.params = {
+                selector: "",
+                onload: null,
+                interval: 10,
+                timeout: 0
+            };
+            if (typeof selector === "string" && selector.length > 0) {
+                this.params.selector = selector;
+            } else if (selector instanceof Object) {
+                options = selector;
+            }
+
+            if (typeof options === "function") {
+                this.params.onload = options;
+            } else if (options instanceof Object) {
+                Object.keys(options).forEach(function(x) {
+                    if (self.params[x] !== undef) {
+                        if (typeof options[x] === typeof self.params[x]) {
+                            self.params[x] = options[x];
+                        } else if (x === "onload" && typeof options[x] === "function") {
+                            self.params[x] = options[x];
+                        }
+
+                    }
+                });
+            }
+
+            if (typeof this.params.onload === "function" && this.params.interval > 0 && this.params.selector.length > 0) {
+                this.start();
+            }
+
+        }
+    }
+
+
+
+
 
     var kissasian = {
         loggedin: true,
@@ -213,7 +294,7 @@ window.eval = function() {};
         ui: {
 
             css: `
-                [data-player-enabled] #head, .hidden, div[id*="divAds"], div[style*="fixed;"], iframe:not(.ignored), #videoAd, #btnShowComments,
+                [data-player-enabled] #head, .hidden, div[id*="divAds"], div[style*="fixed;"], #videoAd,
                 #liReportError, #liRequest, #liCommunity, #liFAQ, #liChatRoom, #liReadManga, #liGame, #liMobile
                 { display: none!important;}
                 .nomargin, .banner, .bigBarContainer{margin: 0!important;}
@@ -356,9 +437,8 @@ window.eval = function() {};
                     $('body').attr('data-player-enabled', true);
                     $('#divContentVideo iframe').addClass('ignored');
                     $('iframe#mVideo').addClass('ignored');
-                    //$('.divCloseBut a').click();
                     $('div > span.st_facebook_hcount').parent('div').parent('div').remove();
-                    $('#divComments').remove();
+                    //$('#divComments').remove();
                     $("div.barContent > div > div > div:contains('video is stuttering,')").parent('div').addClass('hidden');
 
                     if (kissasian.loggedin == false)
@@ -384,10 +464,12 @@ window.eval = function() {};
                         checkbox.find('input[type="checkbox"]').attr('checked', 'true');
                         kissasian.ui.player.getlink();
                     }
-
-
-
-
+                    new ElementObserver({
+                        selector: '#divContentVideo div[id*="glx-"] > div, div.glx-close',
+                        onload(el, obs) {
+                            $(el).click();
+                        }
+                    });
 
 
 
@@ -397,7 +479,7 @@ window.eval = function() {};
                 $("div.barTitle:contains('Remove ads')").parent('div.rightBox').addClass('hidden');
                 $("div.barTitle:contains('^^')").parent('div.rightBox').addClass('hidden');
                 $("div.barTitle:contains('Related')").parent('div.rightBox').addClass('hidden');
-                $("div.barTitle:contains('Comments')").parent('div.bigBarContainer').addClass('hidden');
+                //$("div.barTitle:contains('Comments')").parent('div.bigBarContainer').addClass('hidden');
                 $("div.barTitle:contains('Episodes')").parent('div.bigBarContainer').prev().addClass('hidden');
                 rsstag = $('a[href*="/RSS/"]').parent('div');
                 rsstag.next().addClass('hidden');
@@ -433,13 +515,27 @@ window.eval = function() {};
             if (url.match(/\/Drama\//) || url.match(/\/Anime\//)) {
                 kissasian.ui.epl();
             }
-            $('.divCloseBut a').click();
+
+            new ElementObserver({
+                selector: '.divCloseBut a',
+                onload(el, obs) {
+                    $(el).click();
+                }
+            });
+
+
+            //$('.divCloseBut a').click();
             if ($('#centerDivVideo').length > 0 || $('#mVideo').length > 0) {
                 kissasian.ui.player.init();
             }
             kissasian.ui.main();
+
+
+
             $('div[id*="divAds"]').remove();
             $('iframe:not(.ignored)').remove();
+
+
             $('div[style*="fixed;"]').remove();
             betamode.init();
             autoserver.init();
@@ -882,4 +978,4 @@ window.eval = function() {};
 
     };
     toolbox.init(toolbox.cookies.init);
-})();
+})(document);
