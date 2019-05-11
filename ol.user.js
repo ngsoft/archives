@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
 // @description  Helps to download streams (videojs and jwvideo based sites)
-// @version      6.5
+// @version      6.6
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @grant       none
@@ -22,6 +22,7 @@
 // @include     *://oloadblock.*/embed/*
 // @include     *://*xstreamcdn.com/v/*
 // @include     *://*vidstreaming.io/*
+// @include     *://*gdriveplayer.us/embed.php*
 // ==/UserScript==
 
 
@@ -492,6 +493,12 @@
                     application.video.addEventListener('pause', function() {
                         doc.querySelector('#list-server-more').style.display = null;
                     });
+                }
+                /**
+                 * Set favicon for kurinaofficial
+                 */
+                if (doc.location.host.match(/gdriveplayer/i) !== null) {
+                    application.newtab.querySelector('img').src = 'https://kurinaofficial.com/wp-content/uploads/2019/02/cropped-icon-32x32.png';
                 }
             }
         });
