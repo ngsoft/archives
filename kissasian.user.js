@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Kissasian Site Integration
 // @namespace    https://github.com/ngsoft
-// @version      5.9
+// @version      5.9.1
 // @description  removes adds + simplify UI + Mobile mode
 // @author       daedelus
-// @icon        https://kissasian.sh/Content/images/favicon.ico
+// @icon        data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAChVBMVEX////jqHyeq9a6YJvWSH/FhbajmMe6RYfNY5ilkcK3P4LLZpumi77JaJ3bp4qnhrvIaZ/irnLajZ+nf7XHa6Hep3fbjpmoe7PGbKLaoH2od7HIOHfGa6LXm4Oocq3GPHvGbqXTl4ena6jDP3/GbaXRkoqmZKTCQ4PGbKTPj42M1/imXJ7ASIjJZJ7XfF3MjI+OptWkVJm+TIzMYZy1pMmRotOhTJS9UZDNaKKYn9CeRZC7VpSqtsrJlp7LlaSfTZa6Wpi4qKnWlIC5XZu6pKfWl4O4YZ++np7UmYm2Y6HAmJfUm4q2ZqOvrMXUn421Z6WxqsLToJKzaqfJjoDUoZGzaqfLj37SpJWza6jPkHrRpZmiOYazaqjRkHTTpZehPYmzaaehwsnTknPRqJuhQI21Z6apvbrWk23Rp52jVZu5ZKSgxs3UmHfpvGPaeFDgfT3ihj/kjkDnmULqokPsq0XutUjwvknBRobDRoXERYTHRoTJRoPKRYLMRoLORoLQRYDRRoDURn+6Jm68J22/J2zBJ2vFKGrHKGnJJ2jMKGfPKGfSJ2XUKGTXKmW4J2/UK2e1OH60J2/SLGmyNHyyJnDPL22wMXuvJnHMMnCsLXitJ3PKNHOpKnepJnPnmUOmKHanJnTkjkKiJ3elJnXhhkSgJnaiJnbffUadJnibJniYJnmVJnqSJXveiVXjjUDmkkGZN4etKHTehU7jiD/ml0KqKHTfgUjhhD7om0KpKXbee0LhgD7pn0SnK3nedj3fezzpn0Pqo0amLXvedjvqpETrqUilMH3sqkXsrEqkM4HtrkbtsEyjNoPus0bttU7vuEjtt1LvvEntulbwwUrtv1fllkbxxktHPnZRAAAAbnRSTlMB/Rfx/Xkl+6kz/ZdFhetbcfELc1/nBYtP2Z/9P8e1/TGzyfslm9n3GYMD5fMR/W0L7+8JKRf35wUh+d0r5b37z03ZwWnRsYXFoaO7j3WxfYOha9WXWd2NSeN7/Tfrc/spBe9n+RsJ81XpEQ3n/fLP0lUAAAGASURBVDjLY2CgGOTlFxQWFZeUljGCuUzM5RWVVdU1tXX1DY0srBgK2Nibmlta29o7Oru6e3o5MEzg5OpDKOjnxrCCZ8JEhIJJvGhu4GPgnzwFoWCqAJojBYWEp01HKJghguYLUTHxmbMQCmZLoHlTkkFqzlyEAmkZ1HCYJ8sgN38BQoG8AmpALVRkUFq0GKFAWQU1JJeoMqgtXYZQoK6BGtTLNbW0VyAp0NFFjQs9fQPDlUgKjIzRIsvE1GwVkgJzC/TYtLRajaTAmsHG1g5Vgf0aJAUODI5r1613QlGwAaFgozODy6bN69ZvccWuYKsbg/u27SAFOzywKdjpyeC1azdEwR5vTAV7fRh89+2HKjhw0A9dwSF/BoaAw3AFR44Goio4FgRiByMUHD8RgqzgZCiEE4ZQcOp0OELBmQiYeZEIBWfPRcEURMfAXaQVi1Bw/kIcREF8ApKvE5MQCi5eSgYpSElFCdm0dISCy1cyGBgys9BiLzvnKlzBtVwGygEAJ9w8vq6VXKoAAAAASUVORK5CYII=
 // @include     *://*kissasian.*/*
 // @include     *://*kissanime.*/*
 // @include     *://*kissmanga.*/*
