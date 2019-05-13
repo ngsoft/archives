@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
 // @description  Helps to download streams (videojs and jwvideo based sites)
-// @version      6.7.1
+// @version      6.7.2
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @grant       none
@@ -21,6 +21,7 @@
 // @include     *://oload.*/embed/*
 // @include     *://oloadblock.*/embed/*
 // @include     *://*xstreamcdn.com/v/*
+// @include     *://*fembed.com/v/*
 // @include     *://*vidstreaming.io/*
 // @include     *://*gdriveplayer.us/*
 // @include     *://kurinaofficial.com/*
@@ -38,7 +39,7 @@
      * Prevent Adds
      */
     let on = EventTarget.prototype.addEventListener;
-    if (doc.location.host.match(/xstreamcdn/i) === null) {
+    if (doc.location.host.match(/(xstreamcdn|fembed)/i) === null) {
         window.addEventListener = doc.addEventListener = function(t) {
             let e = [
                 "contextmenu", "click", "mouseup"
@@ -281,7 +282,7 @@
             styles += `#home_video, #home_video *{z-index:3000;}`;
         }
 
-        if (doc.location.host.match(/xstreamcdn/i) !== null) {
+        if (doc.location.host.match(/(xstreamcdn|fembed)/i) !== null) {
             styles += `body {margin-right: 0!important;padding-right: 0!important;}`;
         }
 
@@ -534,7 +535,7 @@
             });
         }
 
-        if (doc.location.host.match(/xstreamcdn/i) !== null) {
+        if (doc.location.host.match(/(xstreamcdn|fembed)/i) !== null) {
             new ElementObserver({
                 selector: '#loading .fakeplaybutton',
                 onload(el, obs) {
