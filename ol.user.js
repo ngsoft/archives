@@ -388,6 +388,8 @@
                     }
                 } else if (video.matches('[id^="mejs_"]')) {
                     target = doc.querySelector('div.mejs-container');
+                } else if (video.classList.contains('jw-video')) {
+                    target = doc.querySelector('div.jw-wrapper');
                 }
 
                 //build elements
