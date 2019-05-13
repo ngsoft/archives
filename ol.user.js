@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
 // @description  Helps to download streams (videojs and jwvideo based sites)
-// @version      6.7
+// @version      6.7.1
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @grant       none
@@ -22,7 +22,7 @@
 // @include     *://oloadblock.*/embed/*
 // @include     *://*xstreamcdn.com/v/*
 // @include     *://*vidstreaming.io/*
-// @include     *://*gdriveplayer.us/embed.php*
+// @include     *://*gdriveplayer.us/*
 // @include     *://kurinaofficial.com/*
 // ==/UserScript==
 
@@ -389,7 +389,7 @@
                 } else if (video.matches('[id^="mejs_"]')) {
                     target = doc.querySelector('div.mejs-container');
                 } else if (video.classList.contains('jw-video')) {
-                    target = doc.querySelector('div.jw-wrapper');
+                    target = video.parentElement.parentElement;
                 }
 
                 //build elements
