@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
 // @description  Helps to download streams (videojs and jwvideo based sites)
-// @version      6.6
+// @version      6.7
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @grant       none
@@ -23,6 +23,7 @@
 // @include     *://*xstreamcdn.com/v/*
 // @include     *://*vidstreaming.io/*
 // @include     *://*gdriveplayer.us/embed.php*
+// @include     *://kurinaofficial.com/*
 // ==/UserScript==
 
 
@@ -232,13 +233,13 @@
         let self = this, video;
 
         let styles = `
-            .video-toolbar{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; padding: 16px 8px;font-size: 16px;z-index: 9999;}
-            [class*="video-"] [class*="-icon"]:not([class*="vjs-"])
+            .esd .video-toolbar{position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; padding: 16px 8px;font-size: 16px;z-index: 9999;}
+            .esd [class*="video-"] [class*="-icon"]:not([class*="vjs-"])
             {vertical-align: middle;display: inline-block;width: 20px;height: 20px;margin:0 8px;line-height:0;}
-            [class*="video-"] [class*="-icon"]:not([class*="vjs-"]) svg{width:87.5%;height:100%;}
-            [class*="video-"] [class*="-icon"]:not([class*="vjs-"]) img {width:100%;height:100%;}
-            [class*="video-"] .left{float:left;}[class*="video-"] .right{float: right;}
-            [class*="video-"] .center{position: absolute;left: 50%;top: 16px;transform: translate(-50%);}`;
+            .esd [class*="video-"] [class*="-icon"]:not([class*="vjs-"]) svg{width:87.5%;height:100%;}
+            .esd [class*="video-"] [class*="-icon"]:not([class*="vjs-"]) img {width:100%;height:100%;}
+            .esd [class*="video-"] .left{float:left;}[class*="video-"] .right{float: right;}
+            .esd [class*="video-"] .center{position: absolute;left: 50%;top: 16px;transform: translate(-50%);}`;
 
         //notifications
         styles += `
@@ -259,22 +260,22 @@
 
         styles += `
             /** Default Theme **/
-            .video-toolbar{background-color: rgba(0,0,0,.4);font-family: Arial,Helvetica,sans-serif;}
-            .video-toolbar, .video-toolbar a {color:#FFF;}.video-toolbar a {text-decoration: none;padding: 0 8px;}
-            .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #fff);}
+            .esd .video-toolbar{background-color: rgba(0,0,0,.4);font-family: Arial,Helvetica,sans-serif;}
+            .esd .video-toolbar, .video-toolbar a {color:#FFF;}.video-toolbar a {text-decoration: none;padding: 0 8px;}
+            .esd .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #fff);}
             .video-notify{color:rgb(34, 34, 34);background-color: rgba(255, 255, 255, .8);font-family: Arial,Helvetica,sans-serif;}`;
 
         if (doc.location.origin.match(/mango/i) !== null) {
             styles += `
                 /* color theme streammango*/
-                .video-toolbar{color: rgb(116, 44, 161); background-color: rgb(253, 250, 250);}
-                .video-toolbar, .video-toolbar a {color:rgb(116, 44, 161);}
-                .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px rgb(116, 44, 161));}`;
+                .esd .video-toolbar{color: rgb(116, 44, 161); background-color: rgb(253, 250, 250);}
+                .esd .video-toolbar, .esd .video-toolbar a {color:rgb(116, 44, 161);}
+                .esd .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px rgb(116, 44, 161));}`;
         }
         if (doc.location.origin.match(/openload|oload/i) !== null) {
             styles += `/* color theme openload */
-                .video-toolbar:hover, .video-js:hover button.vjs-big-play-button{background-color: rgba(0,170,255,.9);}
-                .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #000);}.video-toolbar:hover .fav-icon{filter: invert(100%);}`;
+                .esd .video-toolbar:hover, .video-js:hover button.vjs-big-play-button{background-color: rgba(0,170,255,.9);}
+                .esd .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #000);}.video-toolbar:hover .fav-icon{filter: invert(100%);}`;
         }
         if (doc.location.host.match(/rapidvideo/i) !== null) {
             styles += `#home_video, #home_video *{z-index:3000;}`;
@@ -289,18 +290,21 @@
         }
 
         //Stretch video and prevent scrollbar
-        styles += `body{width:100%; max-height:100%;margin-right:-100px;padding-right:100px;overflow:hidden;}video.vjs-tech, .jwplayer.jw-stretch-uniform video{object-fit: fill;}`;
+        styles += ` body{width:100%; max-height:100%;margin-right:-100px;padding-right:100px;overflow:hidden;}
+                    video.vjs-tech, .jwplayer.jw-stretch-uniform video{object-fit: fill;}`;
         //hides some elements
         styles += `
                 .hidden, .hidden *,
                 #videooverlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay , #overlay, .vjs-resize-manager
-                {position: fixed; right: auto; bottom: auto;top:-100%;left: -100%; height:1px; width:1px; opacity: 0;max-height:1px; max-width:1px;display:inline;}`;
+                {   position: fixed; right: auto; bottom: auto;top:-100%;left: -100%; height:1px; width:1px;
+                    opacity: 0;max-height:1px; max-width:1px;display:inline;}`;
 
         onBody(function() {
             addcss(styles);
         });
 
         let template = {
+            container: `<div class="esd"></div>`,
             toolbar: `<div class="video-toolbar"></div>`,
             clipboard: `<a href="" class="clipboard-btn left" title="Copy to Clipboard"><span class="clipboard-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M433.941 193.941l-51.882-51.882A48 48 0 0 0 348.118 128H320V80c0-26.51-21.49-48-48-48h-61.414C201.582 13.098 182.294 0 160 0s-41.582 13.098-50.586 32H48C21.49 32 0 53.49 0 80v288c0 26.51 21.49 48 48 48h80v48c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V227.882a48 48 0 0 0-14.059-33.941zm-84.066-16.184l48.368 48.368a6 6 0 0 1 1.757 4.243V240h-64v-64h9.632a6 6 0 0 1 4.243 1.757zM160 38c9.941 0 18 8.059 18 18s-8.059 18-18 18-18-8.059-18-18 8.059-18 18-18zm-32 138v192H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h55.414c9.004 18.902 28.292 32 50.586 32s41.582-13.098 50.586-32H266a6 6 0 0 1 6 6v42h-96c-26.51 0-48 21.49-48 48zm266 288H182a6 6 0 0 1-6-6V182a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v170a6 6 0 0 1-6 6z"></path></svg></span></a>`,
             download: `<a href="" target="_blank" title="Download Video" class="dl-btn center"><span class="dl-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M230.9 64c8.8 0 16 7.2 16 16v144h93.9c7.1 0 10.7 8.6 5.7 13.6L203.3 381.2c-6.3 6.3-16.4 6.3-22.7 0l-143-143.6c-5-5-1.5-13.6 5.7-13.6h93.9V80c0-8.8 7.2-16 16-16h77.7m0-32h-77.7c-26.5 0-48 21.5-48 48v112H43.3c-35.5 0-53.5 43-28.3 68.2l143 143.6c18.8 18.8 49.2 18.8 68 0l143.1-143.5c25.1-25.1 7.3-68.2-28.3-68.2h-61.9V80c0-26.5-21.6-48-48-48zM384 468v-8c0-6.6-5.4-12-12-12H12c-6.6 0-12 5.4-12 12v8c0 6.6 5.4 12 12 12h360c6.6 0 12-5.4 12-12z"></path></svg></span>VIDEO LINK</a>`,
@@ -382,15 +386,20 @@
                         }
                     } catch (e) {
                     }
+                } else if (video.matches('[id^="mejs_"]')) {
+                    target = doc.querySelector('div.mejs-container');
                 }
+
                 //build elements
+                this.container = html2element(template.container);
                 this.toolbar = html2element(template.toolbar);
                 this.clipboard = html2element(template.clipboard);
                 this.download = html2element(template.download);
                 this.newtab = html2element(template.newtab);
                 this.notifications = html2element(template.notifications);
                 //assemble elements
-                target.appendChild(this.toolbar);
+                target.appendChild(this.container);
+                this.container.appendChild(this.toolbar);
                 this.toolbar.appendChild(this.clipboard);
                 this.toolbar.appendChild(this.download);
                 this.toolbar.appendChild(this.newtab);
@@ -479,7 +488,7 @@
 
 
 
-        new ElementObserver('video.vjs-tech, video.jw-video', function(el, obs) {
+        new ElementObserver('video.vjs-tech, video.jw-video, .mejs-container video', function(el, obs) {
             if (this.src.length > 0) {
                 obs.stop();
                 application.start(this);
