@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.1
+// @version      2.9.2
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -94,6 +94,7 @@
                 .widget.quickfilter .widget-title > span:first-child + *{float: right;}
                 .widget.quickfilter .widget-title ul{display:inline!important;padding: 4px!important;}
                 .widget.quickfilter .widget-title ul label{min-width: 110px; text-align: right;}
+                body.watch .list-film{max-width: 75%; margin: 0 auto;}
             `);
             ondomready(function() {
                 let el;
