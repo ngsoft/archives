@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
 // @description  Helps to download streams (videojs and jwvideo based sites)
-// @version      6.7.2
+// @version      6.7.3
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @grant       none
@@ -282,17 +282,21 @@
             styles += `#home_video, #home_video *{z-index:3000;}`;
         }
 
-        if (doc.location.host.match(/(xstreamcdn|fembed)/i) !== null) {
-            styles += `body {margin-right: 0!important;padding-right: 0!important;}`;
-        }
-
         if (doc.location.host.match(/vidstreaming/i) !== null) {
             styles += `.wrapper .videocontent #list-server-more {padding: 8px 0 0 16px; top: 56px; text-align: left; right: auto; z-index: 99999;}`;
         }
 
+
+        if (doc.location.host.match(/mp4upload/i) !== null) {
+            styles += `.video-js {padding-top: 50%!important;}`;
+        }
+
         //Stretch video and prevent scrollbar
-        styles += ` body{width:100%; max-height:100%;margin-right:-100px;padding-right:100px;overflow:hidden;}
-                    video.vjs-tech, .jwplayer.jw-stretch-uniform video{object-fit: fill;}`;
+        styles += ` body{width:100%; max-height:100%;margin-right:-100px;padding-right:100px;overflow:hidden;}`;
+
+        if (/(xstreamcdn|fembed|mp4upload)/i.test(doc.location.host)) {
+            styles += `body {margin-right: 0!important;padding-right: 0!important;}`;
+        }
         //hides some elements
         styles += `
                 .hidden, .hidden *,
@@ -320,6 +324,7 @@
         let videoevents = {
             play() {
                 self.toolbar.classList.add('hidden');
+                this.style['object-fit'] = "fill";
                 updlnk.call(this);
             },
             pause() {
