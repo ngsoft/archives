@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      6.1.1
+// @version      6.2
 // @description  Subtitle downloader
 // @author       daedelus
 // @include     /^https?://(www.)?dimsum.my//
@@ -494,6 +494,20 @@
         });
 
     }, false);
+
+    /**
+     * Disable trial web adds
+     */
+    let ad_interval = setInterval(function() {
+        if (typeof dfp_config !== "undefined") {
+            clearInterval(ad_interval);
+            //dfp_config.ads_for_entire_site = false;
+            Object.keys(dfp_config.ads_enable).forEach(function(type) {
+                dfp_config.ads_enable[type] = false;
+            });
+        }
+    }, 20);
+
 
     console.debug(scriptname, 'Started');
 
