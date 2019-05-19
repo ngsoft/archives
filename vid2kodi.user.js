@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Send Video to Kodi
 // @namespace   https://github.com/ngsoft
-// @version     0.9b1
+// @version     3.0
 // @description Send Stream URL to Kodi using jsonRPC (Works with ol.user.js)
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -274,10 +274,10 @@
 
         let styles = `
             button.vid2kodi
-            {position: absolute; top: 70%; left:5%;z-index: 99999;cursor: pointer;}
+            {position: absolute; top: 64px; right:32px;z-index: 99999;cursor: pointer;}
             button.vid2kodi, button.vid2kodi .vid2kodi-icn
             {border: 0; margin:0; padding:0;color: transparent;background-color: rgba(0, 0, 0, 0);}
-            button.vid2kodi .vid2kodi-icn{width: 64px; height: 64px;}
+            button.vid2kodi .vid2kodi-icn{width: 56px; height: 56px;}
         `;
         //settings
         styles += `
@@ -368,7 +368,7 @@
             .bounceOut {animation-name: bounceOut;animation-duration: .75s;animation-duration: 1s;animation-fill-mode: both;}
             .fadeInR {animation-name: fadeInRight;animation-duration: .5s;animation-fill-mode: both;}`;
         styles += `
-            .hidden, .hidden *, button.vid2kodi:not([data-src])
+            .hidden, .hidden *, button.vid2kodi:not([data-src]), .vid2kodi-target:not(:hover) button.vid2kodi
             {position: fixed; right: auto; bottom: auto;top:-100%;left: -100%; height:1px; width:1px;
             opacity: 0;max-height:1px; max-width:1px;display:inline;}`;
 
@@ -462,27 +462,23 @@
                     updatevideolink(this.src);
                 }
             },
+            target: {
+                mouseover() {
+                    if (!elements.button.classList.contains('fadeInR')) elements.button.classList.add('fadeInR');
+                },
+                mouseout() {
+                    elements.button.classList.remove('fadeInR');
+                }
+            },
             button: {
                 mouseup(evt) {
                     evt.preventDefault();
-                    console.debug(evt);
                     if (evt.button === 0) {
                         //send to kodi
-                        self.notify(elements.sent);
-                        client.send(this.dataset.src, function () {
-                            self.notify(elements.success);
-                        }, function () {
-                            self.notify(elements.error);
-                        });
+                        self.send();
                     } else {
                         //settings
-                        let settings = doc.querySelector('.vid2kodi-settings');
-                        settings.classList.add('fadeIn');
-                        settings.classList.remove('hidden');
-                        setTimeout(function () {
-                            settings.classList.remove('fadeIn');
-                        }, 1000);
-                        settings.querySelector('[name="host"]').focus();
+                        self.settings();
 
                     }
                     return false;
@@ -506,7 +502,6 @@
                     main: {
                         submit(e) {
                             evts.update();
-                            console.debug(e);
                             if (typeof e.keyCode === "number" && e.keyCode === 27) {
                                 return evts.close(e);
                             }
@@ -533,7 +528,6 @@
                             return false;
                         },
                         reset(e) {
-                            console.debug(e);
                             e.preventDefault();
                             e.stopPropagation();
                             client.host = defaults.host;
@@ -648,6 +642,13 @@
         * Display button
         */
         if (target instanceof Element) {
+            //cannot hover on mobile
+            if (!/mobile/i.test(navigator.userAgent)) {
+                target.classList.add('vid2kodi-target');
+                Object.keys(events.target).forEach(function (evt) {
+                    target.addEventListener(evt, events.target[evt]);
+                });
+            }
             target.appendChild(elements.button);
             target.appendChild(elements.notify);
             if (doc.querySelector('.vid2kodi-settings') === null) {
@@ -666,7 +667,165 @@
         Object.keys(events.button).forEach(function (evt) {
             elements.button.addEventListener(evt, events.button[evt]);
         });
+        /**
+         * Kodisend compatibility
+         */
+        self.send = function send() {
+            self.notify(elements.sent);
+            client.send(elements.button.dataset.src, function () {
+                self.notify(elements.success);
+            }, function () {
+                self.notify(elements.error);
+            });
+        };
+        self.settings = function settings() {
+            let settings = doc.querySelector('.vid2kodi-settings');
+            settings.classList.add('fadeIn');
+            settings.classList.remove('hidden');
+            setTimeout(function () {
+                settings.classList.remove('fadeIn');
+            }, 1000);
+            settings.querySelector('[name="host"]').focus();
+        };
+        Object.defineProperty(elements.button, 'vid2kodi', {
+            value: self, configurable: true
+        });
         vid2kodistyles();
+        console.debug(scriptname, 'started');
+    }
+
+    /**
+     * Kodisend Behavior
+     */
+    let ksstylesapplied = false;
+    function KodiSend(oltoolbar) {
+        if (this === undef || this === window) return;
+        if (!(oltoolbar instanceof Element)) return;
+        const self = this, settings = new UserSettings({ enabled: true });
+        let styles = `.esd .video-toolbar .kodisend-icon + .dl-icon {display: none!important;}`;
+
+        onDocEnd(function () {
+            if (!ksstylesapplied) {
+                addcss(styles);
+                ksstylesapplied = true;
+            }
+        });
+        const ol = {
+            toolbar: oltoolbar,
+            download: oltoolbar.querySelector('.dl-btn')
+        };
+
+
+        let v2k;
+        function findVid2Kodi() {
+            if (v2k instanceof vid2kodi) return v2k;
+            let target = template.button.closest('div[id]'), v2ktmp;
+            if (target instanceof Element) {
+                v2ktmp = target.querySelector('button.vid2kodi');
+                if (v2ktmp instanceof Element) {
+                    v2k = v2ktmp.vid2kodi;
+                    return v2k;
+                }
+            }
+        }
+        const template = {
+            dlicon: html2element(`<img class="kodisend-icon" src="${icon}" />`),
+            button: html2element(`<a class="kodisend-btn left" href="#" title="KodiSend Settings"><img class="kodisend-icon" src="${icon}" /></a>`),
+            disabled: `<img class="kodisend-icn" src="${icon}" />KodiSend Disabled.`,
+            enabled: `<img class="kodisend-icn" src="${icon}" />KodiSend Enabled.`
+        }, events = {
+            button: {
+                contextmenu(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                },
+                click(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                },
+                mouseup(e) {
+                    e.preventDefault();
+                    if (e.button === 0) {
+                        //toggle
+                        self.toggle();
+                    } else {
+                        //settings
+                        self.settings();
+                    }
+                    return false;
+                }
+            },
+            dlbutton(e) {
+                e.preventDefault();
+                let vtok;
+                if ((vtok = findVid2Kodi())) {
+                    vtok.send();
+                }
+                return false;
+            }
+
+        };
+
+        Object.assign(self, {
+            notify(message) {
+                let vtok;
+                if ((vtok = findVid2Kodi())) {
+                    vtok.notify(message);
+                }
+            },
+            enable() {
+                self.disable();
+                settings.set('enabled', true);
+                ol.download.addEventListener('click', events.dlbutton);
+                ol.download.dataset.title = ol.download.title;
+                ol.download.title = "Send to Kodi.";
+                ol.download.querySelectorAll('.dl-icon').forEach(function (el) {
+                    el.parentNode.insertBefore(template.dlicon, el);
+                });
+            },
+            disable() {
+                settings.set('enabled', false);
+                ol.download.removeEventListener("click", events.dlbutton);
+                if (template.dlicon.parentNode instanceof Element) {
+                    template.dlicon.parentNode.removeChild(template.dlicon);
+                }
+                if (ol.download.dataset.title !== undef) {
+                    ol.download.title = ol.download.dataset.title;
+                }
+            },
+            toggle() {
+                settings.set('enabled', settings.get('enabled') === false);
+                if (settings.get('enabled') === true) {
+                    self.notify(template.enabled);
+                    return self.enable();
+                }
+                self.notify(template.disabled);
+                return self.disable();
+
+            },
+            settings() {
+                let vtok;
+                if ((vtok = findVid2Kodi())) {
+                    vtok.settings();
+                }
+            }
+        });
+        /**
+         * Add KodiSend icon
+         */
+        ol.toolbar.insertBefore(template.button, ol.toolbar.firstChild);
+        if (settings.get('enabled') === true) {
+            self.enable();
+        }
+        /**
+         * Attach events
+         */
+        Object.keys(events.button).forEach(function (evt) {
+            template.button.addEventListener(evt, events.button[evt]);
+        });
+
     }
 
 
@@ -674,6 +833,13 @@
     onBody(function () {
         (new ElementObserver('video', function (el, obs) {
             new vid2kodi(el);
+        }));
+        (new ElementObserver({
+            selector: '.esd div.video-toolbar',
+            onload(el, obs) {
+                new KodiSend(el);
+            },
+            timeout: 5000
         }));
     });
 
