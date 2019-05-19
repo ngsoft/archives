@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Send Video to Kodi
 // @namespace   https://github.com/ngsoft
-// @version     3.0.3
+// @version     3.0.4
 // @description Send Stream URL to Kodi using jsonRPC (Works with ol.user.js)
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -531,7 +531,7 @@
                         reset(e) {
                             e.preventDefault();
                             e.stopPropagation();
-                            client.host = defaults.host;
+                            client.host = defaults.hostname;
                             client.port = defaults.port;
                             evts.update();
                             return false;
