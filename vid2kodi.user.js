@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Send Video to Kodi
 // @namespace   https://github.com/ngsoft
-// @version     3.0
+// @version     3.0.1
 // @description Send Stream URL to Kodi using jsonRPC (Works with ol.user.js)
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -184,12 +184,12 @@
     class KodiClient {
 
         get host() {
-            let host = this.__usersettings__.get('host', "127.0.0.1");
+            let host = this.__usersettings__.get('hostname', "127.0.0.1");
             return host;
         }
         set host(v) {
             if (/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/.test(v)) {
-                this.__usersettings__.set('host', v);
+                this.__usersettings__.set('hostname', v);
             }
 
         }
@@ -390,7 +390,7 @@
         if (!(videoElement instanceof Element) || videoElement.tagName !== "VIDEO") return;
 
         const self = this, defaults = {
-            host: '127.0.0.1',
+            hostname: '127.0.0.1',
             port: 8080
         }, settings = new UserSettings(defaults), client = new KodiClient(), video = videoElement;
 

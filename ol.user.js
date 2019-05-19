@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
 // @description  Helps to download streams (videojs and jwvideo based sites)
-// @version      6.7.4
+// @version      6.7.4.1
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @grant       none
@@ -570,7 +570,7 @@
             });
         }
         if (doc.location.host.match(/mp4upload/i) !== null) {
-            new ElementObserver('.vjs-over', function(el, obs) {
+            new ElementObserver('.vjs-over, [style*="z-index: 21474"]', function(el, obs) {
                 el.remove();
             });
             new ElementObserver('div[style*="fixed;"]', function(el, obs) {
