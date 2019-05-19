@@ -141,6 +141,10 @@
         }
         return r;
     }
+
+
+
+
     class ElementObserver {
 
         start() {
@@ -175,10 +179,10 @@
             }
             if (this.tworker !== undef) {
                 clearTimeout(this.tworker);
-                delete(this.tworker);
+                delete (this.tworker);
             }
             clearInterval(this.worker);
-            delete(this.worker);
+            delete (this.worker);
             return this;
         }
 
@@ -190,6 +194,7 @@
                 interval: 10,
                 timeout: 0
             };
+            self.nodes = [];
             if (typeof selector === "string" && selector.length > 0) {
                 this.params.selector = selector;
             } else if (selector instanceof Object) {
@@ -300,7 +305,7 @@
         //hides some elements
         styles += `
                 .hidden, .hidden *,
-                #videooverlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay , #overlay, .vjs-resize-manager
+                #videooverlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay , #overlay, .vjs-resize-manager, .vjs-over
                 {   position: fixed; right: auto; bottom: auto;top:-100%;left: -100%; height:1px; width:1px;
                     opacity: 0;max-height:1px; max-width:1px;display:inline;}`;
 
@@ -496,7 +501,9 @@
 
 
 
-        new ElementObserver('video.vjs-tech, video.jw-video, .mejs-container video', function(el, obs) {
+        new ElementObserver({
+            selector: 'video.vjs-tech, video.jw-video, .mejs-container video',
+            onload(el, obs) {
             if (this.src.length > 0) {
                 obs.stop();
                 application.start(this);
@@ -518,6 +525,8 @@
                     application.newtab.querySelector('img').src = 'https://kurinaofficial.com/wp-content/uploads/2019/02/cropped-icon-32x32.png';
                 }
             }
+            },
+            once: false
         });
     });
     onDocEnd(function() {
@@ -561,13 +570,11 @@
             });
         }
         if (doc.location.host.match(/mp4upload/i) !== null) {
-            new ElementObserver({
-                selector: 'body > div[style*="fixed;"]',
-                onload(el, obs) {
-                    obs.stop();
-                    el.classList.add('hidden');
-                },
-                timeout: 2000
+            new ElementObserver('.vjs-over', function(el, obs) {
+                el.remove();
+            });
+            new ElementObserver('div[style*="fixed;"]', function(el, obs) {
+                el.classList.add('hidden');
             });
         }
 
