@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Send Video to Kodi
 // @namespace   https://github.com/ngsoft
-// @version     3.0.2
+// @version     3.0.3
 // @description Send Stream URL to Kodi using jsonRPC (Works with ol.user.js)
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -599,7 +599,7 @@
                         return false;
                     },
                     update(e) {
-                        host.value = client.host;
+                        host.value = client.hostname;
                         port.value = client.port;
                         address.value = client.address;
                         cktxt.classList.remove('success', 'error');
