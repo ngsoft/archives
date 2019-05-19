@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Send Video to Kodi
 // @namespace   https://github.com/ngsoft
-// @version     3.0.1
+// @version     3.0.2
 // @description Send Stream URL to Kodi using jsonRPC (Works with ol.user.js)
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -468,9 +468,7 @@
             target: {
                 mouseover() {
                     if (!elements.button.classList.contains('fadeInR')) elements.button.classList.add('fadeInR');
-                },
-                mouseout() {
-                    elements.button.classList.remove('fadeInR');
+                    this.classList.remove('vid2kodi-target');
                 }
             },
             button: {

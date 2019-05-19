@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Embed Stream Downloader
 // @description  Helps to download streams (videojs and jwvideo based sites)
-// @version      6.7.4.1
+// @version      6.7.4.2
 // @author       daedelus
 // @namespace    https://github.com/ngsoft
 // @grant       none
@@ -307,7 +307,7 @@
                 .hidden, .hidden *,
                 #videooverlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay , #overlay, .vjs-resize-manager, .vjs-over
                 {   position: fixed; right: auto; bottom: auto;top:-100%;left: -100%; height:1px; width:1px;
-                    opacity: 0;max-height:1px; max-width:1px;display:inline;}`;
+                    opacity: 0;max-height:1px; max-width:1px;display:inline;z-index: -1;}`;
 
         onBody(function() {
             addcss(styles);
@@ -570,10 +570,10 @@
             });
         }
         if (doc.location.host.match(/mp4upload/i) !== null) {
-            new ElementObserver('.vjs-over, [style*="z-index: 21474"]', function(el, obs) {
+            new ElementObserver('.vjs-over', function(el, obs) {
                 el.remove();
             });
-            new ElementObserver('div[style*="fixed;"]', function(el, obs) {
+            new ElementObserver('div[style*="fixed;"], [style*="z-index: 21474"]', function(el, obs) {
                 el.classList.add('hidden');
             });
         }
