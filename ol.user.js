@@ -284,7 +284,13 @@
                 .esd .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #000);}.video-toolbar:hover .fav-icon{filter: invert(100%);}`;
         }
         if (doc.location.host.match(/rapidvideo/i) !== null) {
-            styles += `#home_video, #home_video *{z-index:3000;}`;
+            styles += `#home_video, #home_video *{z-index:3000;}
+                /* color theme rapidvideo */
+                .video-js button.vjs-big-play-button{width:3em;}
+                .esd .video-toolbar, .video-js button.vjs-big-play-button{background-color: rgba(0, 0, 0, 0.45);}
+                .video-js:hover .esd .video-toolbar, .video-js:hover button.vjs-big-play-button{background-color: rgba(181, 75, 24, .9);}
+                .esd .video-toolbar a:hover {filter: drop-shadow(8px 8px 8px #000);}
+            `;
         }
 
         if (doc.location.host.match(/vidstreaming/i) !== null) {
@@ -300,7 +306,9 @@
         styles += ` body{width:100%; max-height:100%;margin-right:-100px;padding-right:100px;overflow:hidden;}`;
 
         if (/(xstreamcdn|fembed|mp4upload)/i.test(doc.location.host)) {
-            styles += `body {margin-right: 0!important;padding-right: 0!important;}`;
+            styles += `
+                body {margin-right: 0!important;padding-right: 0!important;}
+            `;
         }
         //hides some elements
         styles += `
@@ -568,6 +576,7 @@
                 },
                 timeout: 2000
             });
+
         }
         if (doc.location.host.match(/mp4upload/i) !== null) {
             new ElementObserver('.vjs-over', function(el, obs) {
