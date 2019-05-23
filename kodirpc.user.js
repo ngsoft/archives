@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        KodiRPC
 // @namespace   https://github.com/ngsoft
-// @version     1.0
+// @version     1.0.1
 // @description Send Stream URL to Kodi using jsonRPC
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -406,8 +406,8 @@
         };
         const self = this, events = {
             root: {
-                pointerdown(e) {
-                    if (e.button !== 0) return;
+                click(e) {
+                    //if (e.button !== 0) return;
                     let target = e.target, button, name;
                     if ((button = target.closest('button')) !== null) {
                         name = button.name;
@@ -736,15 +736,14 @@
 
         const self = this, events = {
             root: {
-                pointerdown(e) {
+                click(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (e.button === 0) {
-                        let btnclicked = e.target.closest('button');
-                        if (btnclicked !== null) {
-                            btnevents[btnclicked.name].call(this, e);
-                        }
+                    let btnclicked = e.target.closest('button');
+                    if (btnclicked !== null) {
+                        btnevents[btnclicked.name].call(this, e);
                     }
+
                 }
             }
         }, btnevents = {

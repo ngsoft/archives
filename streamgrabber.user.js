@@ -868,7 +868,7 @@
     }
 
     if (/(gdriveplayer|googlevideo)/.test(doc.location.host)) {
-        doc.head.appendChild(html2element(`<link href="https://www.google.com/drive/static/images/drive/favicon.ico" rel="icon" type="image/png">`));
+        doc.head.appendChild(html2element(`<link href="https://www.google.com/drive/static/images/drive/favicon.ico" rel="icon">`));
         hostModule = function (grabber) {
             grabber.onReady(() => {
                 jwplayer(grabber.container.id).on('adPlay', () => {
@@ -876,6 +876,10 @@
                 });
             });
         };
+    }
+
+    if (/(fastdrama)/.test(doc.location.host)) {
+        doc.head.appendChild(html2element(`<link href="/ico.ico" rel="icon">`));
     }
 
 
