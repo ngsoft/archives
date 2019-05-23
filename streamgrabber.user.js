@@ -11,7 +11,7 @@
 // @compatible  chrome+tampermonkey
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/streamgrabber.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/streamgrabber.user.js
-// @icon        //www.tampermonkey.net/favicon.ico
+// @icon        https://www.tampermonkey.net/favicon.ico
 // @include     *://streamango.*/embed/*
 // @include     *://*rapidvideo.com/e/*
 // @include     *://*mp4upload.com/embed*
