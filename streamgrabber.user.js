@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.0
+// @version     1.0.1
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -25,6 +25,7 @@
 // @include     *://*there.to/v/*
 // @include     *://*vidstreaming.io/*
 // @include     *://*gdriveplayer.us/*
+// @include     *://*fastdrama.*/embed/*
 // ==/UserScript==
 
 ((doc, undef) => {
