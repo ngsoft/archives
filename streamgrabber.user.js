@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.0.1
+// @version     1.1
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -26,6 +26,8 @@
 // @include     *://*vidstreaming.io/*
 // @include     *://*gdriveplayer.us/*
 // @include     *://*fastdrama.*/embed/*
+// @include     *://*prettyfast.*/e/*
+// @include     *://mcloud.*/embed/*
 // ==/UserScript==
 
 ((doc, undef) => {
@@ -94,6 +96,37 @@
 
         }
     }
+    function isValidUrl(url) {
+        const weburl = new RegExp("^(?:(?:(?:https?|ftp):)?\\/\\/)(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z0-9\\u00a1-\\uffff][a-z0-9\\u00a1-\\uffff_-]{0,62})?[a-z0-9\\u00a1-\\uffff]\\.)+(?:[a-z\\u00a1-\\uffff]{2,}\\.?))(?::\\d{2,5})?(?:[/?#]\\S*)?$", "i");
+        if (typeof url === s && url.length > 0) {
+            return weburl.test(url);
+        }
+        return false;
+    }
+
+    function loadjs(src, callback) {
+        if (isValidUrl(src)) {
+            let script = doc.createElement('script');
+            script.type = 'text/javascript';
+            script.defer = true;
+            if (typeof callback === f) {
+                script.onload = callback;
+            }
+            doc.head.appendChild(script);
+            script.src = src;
+        }
+    }
+    function loadcss(src) {
+        if (isValidUrl(src)) {
+            let style = doc.createElement('link');
+            style.rel = "stylesheet";
+            style.type = 'text/css';
+            doc.head.appendChild(style);
+            style.href = src;
+        }
+    }
+
+
     function copyToClipboard(text) {
         let r = false;
         if (typeof text === "string" && text.length > 0) {
@@ -245,6 +278,14 @@
 
         let started = false;
 
+        function getFavicon() {
+            let src = "/favicon.ico";
+            doc.querySelectorAll('[rel*="icon"][href]').forEach(icon => {
+                src = icon.href;
+            });
+            return src;
+        }
+
         const self = this, template = {
             toolbar: html2element(`<div class="streamgrabber" />`),
             notify: html2element(`<div class="streamgrabber-notify" />`),
@@ -258,7 +299,7 @@
                 clipboard: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M433.941 193.941l-51.882-51.882A48 48 0 0 0 348.118 128H320V80c0-26.51-21.49-48-48-48h-61.414C201.582 13.098 182.294 0 160 0s-41.582 13.098-50.586 32H48C21.49 32 0 53.49 0 80v288c0 26.51 21.49 48 48 48h80v48c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V227.882a48 48 0 0 0-14.059-33.941zm-84.066-16.184l48.368 48.368a6 6 0 0 1 1.757 4.243V240h-64v-64h9.632a6 6 0 0 1 4.243 1.757zM160 38c9.941 0 18 8.059 18 18s-8.059 18-18 18-18-8.059-18-18 8.059-18 18-18zm-32 138v192H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h55.414c9.004 18.902 28.292 32 50.586 32s41.582-13.098 50.586-32H266a6 6 0 0 1 6 6v42h-96c-26.51 0-48 21.49-48 48zm266 288H182a6 6 0 0 1-6-6V182a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v170a6 6 0 0 1-6 6z"></path></svg>`,
                 //downloadold: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M230.9 64c8.8 0 16 7.2 16 16v144h93.9c7.1 0 10.7 8.6 5.7 13.6L203.3 381.2c-6.3 6.3-16.4 6.3-22.7 0l-143-143.6c-5-5-1.5-13.6 5.7-13.6h93.9V80c0-8.8 7.2-16 16-16h77.7m0-32h-77.7c-26.5 0-48 21.5-48 48v112H43.3c-35.5 0-53.5 43-28.3 68.2l143 143.6c18.8 18.8 49.2 18.8 68 0l143.1-143.5c25.1-25.1 7.3-68.2-28.3-68.2h-61.9V80c0-26.5-21.6-48-48-48zM384 468v-8c0-6.6-5.4-12-12-12H12c-6.6 0-12 5.4-12 12v8c0 6.6 5.4 12 12 12h360c6.6 0 12-5.4 12-12z"></path></svg>`,
                 download: `<svg class="square" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="currentColor" d="M28 16h-5l-7 7-7-7h-5l-4 8v2h32v-2l-4-8zM0 28h32v2h-32v-2zM18 10v-8h-4v8h-7l9 9 9-9h-7z"></path></svg>`,
-                newtab: `<img src="/favicon.ico" />`
+                newtab: `<img src="${getFavicon()}" />`
             }
         }, events = {
 
@@ -308,7 +349,7 @@
                     if (this.streamgrabber.videolink() !== undef) {
                         if (!started) start();
                         this.streamgrabber.elements.buttons.download.href = this.streamgrabber.videolink();
-                        this.streamgrabber.show();
+                        if (video.paused === true) this.streamgrabber.show();
                     }
                 },
                 DOMNodeRemoved() {
@@ -333,9 +374,8 @@
             let el = html2element(template.icons[icn]);
             if (icn === "newtab") {
                 el.onerror = function () {
-                    doc.querySelectorAll('[rel*="icon"][href]').forEach(icon => {
-                        this.src = icon.href;
-                    });
+                    this.parentElement.insertBefore(html2element(`<svg class="square" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="currentColor" d="M30.662 5.003c-4.488-0.645-9.448-1.003-14.662-1.003s-10.174 0.358-14.662 1.003c-0.86 3.366-1.338 7.086-1.338 10.997s0.477 7.63 1.338 10.997c4.489 0.645 9.448 1.003 14.662 1.003s10.174-0.358 14.662-1.003c0.86-3.366 1.338-7.086 1.338-10.997s-0.477-7.63-1.338-10.997zM12 22v-12l10 6-10 6z"></path></svg>`), this);
+                    this.parentElement.removeChild(this);
                 };
             }
             this.elements.buttons[icn].querySelector('[class*="-icn"]').appendChild(el);
@@ -447,7 +487,7 @@
              */
             let css = `
                     .streamgrabber {position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; padding: 16px 8px;z-index: 9999; text-align: center;}
-                    .streamgrabber [class*="-icn"]{vertical-align: middle; display: inline-block; width: 20px; height: 20px; margin:0 8px; line-height:0;}
+                    .streamgrabber [class*="-icn"]{vertical-align: middle; display: inline-block; width: 24px; height: 24px; margin:0 8px; line-height:0;}
                     .streamgrabber [class*="-icn"] svg{width:87.5%;height:100%;}.streamgrabber [class*="-icn"] svg.square{width:87.5%;height:87.5%;}
                     .streamgrabber [class*="-icn"] img {width:100%;height:100%;}
                     .streamgrabber .left{float:left;}.streamgrabber .right{float: right;}
@@ -462,7 +502,7 @@
                     .streamgrabber, .streamgrabber a, .streamgrabber-notify {font-family: Arial,Helvetica,sans-serif; font-size: 16px; color:#FFF;line-height: 1.5;}
                     .streamgrabber {background-color: rgba(0, 0, 0, 0.45);}
                     .streamgrabber a {text-decoration: none; padding: 0 8px;}
-                    .streamgrabber a:hover {filter: drop-shadow(8px 8px 8px #fff);}
+                    .streamgrabber a:hover {filter: drop-shadow(4px 4px 4px #fff);}
                     .streamgrabber-notify > div{
                         display: block; text-align:center;padding:16px; border-radius: 4px; margin: 8px 0;
                         min-width:256px;max-width:512px;
@@ -490,11 +530,12 @@
              */
             css += `
                     .hidden, .hidden *,
-                .streamgrabber [class*="-bt"]:not(:hover):not(.download-bt) .bt-desc, .streamgrabber.mobile .bt-desc{
+                    .streamgrabber [class*="-bt"]:not(:hover):not(.download-bt) .bt-desc, .streamgrabber.mobile .bt-desc{
                         position: fixed !important; right: auto !important; bottom: auto !important; top:-100% !important; left: -100% !important;
                         height: 1px !important; width: 1px !important; opacity: 0 !important;max-height: 1px !important; max-width: 1px !important;
                         display: inline !important;z-index: -1 !important;
                     }
+                    video{object-fit: fill !important;}
                 `;
             let node = doc.createElement('style');
             node.setAttribute('type', "text/css");
@@ -513,7 +554,6 @@
                     src = source.src;
                 }
                 if (!(/^http/i.test(src))) {
-                    //alert(src);
                     src = "";
                 }
             }
@@ -613,7 +653,7 @@
         /**
          * Rewrite certains attributes on the fly
          */
-        find('[style*="z-index: 2147483"][style*="z-index: 300000"], div[style*="position: fixed"]', el => {
+        find('[style*="z-index: 2147483"][style*="z-index: 300000"], div[style*="position: fixed"], div[style*="position: absolute"]', el => {
             el.style['z-index'] = "-1";
             el.classList.add('hidden');
         }, 5000);
@@ -621,7 +661,7 @@
             mutations.forEach(({ addedNodes }) => {
                 addedNodes.forEach(element => {
                     if (element instanceof Element) {
-                        if (element.matches('[style*="z-index: 2147483"], [style*="z-index: 300000"], div[style*="position: fixed"]')) {
+                        if (element.matches('[style*="z-index: 2147483"], [style*="z-index: 300000"], div[style*="position: fixed"], div[style*="position: absolute"]')) {
                             element.style['z-index'] = "-1";
                             element.classList.add('hidden');
                         }
@@ -700,9 +740,170 @@
     /**
      * Plyr alternative player for certains hosts
      */
-    function plyrModule(grabber) {
 
+    function altplayer(video, newvideo) {
+
+        if (this instanceof altplayer && video instanceof Element) {
+            const self = this, plyropts = {
+                captions: { active: true, language: 'EN', update: false },
+                settings: [
+                    'captions',
+                    'quality',
+                    //'speed'
+                ]
+
+            }, buttons = {
+                play: `<span class="play-button">
+                            <svg class="play-icn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6zM48 453.5v-395c0-4.6 5.1-7.5 9.1-5.2l334.2 197.5c3.9 2.3 3.9 8 0 10.3L57.1 458.7c-4 2.3-9.1-.6-9.1-5.2z"></path></svg>
+                            </span>`,
+                bigplay: html2element(`<span class="bigplay-button no-focus" tabindex="-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="bigplay-icn"><path fill="currentColor" d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"></path></svg>
+                            </span>`)
+            };
+            Object.assign(self, {
+                video: newvideo instanceof Element ? newvideo : html2element(`<video controls src="" preload="none" tabindex="-1" class="altplayer-video" />`),
+                originalvideo: video,
+                grabber: null,
+                plyr: null,
+                ready: false,
+                elements: {
+                    root: html2element(`<div class="altplayer-container" />`)
+                }
+            });
+
+            self.onResourcesLoaded(() => {
+                self.video.src = video.src;
+                self.elements.root.insertBefore(self.video, self.elements.root.firstChild);
+                doc.body.innerHTML = "";
+                doc.body.insertBefore(self.elements.root, doc.body.firstChild);
+                self.plyr = new Plyr(self.video, plyropts);
+                self.plyr.on('ready', e => {
+
+                    self.plyr.elements.container.id = "altplayer" + Math.floor(+new Date() / 1000);
+                    self.plyr.elements.container.insertBefore(buttons.bigplay, self.plyr.elements.container.firstChild);
+                    buttons.bigplay.addEventListener('click', () => {
+                        self.video.play();
+                    });
+                    self.video.addEventListener('play', () => {
+                        buttons.bigplay.hidden = true;
+                    }, { once: true });
+
+                    self.grabber = new StreamGrabber(self.video, module);
+                    self.ready = true;
+                    trigger(self.elements.root, "altplayer.ready");
+
+                });
+
+
+            });
+
+            altplayer.loadResources();
+        }
     }
+
+    Object.assign(altplayer, {
+        stylesapplied: false,
+        resloading: false,
+        hlsloaded: false,
+        ready: false,
+        loadTheme() {
+            if (!this.stylesapplied) {
+                this.stylesapplied = true;
+                let css = `
+                    .altplayer-container{height:100%;}
+                    .altplayer-container .altplayer-video{width: 100%; height:100%; object-fit: fill; display: block;}
+                    .altplayer-container .plyr{height: 100%;}
+                    .plyr > .plyr__control--overlaid{display: none !important;}
+                    .altplayer-container [class*="-button"]{
+                        background-color: transparent;border: none; display: inline-block;color:#fff;
+                        width:32px;z-index: 10; cursor: pointer;border-radius: 3px;flex-shrink: 0;padding: 7px;transition: all .3s ease;
+                    }
+                    .altplayer-container [class*="-button"]:not(.no-focus):focus, .altplayer-container [class*="-button"]:not(.no-focus):hover{
+                        box-shadow: 0 0 0 5px rgba(26,175,255,.5);background: #1aafff;outline: 0;
+                    }
+                    .altplayer-container .bigplay-button{
+                        position: absolute; top: 50%; left:50%; transform: translate(-50%, -50%);width: 128px;
+                        color: rgba(255,255,255,0.8);
+                    }
+                    .altplayer-container .bigplay-button:focus, .altplayer-container:hover span.bigplay-button{
+                        color: rgba(255,255,255,1);
+                    }
+                `;
+                let node = doc.createElement('style');
+                node.setAttribute('type', "text/css");
+                node.appendChild(doc.createTextNode('<!-- ' + css + ' -->'));
+                doc.head.appendChild(node);
+            }
+        },
+        loadResources() {
+            if (!this.resloading) {
+                this.resloading = true;
+                const self = this, resources = {
+                    css: [
+                        "https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap-reboot.min.css",
+                        "https://cdn.jsdelivr.net/npm/plyr@latest/dist/plyr.css"],
+                    js: [
+                        "https://cdn.jsdelivr.net/npm/plyr@latest/dist/plyr.min.js"
+                    ]
+                }, maxindex = resources.js.length - 1, onload = function () {
+                    trigger(doc.body, "altplayerresources.ready");
+                    self.ready = true;
+                    self.loadTheme();
+                };
+                resources.css.forEach(src => {
+                    loadcss(src);
+                });
+                resources.js.forEach((src, index) => {
+                    loadjs(src, (index === maxindex ? onload : undef));
+                });
+
+            }
+        },
+        loadHls(callback) {
+            if (!this.hlsloaded) {
+                const src = "https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js", self = this;
+                if (typeof callback === f) doc.body.addEventListener('hls.ready', callback, { once: true });
+                return loadjs(src, function () {
+                    trigger(doc.body, "hls.ready");
+                    self.hlsloaded = true;
+                });
+            }
+            if (typeof callback === f) {
+                callback.call(doc.body);
+            }
+        }
+    });
+
+    altplayer.prototype = {
+
+        onResourcesLoaded(callback) {
+            if (typeof callback === f) {
+                const self = this;
+                if (altplayer.ready === true) {
+                    callback.call(self, self);
+                    return;
+                }
+                doc.body.addEventListener('altplayerresources.ready', e => {
+                    callback.call(self, self);
+                }, { once: true });
+            }
+        },
+
+
+        onReady(callback) {
+            if (typeof callback === f) {
+                const self = this;
+                if (self.ready === true) {
+                    callback.call(self, self);
+                    return;
+                }
+                this.elements.root.addEventListener('altplayer.ready', e => {
+                    callback.call(self, self);
+                }, { once: true });
+            }
+        }
+    };
+
 
     /**
      * Main Module
@@ -768,6 +969,15 @@
     };
 
     /**
+     * App Module
+     */
+
+    function module(grabber) {
+        mainModule(grabber);
+        hostModule(grabber);
+    }
+
+    /**
      * Per Host hacks
      */
     if (/(xstreamcdn|fembed|there)/.test(doc.location.host)) {
@@ -798,12 +1008,6 @@
                 listmore.hidden = null;
             });
         };
-    }
-
-
-    if (/(mp4upload)/.test(doc.location.host)) {
-        //use plyr???
-        find('.vjs-over', x => x.remove());
     }
 
     if (/(openload|oload)/.test(doc.location.host)) {
@@ -883,22 +1087,157 @@
     }
 
 
-    /**
-     * App Module
-     */
+    if (/(mp4upload)/.test(doc.location.host)) {
+        //use plyr???
+        find('.vjs-over', x => x.remove());
 
-    function module(grabber) {
-        mainModule(grabber);
-        hostModule(grabber);
+        return find('video[src^="http"]', (video, obs) => {
+
+            if (video.classList.contains('vjs-tech')) {
+                obs.stop();
+
+                // @link https://github.com/kmoskwiak/videojs-resolution-switcher
+                const vjs = videojs('vid');
+                const tracks = vjs.options_.tracks, poster = vjs.poster_ || "";
+                let newvid = html2element(`<video controls src="" preload="none" tabindex="-1" class="altplayer-video" poster="${poster}" />`);
+
+                try {
+                    tracks.forEach(obj => {
+                        let track = html2element(`<track kind="${obj.kind}" label="${obj.srclang}" srclang="${obj.srclang}" src="${obj.src}" />`);
+                        newvid.appendChild(track);
+                    });
+
+                    new altplayer(video, newvid);
+
+                } catch (error) {
+                    new altplayer(video);
+                }
+            }
+        });
+
     }
+
+    if (/(uptostream)/.test(doc.location.host)) {
+
+        doc.head.appendChild(html2element(`<link href="/assets/images/utb.png" rel="icon">`));
+        find('[class*="ad-container"]', x => x.remove());
+
+
+        return find('video[src^="http"]', (video, obs) => {
+
+            if (video.classList.contains('vjs-tech')) {
+                obs.stop();
+
+                try {
+                    // @link https://github.com/kmoskwiak/videojs-resolution-switcher
+                    const vjs = videojs('player');
+                    const tracks = vjs.options_.tracks, poster = vjs.poster_ || "", videosources = vjs.groupedSrc.type["video/mp4"];
+                    let newvid = html2element(`<video controls src="" preload="none" tabindex="-1" class="altplayer-video" poster="${poster}" />`);
+                    let last = localStorage.lastquality || "480", available = [];
+                    videosources.forEach(obj => {
+                        let source = html2element(`<source src="${obj.src}" size="${obj.res}" type="${obj.type}" />`);
+                        available.push(obj.res);
+                        newvid.appendChild(source);
+                    });
+                    tracks.forEach(obj => {
+                        let track = html2element(`<track kind="${obj.kind}" label="${obj.srclang}" srclang="${obj.srclang}" src="${obj.src}" />`);
+                        newvid.appendChild(track);
+                    });
+
+                    let alt = new altplayer(video, newvid);
+
+                    alt.onReady(() => {
+                        alt.plyr.on('qualitychange', function (e) {
+                            last = localStorage.lastquality = e.detail.quality;
+                            alt.grabber.notify('Setting quality to ' + last + "p");
+                        });
+                        alt.grabber.onReady(() => {
+                            if (available.includes(last) && alt.plyr.quality !== last) {
+                                alt.plyr.quality = last;
+
+                            }
+                        });
+                    });
+
+                } catch (error) {
+                    new altplayer(video);
+                }
+            }
+        });
+    }
+
+    if (/(prettyfast)/.test(doc.location.host)) {
+
+        doc.head.appendChild(html2element(`<link href="https://9anime.to/assets/favicons/favicon.png" rel="icon">`));
+        hostModule = function (grabber) {
+            let i = setInterval(() => {
+                if (typeof config !== u) {
+                    clearInterval(i);
+                    if (Array.isArray(config.playlist) && config.playlist.length > 0) {
+                        grabber.video.dataset.src = config.playlist[0].file;
+                    }
+                }
+            }, 1);
+            grabber.videolink = function () {
+                return grabber.video.dataset.src;
+            };
+
+        };
+
+        /*
+        try {
+            let video = doc.createElement('video');
+            video.src = config.playlist[0].file;
+            let alt = new altplayer(video);
+            alt.onReady(() => {
+                player.stop();
+            });
+            return altplayer.loadHls(() => {
+                let hls = new Hls();
+                hls.attachMedia(alt.video);
+                hls.loadSource(decodeURIComponent(video.src));
+                alt.video.dataset.src = video.src;
+            });
+        } catch (error) {
+
+        }*/
+
+    }
+
+    if (/(mcloud)/.test(doc.location.host)) {
+        hostModule = function (grabber) {
+
+            let i = setInterval(() => {
+                if (typeof config !== u) {
+                    clearInterval(i);
+                    if (Array.isArray(config.playlist) && config.playlist.length > 0 && Array.isArray(config.playlist[0].sources) && config.playlist[0].sources.length > 0) {
+                        grabber.video.dataset.src = config.playlist[0].sources[0].file;
+                    }
+                }
+            }, 1);
+
+            grabber.videolink = function () {
+                return grabber.video.dataset.src;
+
+            };
+
+        };
+    }
+
+
+
 
 
 
     /**
      * Start APP
      */
+    let auto = true;
     find('video', video => {
-        const grabber = new StreamGrabber(video, typeof module === f ? module : mainModule);
+        if (auto === true) {
+            const grabber = new StreamGrabber(video, typeof module === f ? module : mainModule);
+        }
+
     }, 15000);
 
 
