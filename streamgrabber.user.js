@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.2
+// @version     1.3
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -24,10 +24,12 @@
 // @include     *://*fembed.com/v/*
 // @include     *://*there.to/v/*
 // @include     *://*vidstreaming.io/*
+// @include     *://kshows.to/*
 // @include     *://*gdriveplayer.us/*
 // @include     *://*fastdrama.*/embed/*
 // @include     *://*prettyfast.*/e/*
 // @include     *://mcloud.*/embed/*
+// @include     *://embed.dramacool*.*/*
 // ==/UserScript==
 
 ((doc, undef) => {
@@ -38,6 +40,7 @@
 
     const GMinfo = (GM_info ? GM_info : (typeof GM === 'object' && GM !== null && typeof GM.info === 'object' ? GM.info : null));
     const scriptname = `${GMinfo.script.name} version ${GMinfo.script.version}`;
+    const alert = window.alert;
 
     const s = "string", b = "boolean", f = "function", o = "object", u = "undefined", n = "number";
 
@@ -803,7 +806,7 @@
 
         if (this instanceof altplayer && video instanceof Element) {
             const self = this, plyropts = {
-                captions: { active: true, language: 'EN', update: false },
+                captions: { active: true, language: 'auto', update: true },
                 settings: [
                     'captions',
                     'quality'
@@ -840,7 +843,7 @@
                 self.elements.root.insertBefore(self.video, self.elements.root.firstChild);
                 doc.body.innerHTML = "";
                 doc.body.insertBefore(self.elements.root, doc.body.firstChild);
-
+                let currentTrack = -1;
                 //convert subtitles to vtt
                 if (self.video.textTracks.length > 0) {
                     self.video.querySelectorAll('track').forEach(track => {
@@ -853,34 +856,44 @@
                                     if (url.href === doc.location.href) {
                                         return null;
                                     }
-                                    return url.href;
+                                    return url;
                                 } catch (error) {
                                     return null;
                                 }
                             })(src);
-                            if (typeof url === s) {
-                                fetch(url, {
-                                    method: "GET", mode: "cors", cache: "default", redirect: 'follow', referrer: 'client'
-                                }).then(r => {
-                                    if (r.status === 200) {
-                                        r.text().then(text => {
-                                            let parsed, vtt, blob, virtualurl;
-                                            if (Array.isArray(parsed = Subtitle.parse(text)) && parsed.length > 0) {
-                                                vtt = Subtitle.stringifyVtt(parsed);
-                                                if (typeof vtt === s && vtt.length > 0) {
-                                                    blob = new Blob([vtt], { type: "text/vtt" });
-                                                    track.dataset.src = url;
-                                                    virtualurl = URL.createObjectURL(blob);
-                                                    track.src = virtualurl;
-                                                    //setTimeout(x => URL.revokeObjectURL(virtualurl), 2000);
+                            if (url !== null) {
+                                // @link https://medium.com/netscape/hacking-it-out-when-cors-wont-let-you-be-great-35f6206cc646
+                                if (url.origin !== doc.location.origin) {
+                                    url = "https://cors-anywhere.herokuapp.com/" + url.href;
+                                } else if ((/\.srt/.test(url.pathname))) {
+                                    url = url.href;
+                                } else url = url.href; //null;
+                                if (url !== null) {
+                                    fetch(url, {
+                                        // mode: "no-cors", method: "GET", 
+                                        cache: "default", redirect: 'follow'
+                                    }).then(r => {
+                                        if (r.status === 200) {
+                                            r.text().then(text => {
+                                                let parsed, vtt, blob, virtualurl;
+                                                if (Array.isArray(parsed = Subtitle.parse(text)) && parsed.length > 0) {
+                                                    vtt = Subtitle.stringifyVtt(parsed);
+                                                    if (typeof vtt === s && vtt.length > 0) {
+                                                        blob = new Blob([vtt], { type: "text/vtt" });
+                                                        track.dataset.src = url;
+                                                        virtualurl = URL.createObjectURL(blob);
+                                                        track.src = virtualurl;
+                                                        //setTimeout(x => URL.revokeObjectURL(virtualurl), 2000);
+                                                    }
                                                 }
-                                            }
-                                        });
-                                    }
-                                }).catch(ex => track.remove());
+                                            });
+                                        }
+                                    }).catch(ex => {
+                                        console.error(ex);
+                                        //track.remove();
+                                    });
+                                }
                             }
-
-
                         }
                     });
                 }
@@ -896,6 +909,10 @@
                     self.video.addEventListener('play', () => {
                         buttons.bigplay.hidden = true;
                     }, { once: true });
+                    self.video.addEventListener('click', function (e) {
+                        if (this.paused) this.play();
+                        else this.pause();
+                    });
 
                     self.grabber = new StreamGrabber(self.video, module);
 
@@ -905,9 +922,44 @@
                         self.grabber.notify('Setting quality to ' + e.detail.quality + "p");
                     });
 
+                    self.plyr.on('error', function (e) {
+                        let url = new URL(self.video.src);
+                        if (/\.m3u8/.test(url.pathname)) {
+                            let hls = self.hls = new Hls();
+                            hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+                                self.video.dataset.src = url.href;
+                                self.grabber.onReady(() => {
+                                    self.grabber.videolink = function () {
+                                        return self.video.dataset.src;
+                                    };
+                                });
+                                self.video.play();
+                            });
+                            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                                hls.loadSource(url.href);
+                            });
+                            self.video.addEventListener('play', function () {
+                                if (self.video.textTracks.length > 0) {
+                                    self.video.querySelectorAll('track[src]').forEach(track => {
+                                        track.src = track.src;
+                                    });
+                                }
+                                setTimeout(() => {
+                                    self.plyr.currentTrack = currentTrack;
+                                }, 300);
+
+                            }, { once: true });
+                            hls.attachMedia(self.video);
+                        }
+                    });
+
                     //activate first subtitle track if CC are disabled
+                    currentTrack = self.plyr.currentTrack;
                     if (self.video.textTracks.length > 0 && self.plyr.currentTrack === -1) {
-                        self.plyr.currentTrack = 0;
+                        setTimeout(() => {
+                            self.plyr.currentTrack = currentTrack = 0;
+                        }, 200);
+
                     }
                     //video auto size (won't go out of bounds)
                     window.addEventListener('resize', resize);
@@ -958,12 +1010,24 @@
                     .altplayer-container .bigplay-button:focus, .altplayer-container:hover span.bigplay-button{
                         color: rgba(255,255,255,1);
                     }
+                    
+                    
+                    .altplayer-container  .plyr__captions{
+                        transform: translate(0, -60px);
+                    }
                                        
                     .altplayer-container  .plyr__caption{
                         -webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;user-select: none;
-                         background: rgba(0,0,0,.45); font-weight: 600;
-                        
+                         font-weight: 600; text-shadow: 5px 5px 5px #000; min-width: 90%; display: inline-block;
+                         background: rgba(0,0,0,.25);
                     }
+                    
+                    .altplayer-container .plyr--captions-enabled .altplayer-video::cue{
+                        color: rgba(255,255,255,0); background-color: rgba(255,255,255,0); 
+                        display: none;
+                    }
+                    
+                    
                     @media (min-width: 768px) {
                         .altplayer-container  .plyr__caption{font-size: 2rem;}
                     }
@@ -1110,7 +1174,7 @@
     }
 
 
-    if (/(vidstreaming)/.test(doc.location.host)) {
+    if (/(vidstreaming|dramacool|kshows)/.test(doc.location.host)) {
 
 
         let lstmore, css;
@@ -1118,7 +1182,6 @@
 
         find("#list-server-more", el => {
             lstmore = el;
-            console.debug(lstmore);
         }, 5000);
         find('.videocontent > style', style => {
             css = style.innerText;
@@ -1241,11 +1304,11 @@
 
     if (/(mp4upload)/.test(doc.location.host)) {
         find('.vjs-over', x => x.remove());
-        new cssloader();
 
         return find('video.vjs-tech[src^="http"]', video => {
-            try {
 
+
+            try {
                 const vjs = videojs(video.parentElement.closest('div[id]').id);
                 const tracks = vjs.options_.tracks, poster = vjs.poster() || "";
                 let altvid = html2element(`<video controls src="${video.src}" preload="none" tabindex="-1" class="altplayer-video" poster="${poster}" />`);
@@ -1253,12 +1316,14 @@
                     let track = html2element(`<track kind="${obj.kind}" label="${obj.srclang}" srclang="${obj.srclang}" src="${obj.src}" />`);
                     altvid.appendChild(track);
                 });
+                new cssloader();
                 new altplayer(video, altvid);
+
 
             } catch (error) {
                 new altplayer(video);
             }
-        });
+        }, 5000);
     }
 
     if (/(uptostream)/.test(doc.location.host)) {
@@ -1324,8 +1389,8 @@
     /**
      * Start APP
      */
-    find('video.vjs-tech, video.jw-video', video => {
-
+    find('video.vjs-tech, video.jw-video', (video, obs) => {
+        obs.stop();
         try {
             //jw-video to plyr
             if (video.classList.contains('jw-video') && typeof jwplayer !== u) {

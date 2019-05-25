@@ -411,7 +411,6 @@
                     let target = e.target, button, name;
                     if ((button = target.closest('button')) !== null) {
                         name = button.name;
-                        console.debug(name);
                         if (typeof btevents[name] === f) {
                             btevents[name].call(this, e);
                             e.preventDefault();
