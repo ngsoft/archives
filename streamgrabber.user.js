@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.1
+// @version     1.2
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -194,9 +194,6 @@
                 };
             }
         }
-
-
-
         return function findNode(options) {
             let params = Object.assign({}, defaults), base = doc;
             for (let i = 0; i < arguments.length; i++) {
@@ -267,6 +264,67 @@
 
     })();
 
+    /**
+     * .css-loader
+     */
+    function cssloader() {
+        if (this instanceof cssloader) {
+            const template = `<div class="css-loader"><div class="snake-loader-container"><div class="snake-loader rotate-fast"></div></div></div>`, self = this;
+            Object.assign(self, {
+                target: null,
+                loader: html2element(template)
+            });
+            cssloader.loadTheme();
+            self.start();
+        }
+    }
+
+    cssloader.prototype = {
+        start(element) {
+            const self = this;
+            onBody(() => {
+                self.target = element instanceof Element ? element : doc.body;
+                self.target.appendChild(self.loader);
+            });
+        },
+        stop() {
+            if (this.target !== null) {
+                this.target.removeChild(this.loader);
+            }
+        }
+    };
+
+    Object.assign(cssloader, {
+
+        loadTheme() {
+            if (!this.stylesapplied) {
+                this.stylesapplied = true;
+                let css = `
+                    @keyframes rotate {0%{transform: rotate(0deg);}100%{transform: rotate(360deg);}}
+                    .snake-loader, .rotate, [class*="rotate-"]{animation: rotate 0.8s infinite linear;}
+                    .rotate-reverse{animation-direction: reverse;}.rotate-fast{animation-duration: 0.5s;}
+                    .rotate-slow{animation-duration: 1.2s;}.rotate-alternate{animation-direction: alternate;}
+                    .rotate-alternate.rotate-reverse{animation-direction: alternate-reverse;}
+                    .snake-loader{
+                        border-style: solid!important;border-top-color: transparent!important;border-radius: 50%!important;
+                        display: inline-block;height: 28px;width: 28px;color: #fff; border: 8px;
+                    }
+                    .css-loader{display: block;position: absolute;top: 0;right: 0; bottom: 0;left: 0;z-index: 2147483647; background: no-repeat center rgba(0, 0, 0, .55);}
+                    .css-loader-overlay{position: fixed;z-index: 1800;}
+                    .css-loader .snake-loader-container{margin: 0;padding: 0;position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);} 
+                    body > .css-loader .snake-loader-container, body > .css-loader{position: fixed;}
+                    body > .css-loader{background-color: rgba(0, 0, 0, 1);}
+                    .snake-loader{width: 56px; height: 56px;border: 16px; color: #dee2e6;}   
+                `;
+                let node = doc.createElement('style');
+                node.setAttribute('type', "text/css");
+                node.appendChild(doc.createTextNode('<!-- ' + css + ' -->'));
+                doc.head.appendChild(node);
+            }
+        }
+    });
+
+
 
     /**
      * StreamGrabber Toolbar
@@ -335,7 +393,7 @@
                         if (!started) start();
                         this.streamgrabber.elements.buttons.download.href = this.streamgrabber.videolink();
                     }
-                    this.style['object-fit'] = "fill";
+                    //this.style['object-fit'] = "fill";
                 },
                 pause() {
                     if (this.streamgrabber.videolink() !== undef) {
@@ -529,6 +587,7 @@
              * Visually hidden
              */
             css += `
+                    .no-select, .streamgrabber > *, .streamgrabber-notify > *{-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;user-select: none;}
                     .hidden, .hidden *,
                     .streamgrabber [class*="-bt"]:not(:hover):not(.download-bt) .bt-desc, .streamgrabber.mobile .bt-desc{
                         position: fixed !important; right: auto !important; bottom: auto !important; top:-100% !important; left: -100% !important;
@@ -733,7 +792,6 @@
         Object.defineProperty(doc.body, 'KodiRPCModule', {
             value: "on", configurable: true
         });
-        //document.body.dataset.kodirpcmodule = "on";
     });
 
 
@@ -741,15 +799,14 @@
      * Plyr alternative player for certains hosts
      */
 
-    function altplayer(video, newvideo) {
+    function altplayer(video, altvideo) {
 
         if (this instanceof altplayer && video instanceof Element) {
             const self = this, plyropts = {
                 captions: { active: true, language: 'EN', update: false },
                 settings: [
                     'captions',
-                    'quality',
-                    //'speed'
+                    'quality'
                 ]
 
             }, buttons = {
@@ -761,7 +818,7 @@
                             </span>`)
             };
             Object.assign(self, {
-                video: newvideo instanceof Element ? newvideo : html2element(`<video controls src="" preload="none" tabindex="-1" class="altplayer-video" />`),
+                video: altvideo instanceof Element ? altvideo : html2element(`<video controls src="" preload="none" tabindex="-1" class="altplayer-video" />`),
                 originalvideo: video,
                 grabber: null,
                 plyr: null,
@@ -770,12 +827,64 @@
                     root: html2element(`<div class="altplayer-container" />`)
                 }
             });
+            //fit video to screen/iframe size
+            const resize = () => {
+                //fit to vertical view also (mobile), works also fullscreen
+                self.plyr.elements.wrapper.classList.remove('.plyr__video-wrapper--fixed-ratio');
+                self.video.style.width = `${doc.documentElement.clientWidth}px`;
+                self.video.style.height = `${doc.documentElement.clientHeight}px`;
+            };
 
-            self.onResourcesLoaded(() => {
-                self.video.src = video.src;
+            const start = () => {
+                if ((!altvideo instanceof Element)) self.video.src = video.src;
                 self.elements.root.insertBefore(self.video, self.elements.root.firstChild);
                 doc.body.innerHTML = "";
                 doc.body.insertBefore(self.elements.root, doc.body.firstChild);
+
+                //convert subtitles to vtt
+                if (self.video.textTracks.length > 0) {
+                    self.video.querySelectorAll('track').forEach(track => {
+                        if (typeof track.kind === s && /^(subtitles|captions)$/.test(track.kind) && typeof track.src === s) {
+                            let src = track.src, url = (src => {
+                                try {
+                                    let a = doc.createElement('a'), url;
+                                    a.href = src;
+                                    url = new URL(a.href);
+                                    if (url.href === doc.location.href) {
+                                        return null;
+                                    }
+                                    return url.href;
+                                } catch (error) {
+                                    return null;
+                                }
+                            })(src);
+                            if (typeof url === s) {
+                                fetch(url, {
+                                    method: "GET", mode: "cors", cache: "default", redirect: 'follow', referrer: 'client'
+                                }).then(r => {
+                                    if (r.status === 200) {
+                                        r.text().then(text => {
+                                            let parsed, vtt, blob, virtualurl;
+                                            if (Array.isArray(parsed = Subtitle.parse(text)) && parsed.length > 0) {
+                                                vtt = Subtitle.stringifyVtt(parsed);
+                                                if (typeof vtt === s && vtt.length > 0) {
+                                                    blob = new Blob([vtt], { type: "text/vtt" });
+                                                    track.dataset.src = url;
+                                                    virtualurl = URL.createObjectURL(blob);
+                                                    track.src = virtualurl;
+                                                    //setTimeout(x => URL.revokeObjectURL(virtualurl), 2000);
+                                                }
+                                            }
+                                        });
+                                    }
+                                }).catch(ex => track.remove());
+                            }
+
+
+                        }
+                    });
+                }
+
                 self.plyr = new Plyr(self.video, plyropts);
                 self.plyr.on('ready', e => {
 
@@ -789,13 +898,30 @@
                     }, { once: true });
 
                     self.grabber = new StreamGrabber(self.video, module);
+
+                    //quality change (save to localStorage)
+                    self.plyr.on('qualitychange', function (e) {
+                        localStorage.lastquality = e.detail.quality;
+                        self.grabber.notify('Setting quality to ' + e.detail.quality + "p");
+                    });
+
+                    //activate first subtitle track if CC are disabled
+                    if (self.video.textTracks.length > 0 && self.plyr.currentTrack === -1) {
+                        self.plyr.currentTrack = 0;
+                    }
+                    //video auto size (won't go out of bounds)
+                    window.addEventListener('resize', resize);
+                    resize();
+
+                    //set ready
                     self.ready = true;
                     trigger(self.elements.root, "altplayer.ready");
-
                 });
+            };
 
-
-            });
+            if (altplayer.ready === true) {
+                start();
+            } else doc.body.addEventListener('altplayer.resources.ready', start);
 
             altplayer.loadResources();
         }
@@ -804,16 +930,20 @@
     Object.assign(altplayer, {
         stylesapplied: false,
         resloading: false,
-        hlsloaded: false,
+        resloaded: 0,
         ready: false,
         loadTheme() {
             if (!this.stylesapplied) {
                 this.stylesapplied = true;
+                doc.head.appendChild(html2element(`<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">`));
                 let css = `
                     .altplayer-container{height:100%;}
-                    .altplayer-container .altplayer-video{width: 100%; height:100%; object-fit: fill; display: block;}
+                    .altplayer-container .altplayer-video{
+                        width: 100%; height:100%; object-fit: fill; display: block;
+                    }
                     .altplayer-container .plyr{height: 100%;}
                     .plyr > .plyr__control--overlaid{display: none !important;}
+                    
                     .altplayer-container [class*="-button"]{
                         background-color: transparent;border: none; display: inline-block;color:#fff;
                         width:32px;z-index: 10; cursor: pointer;border-radius: 3px;flex-shrink: 0;padding: 7px;transition: all .3s ease;
@@ -828,6 +958,20 @@
                     .altplayer-container .bigplay-button:focus, .altplayer-container:hover span.bigplay-button{
                         color: rgba(255,255,255,1);
                     }
+                                       
+                    .altplayer-container  .plyr__caption{
+                        -webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;user-select: none;
+                         background: rgba(0,0,0,.45); font-weight: 600;
+                        
+                    }
+                    @media (min-width: 768px) {
+                        .altplayer-container  .plyr__caption{font-size: 2rem;}
+                    }
+
+                    @media (min-width: 992px) {
+                        .altplayer-container  .plyr__caption{font-size: 2.5rem;}
+                    }
+
                 `;
                 let node = doc.createElement('style');
                 node.setAttribute('type', "text/css");
@@ -843,63 +987,38 @@
                         "https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap-reboot.min.css",
                         "https://cdn.jsdelivr.net/npm/plyr@latest/dist/plyr.css"],
                     js: [
+                        "https://cdn.jsdelivr.net/npm/subtitle@latest/dist/subtitle.bundle.js",
+                        "https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js",
                         "https://cdn.jsdelivr.net/npm/plyr@latest/dist/plyr.min.js"
                     ]
-                }, maxindex = resources.js.length - 1, onload = function () {
-                    trigger(doc.body, "altplayerresources.ready");
-                    self.ready = true;
-                    self.loadTheme();
                 };
                 resources.css.forEach(src => {
                     loadcss(src);
                 });
-                resources.js.forEach((src, index) => {
-                    loadjs(src, (index === maxindex ? onload : undef));
+                resources.js.forEach(src => {
+                    loadjs(src, () => {
+                        self.resloaded++;
+                        if (self.resloaded === resources.js.length) {
+                            self.loadTheme();
+                            self.ready = true;
+                            trigger(doc.body, 'altplayer.resources.ready');
+                        }
+                    });
                 });
-
-            }
-        },
-        loadHls(callback) {
-            if (!this.hlsloaded) {
-                const src = "https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js", self = this;
-                if (typeof callback === f) doc.body.addEventListener('hls.ready', callback, { once: true });
-                return loadjs(src, function () {
-                    trigger(doc.body, "hls.ready");
-                    self.hlsloaded = true;
-                });
-            }
-            if (typeof callback === f) {
-                callback.call(doc.body);
             }
         }
     });
 
     altplayer.prototype = {
-
-        onResourcesLoaded(callback) {
-            if (typeof callback === f) {
-                const self = this;
-                if (altplayer.ready === true) {
-                    callback.call(self, self);
-                    return;
-                }
-                doc.body.addEventListener('altplayerresources.ready', e => {
-                    callback.call(self, self);
-                }, { once: true });
-            }
-        },
-
-
         onReady(callback) {
             if (typeof callback === f) {
                 const self = this;
-                if (self.ready === true) {
-                    callback.call(self, self);
-                    return;
+                if (!self.ready) {
+                    return this.elements.root.addEventListener('altplayer.ready', e => {
+                        callback.call(self, self);
+                    }, { once: true });
                 }
-                this.elements.root.addEventListener('altplayer.ready', e => {
-                    callback.call(self, self);
-                }, { once: true });
+                callback.call(self, self);
             }
         }
     };
@@ -913,48 +1032,51 @@
          * Disables vast for videojs
          */
         if (grabber.video.classList.contains('vjs-tech')) {
+
             try {
                 let id, vjs;
-                if ((id = grabber.video.parentNode.id)) {
+                if ((id = grabber.video.parentElement.closest('div[id]').id)) {
                     if (typeof videojs !== "undefined" && (vjs = videojs(id)) && typeof vjs.vast !== "undefined") {
                         vjs.vast.disable();
+                        console.debug('VideoJS Vast disabled');
                     }
                 }
+
             } catch (e) {
             }
         }
         /**
          * jwVideo Quality Selector
          */
-        if (typeof jwplayer !== u) {
-            /**
-             * Quality Selector
-             */
+
+        if (grabber.video.classList.contains('jw-video'), typeof jwplayer !== u) {
             grabber.onReady(function () {
                 try {
                     let id = grabber.video.parentElement.closest('div[id]'), jw = jwplayer(id);
                     if (jw.getQualityLevels().length > 0) {
-                        let last = localStorage.lastquality || "480p";
+                        let last = localStorage.lastquality || "480", levels = jw.getQualityLevels().map(x => {
+                            let res = "480", matches;
+                            if ((matches = x.label.match(/([0-9]{3,4})/))) {
+                                res = matches[1];
+                            }
+                            return res;
+                        }), selected = levels[jw.getCurrentQuality()];
 
                         jw.on('levelsChanged', obj => {
                             if (obj.type === "levelsChanged") {
-                                last = localStorage.lastquality = obj.levels[obj.currentQuality].label;
+                                last = selected = localStorage.lastquality = levels[obj.currentQuality];
+                                grabber.notify('Setting quality to ' + last + 'p');
                             }
                         });
                         grabber.video.addEventListener('loadeddata', () => {
-                            /**
-                             * Set last if available
-                             */
-                            let levels = jw.getQualityLevels().map(x => x.label), selected = levels[jw.getCurrentQuality()];
                             if (selected !== last) {
                                 let i;
                                 if ((i = levels.indexOf(last)) !== -1) {
                                     jw.setCurrentQuality(i);
-                                    selected = last;
-
+                                    grabber.video.pause();
                                 }
                             }
-                            grabber.notify('Setting quality to ' + selected);
+
                         });
                     }
                 } catch (error) {
@@ -983,30 +1105,68 @@
     if (/(xstreamcdn|fembed|there)/.test(doc.location.host)) {
         find('#resume', x => x.remove(), 5000);
         find('#loading .fakeplaybutton', button => {
-            if (typeof clientSide !== u) {
-                clientSide.setup();
-                button.parentElement.remove();
-            }
+            clientSide.setup();
         }, 5000);
     }
 
 
     if (/(vidstreaming)/.test(doc.location.host)) {
-        find('[style*="position: static"]', x => x.remove());
 
-        addcss(`
-                #list-server-more {z-index: 10000;padding: 14px 0 0 0;top: 50px;}
-                #show-server{background-size: cover;padding: 3px 12px;}
-                .streamgrabber{background-color: rgba(0, 0, 0, 0.7);}
-            `);
+
+        let lstmore, css;
+        find('[style*="position: static"], [href*="bodelen.com"]', x => x.remove());
+
+        find("#list-server-more", el => {
+            lstmore = el;
+            console.debug(lstmore);
+        }, 5000);
+        find('.videocontent > style', style => {
+            css = style.innerText;
+
+        }, 5000);
+
+
         hostModule = function (grabber) {
-            let listmore = doc.getElementById('list-server-more');
-            grabber.video.addEventListener('play', () => {
-                if (grabber.videolink() !== undef) listmore.hidden = true;
-            });
-            grabber.video.addEventListener('pause', () => {
-                listmore.hidden = null;
-            });
+            try {
+                doc.body.appendChild(lstmore);
+                addcss(css + `
+                    #list-server-more {
+                        z-index: 10000;padding: 14px 0 0 0;top: 50px;
+                    }
+                    #show-server{background-size: cover;padding: 3px 12px;}                
+                    .streamgrabber{background-color: rgba(0, 0, 0, 0.7);}
+                `);
+                grabber.video.addEventListener('play', () => {
+                    if (grabber.videolink() !== undef) lstmore.hidden = true;
+                });
+                grabber.video.addEventListener('pause', () => {
+                    lstmore.hidden = null;
+                });
+                let lst = doc.querySelector('.list-server-items'), clean = lst.cloneNode(true);
+                lst.parentElement.insertBefore(clean, lst);
+                lst.parentElement.removeChild(lst);
+
+                const virtualclick = (url) => {
+                    if (typeof url === s && url.length > 0) {
+                        let a = html2element(`<a href="${url}" target="_blank" style="opacity: 0;" />`);
+                        doc.body.appendChild(a);
+                        setTimeout(() => {
+                            doc.body.removeChild(a);
+                        }, 10);
+                        a.click();
+                    }
+                };
+                clean.addEventListener('click', e => {
+                    let server = e.target.closest('.linkserver');
+                    if (server !== null && server.dataset.status !== "0") {
+                        virtualclick(server.dataset.video);
+                    }
+                    clean.style.display = "none";
+                });
+            } catch (error) {
+
+            }
+
         };
     }
 
@@ -1038,7 +1198,6 @@
                     /**
                      * @link https://github.com/silvermine/videojs-quality-selector
                      */
-
                     const vjs = videojs(grabber.container.id);
                     let last = localStorage.lastquality || "480p", element;
 
@@ -1071,15 +1230,8 @@
             `);
     }
 
-    if (/(gdriveplayer|googlevideo)/.test(doc.location.host)) {
+    if (/(gdriveplayer)/.test(doc.location.host)) {
         doc.head.appendChild(html2element(`<link href="https://www.google.com/drive/static/images/drive/favicon.ico" rel="icon">`));
-        hostModule = function (grabber) {
-            grabber.onReady(() => {
-                jwplayer(grabber.container.id).on('adPlay', () => {
-                    grabber.hide();
-                });
-            });
-        };
     }
 
     if (/(fastdrama)/.test(doc.location.host)) {
@@ -1088,33 +1240,25 @@
 
 
     if (/(mp4upload)/.test(doc.location.host)) {
-        //use plyr???
         find('.vjs-over', x => x.remove());
+        new cssloader();
 
-        return find('video[src^="http"]', (video, obs) => {
+        return find('video.vjs-tech[src^="http"]', video => {
+            try {
 
-            if (video.classList.contains('vjs-tech')) {
-                obs.stop();
+                const vjs = videojs(video.parentElement.closest('div[id]').id);
+                const tracks = vjs.options_.tracks, poster = vjs.poster() || "";
+                let altvid = html2element(`<video controls src="${video.src}" preload="none" tabindex="-1" class="altplayer-video" poster="${poster}" />`);
+                tracks.forEach(obj => {
+                    let track = html2element(`<track kind="${obj.kind}" label="${obj.srclang}" srclang="${obj.srclang}" src="${obj.src}" />`);
+                    altvid.appendChild(track);
+                });
+                new altplayer(video, altvid);
 
-                // @link https://github.com/kmoskwiak/videojs-resolution-switcher
-                const vjs = videojs('vid');
-                const tracks = vjs.options_.tracks, poster = vjs.poster_ || "";
-                let newvid = html2element(`<video controls src="" preload="none" tabindex="-1" class="altplayer-video" poster="${poster}" />`);
-
-                try {
-                    tracks.forEach(obj => {
-                        let track = html2element(`<track kind="${obj.kind}" label="${obj.srclang}" srclang="${obj.srclang}" src="${obj.src}" />`);
-                        newvid.appendChild(track);
-                    });
-
-                    new altplayer(video, newvid);
-
-                } catch (error) {
-                    new altplayer(video);
-                }
+            } catch (error) {
+                new altplayer(video);
             }
         });
-
     }
 
     if (/(uptostream)/.test(doc.location.host)) {
@@ -1123,120 +1267,131 @@
         find('[class*="ad-container"]', x => x.remove());
 
 
-        return find('video[src^="http"]', (video, obs) => {
+        return find('video.vjs-tech[src^="http"]', video => {
 
-            if (video.classList.contains('vjs-tech')) {
-                obs.stop();
+            try {
+                // @link https://github.com/kmoskwiak/videojs-resolution-switcher
+                const vjs = videojs(video.parentElement.closest('div[id]').id);
+                const tracks = vjs.options_.tracks, poster = vjs.poster() || "", videosources = vjs.groupedSrc.type["video/mp4"];
+                let newvid = html2element(`<video controls src="" preload="none" tabindex="-1" class="altplayer-video" poster="${poster}" />`);
+                let last = localStorage.lastquality || "480", available = [];
+                videosources.forEach(obj => {
+                    let source = html2element(`<source src="${obj.src}" size="${obj.res}" type="${obj.type}" />`);
+                    available.push(obj.res);
+                    newvid.appendChild(source);
+                });
+                tracks.forEach(obj => {
+                    let track = html2element(`<track kind="${obj.kind}" label="${obj.srclang}" srclang="${obj.srclang}" src="${obj.src}" />`);
+                    newvid.appendChild(track);
+                });
 
-                try {
-                    // @link https://github.com/kmoskwiak/videojs-resolution-switcher
-                    const vjs = videojs('player');
-                    const tracks = vjs.options_.tracks, poster = vjs.poster_ || "", videosources = vjs.groupedSrc.type["video/mp4"];
-                    let newvid = html2element(`<video controls src="" preload="none" tabindex="-1" class="altplayer-video" poster="${poster}" />`);
-                    let last = localStorage.lastquality || "480", available = [];
-                    videosources.forEach(obj => {
-                        let source = html2element(`<source src="${obj.src}" size="${obj.res}" type="${obj.type}" />`);
-                        available.push(obj.res);
-                        newvid.appendChild(source);
+                let alt = window.alt = new altplayer(video, newvid);
+
+                alt.onReady(() => {
+                    alt.grabber.onReady(() => {
+                        if (available.includes(last) && alt.plyr.quality !== last) {
+                            alt.plyr.quality = last;
+                        }
                     });
-                    tracks.forEach(obj => {
-                        let track = html2element(`<track kind="${obj.kind}" label="${obj.srclang}" srclang="${obj.srclang}" src="${obj.src}" />`);
-                        newvid.appendChild(track);
-                    });
+                });
 
-                    let alt = new altplayer(video, newvid);
-
-                    alt.onReady(() => {
-                        alt.plyr.on('qualitychange', function (e) {
-                            last = localStorage.lastquality = e.detail.quality;
-                            alt.grabber.notify('Setting quality to ' + last + "p");
-                        });
-                        alt.grabber.onReady(() => {
-                            if (available.includes(last) && alt.plyr.quality !== last) {
-                                alt.plyr.quality = last;
-
-                            }
-                        });
-                    });
-
-                } catch (error) {
-                    new altplayer(video);
-                }
+            } catch (error) {
+                window.alt = new altplayer(video);
             }
         });
     }
 
     if (/(prettyfast)/.test(doc.location.host)) {
-
         doc.head.appendChild(html2element(`<link href="https://9anime.to/assets/favicons/favicon.png" rel="icon">`));
-        hostModule = function (grabber) {
-            let i = setInterval(() => {
-                if (typeof config !== u) {
-                    clearInterval(i);
-                    if (Array.isArray(config.playlist) && config.playlist.length > 0) {
-                        grabber.video.dataset.src = config.playlist[0].file;
-                    }
-                }
-            }, 1);
-            grabber.videolink = function () {
-                return grabber.video.dataset.src;
-            };
-
-        };
-
-        /*
-        try {
-            let video = doc.createElement('video');
-            video.src = config.playlist[0].file;
-            let alt = new altplayer(video);
-            alt.onReady(() => {
-                player.stop();
-            });
-            return altplayer.loadHls(() => {
-                let hls = new Hls();
-                hls.attachMedia(alt.video);
-                hls.loadSource(decodeURIComponent(video.src));
-                alt.video.dataset.src = video.src;
-            });
-        } catch (error) {
-
-        }*/
-
     }
 
-    if (/(mcloud)/.test(doc.location.host)) {
+    if (/(mcloud|prettyfast)/.test(doc.location.host)) {
         hostModule = function (grabber) {
-
-            let i = setInterval(() => {
-                if (typeof config !== u) {
-                    clearInterval(i);
-                    if (Array.isArray(config.playlist) && config.playlist.length > 0 && Array.isArray(config.playlist[0].sources) && config.playlist[0].sources.length > 0) {
-                        grabber.video.dataset.src = config.playlist[0].sources[0].file;
-                    }
-                }
-            }, 1);
-
-            grabber.videolink = function () {
-                return grabber.video.dataset.src;
-
-            };
-
+            //activate Hls playback on altplayer
+            if (typeof Hls === f) {
+                let src = grabber.video.src, hls = new Hls;
+                grabber.video.dataset.src = src;
+                grabber.videolink = function () {
+                    return src;
+                };
+                hls.attachMedia(grabber.video);
+                hls.loadSource(decodeURIComponent(src));
+            }
         };
     }
-
-
-
-
 
 
     /**
      * Start APP
      */
-    let auto = true;
-    find('video', video => {
-        if (auto === true) {
-            const grabber = new StreamGrabber(video, typeof module === f ? module : mainModule);
-        }
+    find('video.vjs-tech, video.jw-video', video => {
+
+        try {
+            //jw-video to plyr
+            if (video.classList.contains('jw-video') && typeof jwplayer !== u) {
+                const jw = jwplayer(video.parentElement.closest('div[id]').id);
+                new cssloader();
+                let playlist = jw.getPlaylist();
+                if (playlist.length > 0) {
+                    playlist = playlist[0];
+                    let poster = playlist.image || "";
+                    let sources = { list: [], labels: [] }, tracks = [];
+                    let plyrvid = html2element(`<video controls src="" preload="none" tabindex="-1" class="altplayer-video" poster="${poster}" />`);
+                    playlist.sources.forEach((obj, index) => {
+                        if (!sources.list.includes(obj.file)) {
+                            sources.list.push(obj.file);
+                            sources.labels.push({
+                                index: index,
+                                src: obj.file,
+                                label: `${parseInt(obj.label)}`
+                            });
+
+                            plyrvid.appendChild(html2element(`<source src="${obj.file}" size="${parseInt(obj.label)}" type="video/${obj.type}" />`));
+                            if (playlist.sources.length === 1) plyrvid.src = obj.file;
+                        }
+                    });
+                    playlist.tracks.forEach((obj, index) => {
+                        try {
+                            let a = doc.createElement('a');
+                            a.href = obj.file;
+                            let u = new URL(a.href), url = u.searchParams.get("subtitle");
+                            if (url !== "1") {
+                                tracks.push(url);
+                                if (obj.label.length === 0) {
+                                    obj.label = "und";
+                                }
+                                plyrvid.appendChild(html2element(`<track kind="subtitles" label="${obj.name}" srclang="${obj.label}" src="${u.href}" />`));
+                            }
+                        } catch (error) {
+                        }
+                    });
+
+                    Object.defineProperty(plyrvid, "parsedData", {
+                        value: { sources: sources, tracks: tracks }
+                    });
+                    let alt = window.alt = new altplayer(video, plyrvid);
+                    alt.onReady(() => {
+                        alt.grabber.onReady(() => {
+                            //auto quality
+                            let last = localStorage.lastquality || "480";
+                            sources.labels.forEach(obj => {
+                                if (obj.label === last) {
+                                    alt.plyr.quality = last;
+                                }
+                            });
+                            setTimeout(() => {
+                                if (alt.plyr.quality === undef) alt.plyr.quality = "default";
+                            }, 200);
+
+                        });
+                    });
+                }
+                return;
+            }
+
+        } catch (error) { }
+
+        const grabber = new StreamGrabber(video, typeof module === f ? module : mainModule);
 
     }, 15000);
 
