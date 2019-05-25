@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        KodiRPC
 // @namespace   https://github.com/ngsoft
-// @version     1.0.1
+// @version     1.1
 // @description Send Stream URL to Kodi using jsonRPC
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -751,7 +751,11 @@
                 self.settings();
             },
             send() {
-                let src = video.src;
+                let src = "", source;
+                if (/^http/.test(video.src)) src = video.src;
+                else if ((source = video.querySelector('source[src^="http"]')) !== null) {
+                    src = source.src;
+                }
                 if (typeof src === s && /^http/.test(src)) {
                     self.send(src);
                 }
@@ -770,6 +774,12 @@
         self.elements.notify = self.elements.root.querySelector(".kodirpc-ui-notify");
         Object.keys(events.root).forEach(evt => {
             self.elements.root.addEventListener(evt, events.root[evt]);
+        });
+        video.addEventListener('play', () => {
+            self.elements.root.hidden = true;
+        });
+        video.addEventListener('pause', () => {
+            self.elements.root.hidden = null;
         });
         let started = false;
         function start() {
@@ -805,12 +815,8 @@
         obs.observe(video.parentElement, {
             childList: true, subtree: true, characterData: true, attributes: true
         });
-        if (typeof video.src === s && /^http/.test(video.src)) {
-            start();
-        }
 
-
-
+        start();
     }
 
     Object.assign(KodiRPCUI, {
@@ -841,6 +847,7 @@
                 .kodirpc-ui button:hover{
                     background-color: rgba(0,0,0,.125);
                 }
+                [hidden]{display: none !important; opacity:0!important; z-index: -1 !important;}
             `;
 
             let node = doc.createElement('style');
@@ -889,13 +896,10 @@
             new KodiRPCModule(doc.body);
             return;
         }
-        //Find first video element and observes it
-        let video = doc.querySelector('video');
-        if (video !== null) {
-            let ui = new KodiRPCUI(video);
-        }
-
-
+        find('video[src^="http"], video source[src^="http"]', (element, obs) => {
+            new KodiRPCUI(element.closest('video'));
+            obs.stop();
+        }, 5000);
 
     });
 
