@@ -30,6 +30,7 @@
 // @include     *://*prettyfast.*/e/*
 // @include     *://mcloud.*/embed/*
 // @include     *://embed.dramacool*.*/*
+// @include     *://kshows.to/*
 // ==/UserScript==
 
 
