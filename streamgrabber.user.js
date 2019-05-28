@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5a
+// @version     1.5b
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -163,9 +163,12 @@
     function copyToClipboard(text) {
         let r = false;
         if (typeof text === "string" && text.length > 0) {
-            let el = html2element(`<textarea>${text}</textarea>"`);
-            doc.body.appendChild(el);
+
+            //let el = html2element(`<textarea>${text}</textarea>"`);
+            let el = doc.createElement('textarea');
+            el.innerHTML = text;
             el.style.opacity = 0;
+            doc.body.appendChild(el);
             el.select();
             r = doc.execCommand("copy");
             doc.body.removeChild(el);
@@ -193,6 +196,58 @@
             }
         }
     }
+
+    /**
+     * Timer
+     */
+    class Timer {
+
+        start() {
+            if (this.started !== true && typeof this.params.callback === f) {
+                const self = this;
+                self.__interval = setInterval(() => {
+                    self.params.callback.call(self, self);
+                }, self.params.interval);
+                if (self.params.timeout > 0) {
+                    self.__timeout = setTimeout(() => {
+                        self.stop();
+                    }, self.params.timeout);
+                }
+                self.started = true;
+            }
+
+        }
+        stop() {
+            if (this.started === true) {
+                const self = this;
+                self.started = false;
+                if (self.__interval !== null) clearInterval(self.__interval);
+                if (self.__timeout !== null) clearTimeout(self.__timeout);
+                self.__timeout = null;
+                self.__interval = null;
+            }
+        }
+
+        constructor(callback, interval, timeout) {
+            if (typeof callback === f) {
+                const self = this;
+                Object.assign(self, {
+                    params: {
+                        callback: callback,
+                        interval: 10,
+                        timeout: 0
+                    },
+                    started: false,
+                    __interval: null,
+                    __timeout: null
+                });
+                if (typeof interval === n) self.params.interval = interval;
+                if (typeof timeout === n) self.params.timeout = interval;
+                self.start();
+            }
+        }
+    }
+
     /**
      * Uses Mutation Observer + intervals(some sites blocks observers) to find new nodes
      * And test them against params
@@ -444,6 +499,10 @@
         getLangInfos.reverse = reversemap;
     })();
 
+
+
+
+
     function favicon(img) {
         if (img instanceof Element) {
             let src;
@@ -484,265 +543,23 @@
     /**
      * StreamGrabber Toolbar
      */
-    function StreamGrabber(video, module) {
-        if (!(this instanceof StreamGrabber) || !(video instanceof Element) || typeof video.streamgrabber !== u) {
-            return;
-        }
+    class StreamGrabber {
 
-        let started = false;
 
-        /**
-         * Start Toolbar once video loaded correctly
-         */
-        function start() {
-            if (started === true) return;
-            started = true;
-            console.debug(scriptname, "started");
-            let container = video.parentElement.closest('div[id]');
-            if (container === null) {
-                container = video.parentElement;
-            }
-            self.container = container;
-            container.appendChild(self.elements.toolbar);
-            container.appendChild(self.elements.notify);
-            self.elements.buttons.download.href = self.videolink();
-            /**
-             * Events
-             */
-            self.on('click', e => {
-                e.stopPropagation();
-                let target = e.target, btn;
-                if ((btn = e.target.closest('[class*="-bt"]')) !== null) {
-                    Object.keys(self.elements.buttons).forEach(button => {
-                        if (self.elements.buttons[button] === btn && typeof self.events.buttons.click[button] === f) {
-                            self.events.buttons.click[button].call(self.elements.buttons[button], e);
-                        }
+        onReady(callback) {
+            const self = this;
+            if (typeof callback === f) {
+                if (self.ready !== true) {
+                    self.one('streamgrabber.ready', () => {
+                        callback.call(self, self);
                     });
-                    if (typeof btn.dataset.notify === s) {
-                        self.notify(btn.dataset.notify);
-                    }
                 }
-                return false;
-            });
-            self.on('contextmenu', e => e.preventDefault());
-
-            self.ready = true;
-            trigger(self.video, 'streamgrabber.ready');
-            if (video.paused) self.show();
+                else callback.call(self, self);
+            }
+            return self;
         }
 
-        const self = this, template = {
-            toolbar: html2element(`<div class="streamgrabber" />`),
-            notify: html2element(`<div class="streamgrabber-notify" />`),
-            iconnotify: `<span class="notify-icn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="square"><path fill="currentColor" d="M448 0H64C28.7 0 0 28.7 0 64v288c0 35.3 28.7 64 64 64h96v84c0 7.1 5.8 12 12 12 2.4 0 4.9-.7 7.1-2.4L304 416h144c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64zm16 352c0 8.8-7.2 16-16 16H288l-12.8 9.6L208 428v-60H64c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16h384c8.8 0 16 7.2 16 16v288zM332.7 130.4c-3.8-3.9-10.1-3.9-14-.1L231.4 217l-37.9-38.2c-3.8-3.9-10.1-3.9-14-.1l-23.4 23.2c-3.9 3.8-3.9 10.1-.1 14l68.1 68.6c3.8 3.9 10.1 3.9 14 .1l117.8-116.8c3.9-3.8 3.9-10.1.1-14l-23.3-23.4z"></path></svg></span>`,
-            buttons: {
-                clipboard: html2element(`<a href="#" class="clipboard-bt right" title="Copy to Clipboard" data-notify="Link copied to clipboard."><span class="bt-desc">Copy to Clipboard</span><span class="clipboard-icn"></span></a>`),
-                subtitles: html2element(`<a href="" target="_blank" class="subtitles-bt right hidden" title="Download Subtitles"><span class="bt-desc">Download Subtitles</span><span class="subtitles-icn"></span></a>`),
-                newtab: html2element(`<a href="" class="newtab-bt left" title="Open in a New Tab" target="_blank"><span class="newtab-icn"><img src"" /></span><span class="bt-desc">Open in a New Tab</span></a>`),
-                download: html2element(`<a href="" class="download-bt center" target="_blank" title="Download Link"><span class="download-icn"></span><span class="bt-desc">VIDEO LINK</span></a>`)
-            },
-            icons: {
-                clipboard: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M433.941 193.941l-51.882-51.882A48 48 0 0 0 348.118 128H320V80c0-26.51-21.49-48-48-48h-61.414C201.582 13.098 182.294 0 160 0s-41.582 13.098-50.586 32H48C21.49 32 0 53.49 0 80v288c0 26.51 21.49 48 48 48h80v48c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V227.882a48 48 0 0 0-14.059-33.941zm-84.066-16.184l48.368 48.368a6 6 0 0 1 1.757 4.243V240h-64v-64h9.632a6 6 0 0 1 4.243 1.757zM160 38c9.941 0 18 8.059 18 18s-8.059 18-18 18-18-8.059-18-18 8.059-18 18-18zm-32 138v192H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h55.414c9.004 18.902 28.292 32 50.586 32s41.582-13.098 50.586-32H266a6 6 0 0 1 6 6v42h-96c-26.51 0-48 21.49-48 48zm266 288H182a6 6 0 0 1-6-6V182a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v170a6 6 0 0 1-6 6z"></path></svg>`,
-                download: `<svg class="square" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="currentColor" d="M28 16h-5l-7 7-7-7h-5l-4 8v2h32v-2l-4-8zM0 28h32v2h-32v-2zM18 10v-8h-4v8h-7l9 9 9-9h-7z"></path></svg>`,
-                newtab: `<svg class= "square" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" ><path fill="currentColor" d="M30.662 5.003c-4.488-0.645-9.448-1.003-14.662-1.003s-10.174 0.358-14.662 1.003c-0.86 3.366-1.338 7.086-1.338 10.997s0.477 7.63 1.338 10.997c4.489 0.645 9.448 1.003 14.662 1.003s10.174-0.358 14.662-1.003c0.86-3.366 1.338-7.086 1.338-10.997s-0.477-7.63-1.338-10.997zM12 22v-12l10 6-10 6z"></path></svg>`,
-                subtitles: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="square"><path fill="currentColor" d="M464 64H48C21.5 64 0 85.5 0 112v288c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zm-6 336H54c-3.3 0-6-2.7-6-6V118c0-3.3 2.7-6 6-6h404c3.3 0 6 2.7 6 6v276c0 3.3-2.7 6-6 6zm-211.1-85.7c1.7 2.4 1.5 5.6-.5 7.7-53.6 56.8-172.8 32.1-172.8-67.9 0-97.3 121.7-119.5 172.5-70.1 2.1 2 2.5 3.2 1 5.7l-17.5 30.5c-1.9 3.1-6.2 4-9.1 1.7-40.8-32-94.6-14.9-94.6 31.2 0 48 51 70.5 92.2 32.6 2.8-2.5 7.1-2.1 9.2.9l19.6 27.7zm190.4 0c1.7 2.4 1.5 5.6-.5 7.7-53.6 56.9-172.8 32.1-172.8-67.9 0-97.3 121.7-119.5 172.5-70.1 2.1 2 2.5 3.2 1 5.7L420 220.2c-1.9 3.1-6.2 4-9.1 1.7-40.8-32-94.6-14.9-94.6 31.2 0 48 51 70.5 92.2 32.6 2.8-2.5 7.1-2.1 9.2.9l19.6 27.7z"/></svg>`,
-            }
-        };
-        this.events = {
-            buttons: {
-                click: {
-                    download(e) {
-                        let link = self.videolink();
-                        if (link === undef) e.preventDefault();
-                        else self.buttons.download.href = link;
-                    },
-                    clipboard(e) {
-                        e.preventDefault();
-                        let link = self.videolink();
-                        if (link !== undef) copyToClipboard(link);
-                    },
-                    subtitles(e) {
-                        if (self.elements.buttons.subtitles.href === doc.location.href) e.preventDefault();
-                    }
-                }
-            }
-        };
 
-        /**
-         * Build toolbar
-         */
-        this.elements = {
-            root: null,
-            toolbar: template.toolbar,
-            notify: template.notify,
-            buttons: template.buttons,
-            iconnotify: html2element(template.iconnotify)
-        };
-        Object.keys(template.icons).forEach(icn => {
-            let el = html2element(template.icons[icn]);
-            this.elements.buttons[icn].querySelector('[class*="-icn"]').appendChild(el);
-        });
-        favicon(this.elements.buttons.newtab.querySelector('.newtab-icn img'));
-        this.elements.toolbar.appendChild(this.elements.buttons.newtab);
-        this.elements.toolbar.appendChild(this.elements.buttons.download);
-        this.elements.toolbar.appendChild(this.elements.buttons.clipboard);
-        this.elements.toolbar.appendChild(this.elements.buttons.subtitles);
-        if (/mobile/i.test(navigator.userAgent)) {
-            this.elements.toolbar.classList.add('mobile');
-        }
-        this.hide();
-
-        /**
-         * Add Events to object
-         */
-        const evts = new Events(self.elements.toolbar, self);
-
-
-        /**
-         * Attach grabber to video
-         */
-        this.video = video;
-        Object.defineProperty(video, 'streamgrabber', {
-            value: self, configurable: true
-        });
-
-        /**
-         * Media Events
-         */
-        self.mediaevents = Events(video).on('play pause loadeddata', e => {
-            self.hide();
-            if (self.videolink() !== undef) {
-                if (!started) start();
-                self.elements.buttons.download.href = self.videolink();
-                setTimeout(() => {
-                    if (video.paused === true) self.show();
-                }, 200);
-            }
-        });
-        this.on('VideoNodeRemoved', e => self.hide());
-        Events(video.textTracks).on('addtrack', e => {
-            let track = this.video.querySelector('track');
-            if (track !== null) {
-                let src = track.dataset.src || track.src;
-                if (typeof src === s && src.length > 0) {
-                    self.elements.buttons.subtitles.href = src;
-                    self.elements.buttons.subtitles.classList.remove('hidden');
-                }
-            }
-        });
-
-
-        /**
-         * Check if video Element is removed
-         */
-        let obs = new MutationObserver(mutations => {
-            mutations.forEach(({ removedNodes }) => {
-                removedNodes.forEach(element => {
-                    if (element instanceof Element && element === video) {
-                        self.trigger('VideoNodeRemoved');
-                    }
-                });
-            });
-        });
-        obs.observe(video.parentElement, { childList: true, subtree: true });
-
-
-        /**
-         * Detects if a link is available
-         */
-        let worker = setInterval(() => {
-            if (self.videolink() !== undef) {
-                clearInterval(worker);
-                if (!started) start();
-            }
-        }, 10);
-
-        setTimeout(() => {
-            clearInterval(worker);
-        }, 15000);
-
-        /**
-         * Loads Style
-         */
-        StreamGrabber.loadTheme();
-
-        /**
-         * Load Module
-         */
-        if (Object.prototype.isPrototypeOf.call(StreamGrabberModule, module)) {
-            new module(self);
-        }
-
-    }
-
-    Object.assign(StreamGrabber, {
-        stylesapplied: false,
-        loadTheme() {
-            if (this.stylesapplied === true) return;
-            this.stylesapplied = true;
-            /**
-             * Positionnement
-             */
-            let css = `
-                .streamgrabber {position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; padding: 16px 8px;z-index: 9999; text-align: center;}
-                .streamgrabber [class*="-icn"]{vertical-align: middle; display: inline-block; width: 24px; height: 24px; margin:0 8px; line-height:0;}
-                .streamgrabber [class*="-icn"] svg{width:87.5%;height:100%;}.streamgrabber [class*="-icn"] svg.square{width:87.5%;height:87.5%;}
-                .streamgrabber [class*="-icn"] img {width:100%;height:100%;}
-                .streamgrabber .left{float:left;}.streamgrabber .right{float: right;}
-                .streamgrabber .center{position: absolute;left: 50%;top: 16px;transform: translate(-50%);}
-                .streamgrabber-notify {position: absolute; right: 32px; top: 40%; text-align: right;z-index: 9999;}
-            `;
-
-            /**
-             * Default Theme
-             */
-            css += `
-                .streamgrabber, .streamgrabber a, .streamgrabber-notify {font-family: Arial,Helvetica,sans-serif; font-size: 16px; color:#FFF;line-height: 1.5;}
-                .streamgrabber {background-color: rgba(0, 0, 0, 0.45);}
-                .streamgrabber a {text-decoration: none; padding: 0 8px;}
-                .streamgrabber a:hover {filter: drop-shadow(4px 4px 4px #fff);}
-                .streamgrabber .subtitles-icn svg.square{width: 100%; height:100%;}
-                .streamgrabber-notify > div{
-                    display: block; text-align:center;padding:16px; border-radius: 4px; margin: 8px 0;
-                    min-width:256px;max-width:512px;
-                    color:rgb(0,0,0);background-color: rgba(255, 255, 255, .8);font-weight: bold;position: relative;
-                }
-                .streamgrabber-notify > div [class*="-icn"]
-                {position:absolute; left: 8px; top:8px; display: inline-block; width: 32px;height: 32px;line-height: 0;}
-                .streamgrabber-notify > div [class*="-icn"] + *{padding: 0 8px 0 24px;}
-            `;
-
-            /**
-             * Animations
-             * @link https://daneden.github.io/animate.css/
-             */
-            css += `
-                @keyframes fadeInRight {
-                    0% {opacity: 0;-webkit-transform: translate3d(100%, 0, 0);transform: translate3d(100%, 0, 0);}
-                    100% {opacity: 1;-webkit-transform: none;transform: none;}
-                }
-                .fadeInRight {animation-name: fadeInRight;animation-duration: .5s;animation-fill-mode: both;}
-            `;
-
-            /**
-             * Visually hidden + more
-             */
-            css += `
-                [disabled], .disabled, .streamgrabber svg{pointer-events: none;}
-                .no-select, .streamgrabber > *, .streamgrabber-notify > *{-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;user-select: none;}
-                .hidden, .hidden *, .streamgrabber .newtab-icn img + svg,
-                .streamgrabber [class*="-bt"]:not(:hover):not(.download-bt) .bt-desc, .streamgrabber.mobile .bt-desc{
-                    position: fixed !important; right: auto !important; bottom: auto !important; top:-100% !important; left: -100% !important;
-                    height: 1px !important; width: 1px !important; opacity: 0 !important;max-height: 1px !important; max-width: 1px !important;
-                    display: inline !important;z-index: -1 !important;
-                }
-                video{object-fit: fill !important;}
-            `;
-            addstyle(css);
-        }
-    });
-
-    StreamGrabber.prototype = {
         videolink() {
             let src = "", source;
             if (this.video instanceof Element) {
@@ -757,13 +574,19 @@
                 if (src === doc.location.href) src = "";
             }
             return src.length > 0 ? src : undef;
-        },
+        }
+
+
         show() {
             this.elements.toolbar.classList.remove('hidden');
-        },
+        }
+
+
         hide() {
             this.elements.toolbar.classList.add('hidden');
-        },
+        }
+
+
         notify(message, icon, timeout) {
             if (typeof timeout !== n) timeout = 2000;
             if (typeof message === s) {
@@ -783,17 +606,268 @@
             setTimeout(() => {
                 this.elements.notify.removeChild(notification);
             }, timeout);
-        },
-        onReady(callback) {
-            if (typeof callback === f) {
-                if (this.ready === true) {
-                    callback.call(this.video);
-                    return;
+        }
+
+        start() {
+            if (this.started !== true) {
+
+                this.started = true;
+                const self = this, video = self.video;
+
+                let container = video.parentElement.closest('div[id]');
+                if (container === null) {
+                    container = video.parentElement;
                 }
-                this.video.addEventListener('streamgrabber.ready', callback);
+                self.container = container;
+                container.appendChild(self.elements.toolbar);
+                container.appendChild(self.elements.notify);
+
+                self.elements.buttons.download.href = self.videolink();
+                self.on('click', e => {
+                    e.stopPropagation();
+                    let target = e.target, btn;
+                    if ((btn = e.target.closest('[class*="-bt"]')) !== null) {
+                        Object.keys(self.elements.buttons).forEach(button => {
+                            if (self.elements.buttons[button] === btn && typeof self.events.buttons.click[button] === f) {
+                                self.events.buttons.click[button].call(self.elements.buttons[button], e);
+                            }
+                        });
+                        if (typeof btn.dataset.notify === s) {
+                            self.notify(btn.dataset.notify);
+                        }
+                    }
+                    return false;
+                });
+                self.ready = true;
+                self.trigger('streamgrabber.ready');
+                if (video.paused) self.show();
             }
         }
-    };
+
+
+        constructor(video, module) {
+
+            if (video instanceof Element && typeof video.StreamGrabber === u) {
+
+                const self = this, template = {
+                    toolbar: html2element(`<div class="streamgrabber" oncontextmenu="return false;" />`),
+                    notify: html2element(`<div class="streamgrabber-notify" />`),
+                    iconnotify: `<span class="notify-icn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="square"><path fill="currentColor" d="M448 0H64C28.7 0 0 28.7 0 64v288c0 35.3 28.7 64 64 64h96v84c0 7.1 5.8 12 12 12 2.4 0 4.9-.7 7.1-2.4L304 416h144c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64zm16 352c0 8.8-7.2 16-16 16H288l-12.8 9.6L208 428v-60H64c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16h384c8.8 0 16 7.2 16 16v288zM332.7 130.4c-3.8-3.9-10.1-3.9-14-.1L231.4 217l-37.9-38.2c-3.8-3.9-10.1-3.9-14-.1l-23.4 23.2c-3.9 3.8-3.9 10.1-.1 14l68.1 68.6c3.8 3.9 10.1 3.9 14 .1l117.8-116.8c3.9-3.8 3.9-10.1.1-14l-23.3-23.4z"></path></svg></span>`,
+                    buttons: {
+                        clipboard: html2element(`<a href="#" class="clipboard-bt right" title="Copy to Clipboard" data-notify="Link copied to clipboard."><span class="bt-desc">Copy to Clipboard</span><span class="clipboard-icn"></span></a>`),
+                        subtitles: html2element(`<a href="" target="_blank" class="subtitles-bt right hidden" title="Download Subtitles"><span class="bt-desc">Download Subtitles</span><span class="subtitles-icn"></span></a>`),
+                        newtab: html2element(`<a href="" class="newtab-bt left" title="Open in a New Tab" target="_blank"><span class="newtab-icn"><img src"" /></span><span class="bt-desc">Open in a New Tab</span></a>`),
+                        download: html2element(`<a href="" class="download-bt center" target="_blank" title="Download Link"><span class="download-icn"></span><span class="bt-desc">VIDEO LINK</span></a>`)
+                    },
+                    icons: {
+                        clipboard: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M433.941 193.941l-51.882-51.882A48 48 0 0 0 348.118 128H320V80c0-26.51-21.49-48-48-48h-61.414C201.582 13.098 182.294 0 160 0s-41.582 13.098-50.586 32H48C21.49 32 0 53.49 0 80v288c0 26.51 21.49 48 48 48h80v48c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V227.882a48 48 0 0 0-14.059-33.941zm-84.066-16.184l48.368 48.368a6 6 0 0 1 1.757 4.243V240h-64v-64h9.632a6 6 0 0 1 4.243 1.757zM160 38c9.941 0 18 8.059 18 18s-8.059 18-18 18-18-8.059-18-18 8.059-18 18-18zm-32 138v192H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h55.414c9.004 18.902 28.292 32 50.586 32s41.582-13.098 50.586-32H266a6 6 0 0 1 6 6v42h-96c-26.51 0-48 21.49-48 48zm266 288H182a6 6 0 0 1-6-6V182a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v170a6 6 0 0 1-6 6z"></path></svg>`,
+                        download: `<svg class="square" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="currentColor" d="M28 16h-5l-7 7-7-7h-5l-4 8v2h32v-2l-4-8zM0 28h32v2h-32v-2zM18 10v-8h-4v8h-7l9 9 9-9h-7z"></path></svg>`,
+                        newtab: `<svg class= "square" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" ><path fill="currentColor" d="M30.662 5.003c-4.488-0.645-9.448-1.003-14.662-1.003s-10.174 0.358-14.662 1.003c-0.86 3.366-1.338 7.086-1.338 10.997s0.477 7.63 1.338 10.997c4.489 0.645 9.448 1.003 14.662 1.003s10.174-0.358 14.662-1.003c0.86-3.366 1.338-7.086 1.338-10.997s-0.477-7.63-1.338-10.997zM12 22v-12l10 6-10 6z"></path></svg>`,
+                        subtitles: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="square"><path fill="currentColor" d="M464 64H48C21.5 64 0 85.5 0 112v288c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zm-6 336H54c-3.3 0-6-2.7-6-6V118c0-3.3 2.7-6 6-6h404c3.3 0 6 2.7 6 6v276c0 3.3-2.7 6-6 6zm-211.1-85.7c1.7 2.4 1.5 5.6-.5 7.7-53.6 56.8-172.8 32.1-172.8-67.9 0-97.3 121.7-119.5 172.5-70.1 2.1 2 2.5 3.2 1 5.7l-17.5 30.5c-1.9 3.1-6.2 4-9.1 1.7-40.8-32-94.6-14.9-94.6 31.2 0 48 51 70.5 92.2 32.6 2.8-2.5 7.1-2.1 9.2.9l19.6 27.7zm190.4 0c1.7 2.4 1.5 5.6-.5 7.7-53.6 56.9-172.8 32.1-172.8-67.9 0-97.3 121.7-119.5 172.5-70.1 2.1 2 2.5 3.2 1 5.7L420 220.2c-1.9 3.1-6.2 4-9.1 1.7-40.8-32-94.6-14.9-94.6 31.2 0 48 51 70.5 92.2 32.6 2.8-2.5 7.1-2.1 9.2.9l19.6 27.7z"/></svg>`,
+                    }
+                };
+
+                Object.assign(self, {
+                    started: false,
+                    ready: false,
+                    events: {
+                        buttons: {
+                            click: {
+                                download(e) {
+                                    let link = self.videolink();
+                                    if (link === undef) e.preventDefault();
+                                    else self.buttons.download.href = link;
+                                },
+                                clipboard(e) {
+                                    e.preventDefault();
+                                    let link = self.videolink();
+                                    if (link !== undef) copyToClipboard(link);
+                                },
+                                subtitles(e) {
+                                    if (self.elements.buttons.subtitles.href === doc.location.href) e.preventDefault();
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        root: null,
+                        toolbar: template.toolbar,
+                        notify: template.notify,
+                        buttons: template.buttons,
+                        iconnotify: html2element(template.iconnotify)
+                    },
+                    video: video,
+                    container: null
+                });
+
+                /**
+                 * Build toolbar
+                 */
+                Object.keys(template.icons).forEach(icn => {
+                    let el = html2element(template.icons[icn]);
+                    this.elements.buttons[icn].querySelector('[class*="-icn"]').appendChild(el);
+                });
+                favicon(this.elements.buttons.newtab.querySelector('.newtab-icn img'));
+                this.elements.toolbar.appendChild(this.elements.buttons.newtab);
+                this.elements.toolbar.appendChild(this.elements.buttons.download);
+                this.elements.toolbar.appendChild(this.elements.buttons.clipboard);
+                this.elements.toolbar.appendChild(this.elements.buttons.subtitles);
+                if (/mobile/i.test(navigator.userAgent)) {
+                    this.elements.toolbar.classList.add('mobile');
+                }
+                this.hide();
+                /**
+                 * Add Events to object
+                 */
+                const evts = new Events(self.elements.toolbar, self);
+                /**
+                 * Attach grabber to video
+                 */
+                Object.defineProperty(video, 'StreamGrabber', {
+                    value: self, configurable: true
+                });
+                /**
+                 * Media Events
+                 */
+                self.mediaevents = Events(video).on('play pause loadeddata', e => {
+                    self.hide();
+                    if (self.videolink() !== undef) {
+                        if (!self.started) self.start();
+                        self.elements.buttons.download.href = self.videolink();
+                        setTimeout(() => {
+                            if (video.paused === true) self.show();
+                        }, 200);
+                    }
+                });
+                this.on('VideoNodeRemoved', e => self.hide());
+                Events(video.textTracks).on('addtrack', e => {
+                    let track = this.video.querySelector('track');
+                    if (track !== null) {
+                        let src = track.dataset.src || track.src;
+                        if (typeof src === s && src.length > 0) {
+                            self.elements.buttons.subtitles.href = src;
+                            self.elements.buttons.subtitles.classList.remove('hidden');
+                        }
+                    }
+                });
+
+                /**
+                 * Check if video Element is removed
+                 */
+                let obs = new MutationObserver(mutations => {
+                    mutations.forEach(({ removedNodes }) => {
+                        removedNodes.forEach(element => {
+                            if (element instanceof Element && element === video) {
+                                self.trigger('VideoNodeRemoved');
+                            }
+                        });
+                    });
+                });
+                obs.observe(video.parentElement, { childList: true, subtree: true });
+                /**
+                 * Detects if a link is available
+                 */
+                new Timer(timer => {
+                    if (self.videolink() !== undef) {
+                        timer.stop();
+                        if (!self.started) self.start();
+                    }
+                }, 10, 15000);
+
+                /**
+                 * Loads Style
+                 */
+                StreamGrabber.loadTheme();
+
+                /**
+                 * Load Module
+                 */
+                if (Object.prototype.isPrototypeOf.call(StreamGrabberModule, module)) {
+                    new module(self);
+                }
+            }
+        }
+
+
+
+        static loadTheme() {
+            if (this.stylesapplied !== true) {
+                this.stylesapplied = true;
+                /**
+                 * Positionnement
+                 */
+                let css = `
+                    .streamgrabber {position: absolute; top: 0 ; left: 0 ; right: 0; text-align: center; padding: 16px 8px;z-index: 9999; text-align: center;}
+                    .streamgrabber [class*="-icn"]{vertical-align: middle; display: inline-block; width: 24px; height: 24px; margin:0 8px; line-height:0;}
+                    .streamgrabber [class*="-icn"] svg{width:87.5%;height:100%;}.streamgrabber [class*="-icn"] svg.square{width:87.5%;height:87.5%;}
+                    .streamgrabber [class*="-icn"] img {width:100%;height:100%;}
+                    .streamgrabber .left{float:left;}.streamgrabber .right{float: right;}
+                    .streamgrabber .center{position: absolute;left: 50%;top: 16px;transform: translate(-50%);}
+                    .streamgrabber-notify {position: absolute; right: 32px; top: 40%; text-align: right;z-index: 9999;}
+                `;
+
+                /**
+                 * Default Theme
+                 */
+                css += `
+                    .streamgrabber, .streamgrabber a, .streamgrabber-notify {font-family: Arial,Helvetica,sans-serif; font-size: 16px; color:#FFF;line-height: 1.5;}
+                    .streamgrabber {background-color: rgba(0, 0, 0, 0.45);}
+                    .streamgrabber a {text-decoration: none; padding: 0 8px;}
+                    .streamgrabber a:hover {filter: drop-shadow(4px 4px 4px #fff);}
+                    .streamgrabber .subtitles-icn svg.square{width: 100%; height:100%;}
+                    .streamgrabber-notify > div{
+                        display: block; text-align:center;padding:16px; border-radius: 4px; margin: 8px 0;
+                        min-width:256px;max-width:512px;
+                        color:rgb(0,0,0);background-color: rgba(255, 255, 255, .8);font-weight: bold;position: relative;
+                    }
+                    .streamgrabber-notify > div [class*="-icn"]
+                    {position:absolute; left: 8px; top:8px; display: inline-block; width: 32px;height: 32px;line-height: 0;}
+                    .streamgrabber-notify > div [class*="-icn"] + *{padding: 0 8px 0 24px;}
+                `;
+
+                /**
+                 * Animations
+                 * @link https://daneden.github.io/animate.css/
+                 */
+                css += `
+                    @keyframes fadeInRight {
+                        0% {opacity: 0;-webkit-transform: translate3d(100%, 0, 0);transform: translate3d(100%, 0, 0);}
+                        100% {opacity: 1;-webkit-transform: none;transform: none;}
+                    }
+                    .fadeInRight {animation-name: fadeInRight;animation-duration: .5s;animation-fill-mode: both;}
+                `;
+
+                /**
+                 * Visually hidden + more
+                 */
+                css += `
+                    [disabled], .disabled, .streamgrabber svg{pointer-events: none;}
+                    .no-select, .streamgrabber > *, .streamgrabber-notify > *{-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;user-select: none;}
+                    .hidden, .hidden *, .streamgrabber .newtab-icn img + svg,
+                    .streamgrabber [class*="-bt"]:not(:hover):not(.download-bt) .bt-desc, .streamgrabber.mobile .bt-desc{
+                        position: fixed !important; right: auto !important; bottom: auto !important; top:-100% !important; left: -100% !important;
+                        height: 1px !important; width: 1px !important; opacity: 0 !important;max-height: 1px !important; max-width: 1px !important;
+                        display: inline !important;z-index: -1 !important;
+                    }
+                    video{object-fit: fill !important;}
+                `;
+                addstyle(css);
+            }
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+    }
 
     //======================================= Alt Video Player =====================================
 
@@ -828,7 +902,7 @@
         }
         set size(size) {
             size = parseInt(size);
-            if (size === 0) size = "default";
+            if (isNaN(size)) size = "default";
             this.element.setAttribute('size', size);
         }
         get type() {
@@ -870,7 +944,7 @@
         }
         //label can be anything
         set label(label) {
-            if (typeof label == s && s.length > 0) {
+            if (typeof label === s && s.length > 0) {
                 this.element.setAttribute('label', label);
             }
         }
@@ -880,7 +954,7 @@
         }
 
         set lang(langcode) {
-            if (typeof lang === s) {
+            if (typeof langcode === s) {
                 let entry = getLangInfos(langcode);
                 this.label = entry.lang;
                 this.element.setAttribute('srclang', entry.codes[0]);
@@ -943,6 +1017,8 @@
             if (typeof src === s) {
                 let track = new altvideoCaption(src, lang);
                 if (typeof label === s) track.label = label;
+                if (typeof lang === s) track.lang = lang;
+                track.element.id = "track" + this.captions.length;
                 this.captions.push(track);
                 this.element.appendChild(track.element);
                 track.__altvideo === this;
@@ -1032,20 +1108,26 @@
 
         onReady(callback) {
             const self = this;
-            if (self.ready !== true) {
-                return self.one('altplayer.ready', () => {
-                    callback.call(self, self);
-                });
+            if (typeof callback === f) {
+                if (self.ready !== true) {
+                    return self.one('altplayer.ready', () => {
+                        callback.call(self, self);
+                    });
+                }
+                callback.call(self, self);
             }
-            callback.call(self, self);
-            return this;
+            return self;
         }
 
         constructor(module) {
 
-            if (!Object.prototype.isPrototypeOf.call(AltPlayerModule, module)) {
+            if (typeof module !== f) {
                 throw new Error('AltPlayer Invalid Argument Supplied.');
             }
+
+            /*if (!Object.prototype.isPrototypeOf.call(AltPlayerModule, module)) {
+                
+            }*/
 
             const plyropts = {
                 captions: { active: true, language: 'auto', update: true },
@@ -1119,13 +1201,22 @@
              * Loads Resources
              */
             AltPlayer.loadResources(() => {
-                self.module = new module(self);
+                if (Object.prototype.isPrototypeOf.call(AltPlayerModule, module)) {
+                    self.module = new module(self);
+                } else module(self);
+
                 self.elements.root.insertBefore(self.video, self.elements.root.firstChild);
                 doc.body.innerHTML = "";
                 doc.body.insertBefore(self.elements.root, doc.body.firstChild);
                 loadsubtitles();
                 //loads StreamGrabber
                 self.grabber = new StreamGrabber(self.video, typeof HostModule === f ? HostModule : MainModule);
+
+
+                self.altvideo.on('addtrack', (e) => {
+                    console.debug(e.track);
+                });
+
                 //loads Plyr
                 self.plyr = new Plyr(self.video, plyropts);
 
@@ -1289,38 +1380,33 @@
     }
 
 
-    let jwvideo;
+    function JWPlayerToAltVideo(self) {
+        const video = doc.querySelector('video.jw-video');
+        if (typeof jwplayer === f && video instanceof Element) {
+            try {
+                const jw = jwplayer(video.parentElement.closest('div[id]').id);
+                const playlist = jw.getPlaylist()[0], poster = playlist.image || "";
 
-    class JWToAlt extends AltPlayerModule {
-        module(self) {
-
-            if (typeof jwplayer === f && jwvideo instanceof Element) {
-
-                const jw = jwplayer(jwvideo.parentElement.closest('div[id]').id);
-                let playlist = jw.getPlaylist();
-                if (playlist.length > 0) {
-
-                    playlist = playlist[0];
-                    let poster = playlist.image || "";
-
-                    self.altvideo = new altvideo();
-                    self.altvideo.poster = poster;
-                    if (/^http/.test(jwvideo.src)) self.altvideo.src = jwvideo.src; //fallback
-                    playlist.sources.forEach(source => {
-                        let cs = self.altvideo.addSource(source.file, source.label, source.type);
-                        if (jwvideo.src === source.file) cs.selected = true;
-                    });
-                    playlist.tracks.forEach(track => {
-                        let ct = self.altvideo.addCaption(track.file, track.name, track.label);
-                    });
-                    if (self.altvideo.sources.length === 1 && !self.altvideo.src) {
-                        self.altvideo.sources[0].selected = true;
-                    }
-
+                self.altvideo.poster = poster;
+                if (/^http/.test(video.src)) self.altvideo.src = video.src; //fallback
+                playlist.sources.forEach(source => {
+                    let cs = self.altvideo.addSource(source.file, source.label, source.type);
+                    if (video.src === source.file) cs.selected = true;
+                });
+                playlist.tracks.forEach(track => {
+                    let ct = self.altvideo.addCaption(track.file, track.name, track.label);
+                });
+                if (self.altvideo.sources.length === 1 && !self.altvideo.src) {
+                    self.altvideo.sources[0].selected = true;
                 }
+
+            } catch (error) {
+                self.altvideo = new altvideo(video);
             }
         }
+
     }
+
 
 
     //======================================= Modules and Mods ==================================
@@ -1386,20 +1472,17 @@
              * Detects if KodiRPC is running
              * and displays button
              */
-            /*let kodirpcevents = new Events(doc.body);
-            kodirpcevents.one("kodirpc.ready", e => {
-                res.button.classList.remove('hidden');
-            });*/
-
-            let w = setInterval(() => {
+            //fallback timer if event triggered before video detection
+            let timer = new Timer(timer => {
                 if (typeof doc.body.KRPCM !== u) {
-                    clearInterval(w);
+                    timer.stop();
                     res.button.classList.remove('hidden');
                 }
-            }, 10);
-            setTimeout(() => {
-                clearInterval(w);
-            }, 5000);
+            }, 10, 5000);
+            doc.body.addEventListener('kodirpc.ready', e => {
+                timer.params.callback(timer);
+            });
+
         }
     }
 
@@ -1594,19 +1677,13 @@
 
         return find('video.vjs-tech[src]', video => {
 
-            class AltRapidVideo extends AltPlayerModule {
-
-                module(self) {
-                    self.altvideo = new altvideo();
-                    self.altvideo.poster = video.getAttribute('poster');
-                    self.altvideo.src = video.src;
-                    video.querySelectorAll("source").forEach(source => {
-                        self.altvideo.addSource(source.src, source.getAttribute("label"));
-                    });
-
-                }
-            }
-            window.alt = new AltPlayer(AltRapidVideo);
+            window.alt = new AltPlayer(self => {
+                self.altvideo.poster = video.getAttribute('poster');
+                self.altvideo.src = video.src;
+                video.querySelectorAll("source").forEach(source => {
+                    self.altvideo.addSource(source.src, source.getAttribute("label"));
+                });
+            });
 
         });
 
@@ -1616,9 +1693,10 @@
     if (/(gdriveplayer)/.test(doc.location.host)) {
         addicon("https://www.google.com/drive/static/images/drive/favicon.ico");
 
-        class GDrivePlayer extends JWToAlt {
-            module(self) {
-                super.module(self);
+        return find('video.jw-video', video => {
+
+            window.alt = new AltPlayer(self => {
+                JWPlayerToAltVideo(self);
                 self.altvideo.captions = self.altvideo.captions.filter(caption => {
                     let url = new URL(caption.src);
                     if (url.searchParams.get('subtitle') === "1") {
@@ -1627,12 +1705,8 @@
                     }
                     return true;
                 });
-            }
-        }
 
-        return find('video.jw-video', video => {
-            jwvideo = video;
-            new AltPlayer(GDrivePlayer);
+            });
         }, 5000);
 
     }
@@ -1648,24 +1722,18 @@
 
         return find('video.vjs-tech[src^="http"]', video => {
 
-            class MP4Upload extends AltPlayerModule {
-                module(self) {
-                    try {
-                        const vjs = videojs(video.parentElement.closest('div[id]').id), tracks = vjs.options_.tracks, poster = vjs.poster() || "";
-                        self.altvideo = new altvideo(video);
-                        self.altvideo.poster = poster;
-                        tracks.forEach(track => {
-                            self.altvideo.addCaption(track.src, null, track.srclang);
-                        });
-                    } catch (error) {
-                        self.altvideo = new altvideo(video);
-                    }
-
+            window.alt = new AltPlayer(self => {
+                try {
+                    const vjs = videojs(video.parentElement.closest('div[id]').id), tracks = vjs.options_.tracks, poster = vjs.poster() || "";
+                    self.altvideo = new altvideo(video);
+                    self.altvideo.poster = poster;
+                    tracks.forEach(track => {
+                        self.altvideo.addCaption(track.src, null, track.srclang);
+                    });
+                } catch (error) {
+                    self.altvideo = new altvideo(video);
                 }
-            }
-
-            new AltPlayer(MP4Upload);
-
+            });
 
         }, 5000);
     }
@@ -1676,28 +1744,24 @@
 
         return find('video.vjs-tech[src^="http"]', video => {
 
-            class UpToStream extends AltPlayerModule {
-                module(self) {
-                    try {
-                        // @link https://github.com/kmoskwiak/videojs-resolution-switcher
-                        const vjs = videojs(video.parentElement.closest('div[id]').id);
-                        const tracks = vjs.options_.tracks, poster = vjs.poster() || "", videosources = vjs.groupedSrc.type["video/mp4"];
+            window.alt = new AltPlayer(self => {
+                try {
+                    // @link https://github.com/kmoskwiak/videojs-resolution-switcher
+                    const vjs = videojs(video.parentElement.closest('div[id]').id);
+                    const tracks = vjs.options_.tracks, poster = vjs.poster() || "", videosources = vjs.groupedSrc.type["video/mp4"];
 
-                        self.altvideo.poster = poster;
-                        videosources.forEach(source => {
-                            self.altvideo.addSource(source.src, source.res, source.type);
-                        });
-                        tracks.forEach(track => {
-                            self.altvideo.addCaption(track.src, null, track.srclang);
-                        });
+                    self.altvideo.poster = poster;
+                    videosources.forEach(source => {
+                        self.altvideo.addSource(source.src, source.res, source.type);
+                    });
+                    tracks.forEach(track => {
+                        self.altvideo.addCaption(track.src, null, track.srclang);
+                    });
 
-                    } catch (error) {
-                        self.altvideo = new altvideo(video);
-                    }
+                } catch (error) {
+                    self.altvideo = new altvideo(video);
                 }
-            }
-
-            window.alt = new AltPlayer(UpToStream);
+            });
         });
 
     }
@@ -1709,12 +1773,11 @@
 
         const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
 
-    }, 15000);
+    }, 5000);
 
 
     find('video.jw-video', video => {
-        jwvideo = video;
-        new AltPlayer(JWToAlt);
+        window.alt = new AltPlayer(JWPlayerToAltVideo);
     }, 5000);
 
 
