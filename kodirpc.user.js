@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        KodiRPC
 // @namespace   https://github.com/ngsoft
-// @version     1.1.2
+// @version     1.1.3
 // @description Send Stream URL to Kodi using jsonRPC
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -562,7 +562,7 @@
                     color:#333;font-size: 16px;
                 }
                 .kodirpc-settings fieldset{
-                    position: relative; margin: 50px 0 0 0; min-height:128px;padding: 48px 24px 0 24px;
+                    position: relative; margin: 50px 0 0 0; min-height:128px;padding: 48px 24px 64px 24px;
                     background-color: #FFF; border-radius: 6px;border: none;
                 }
                 .kodirpc-settings legend{
@@ -598,6 +598,7 @@
 
                 .kodirpc-settings .form-footer{
                     display: block; margin:24px -24px 0 -24px; padding: 8px 24px 12px 24px; text-align: right;
+                    position: absolute; bottom: 0; left:0; right:0;
                     background-color: rgba(0,0,0,.03);border-top: 1px solid rgba(0,0,0,.125);
                 }
 
@@ -646,7 +647,7 @@
                 }
                 
                 @media (max-height: 480px) {
-                    .kodirpc-settings form{width: 100%;}
+                    .kodirpc-settings form{width: 100%; padding: 4px;}
                     .kodirpc-settings fieldset{height: 100%; margin: 0;}
                 }
                 
