@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        KodiRPC
 // @namespace   https://github.com/ngsoft
-// @version     1.1.1
+// @version     1.1.2
 // @description Send Stream URL to Kodi using jsonRPC
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -644,6 +644,13 @@
                 .kodirpc-settings [disabled]{
                     pointer-events: none;color: gray;
                 }
+                
+                @media (max-height: 480px) {
+                    .kodirpc-settings form{width: 100%;}
+                    .kodirpc-settings fieldset{height: 100%; margin: 0;}
+                }
+                
+                
                 @keyframes bounceOut {
                     20% {-webkit-transform: scale3d(.9, .9, .9);transform: scale3d(.9, .9, .9);}
                     50%, 55% {opacity: 1;-webkit-transform: scale3d(1.1, 1.1, 1.1);transform: scale3d(1.1, 1.1, 1.1);}
@@ -653,6 +660,8 @@
                 .bounceOut {animation-name: bounceOut;animation-duration: .75s;animation-fill-mode: both;}
                 .fadeIn {animation-name: fadeIn;animation-duration: .75s;animation-fill-mode: both;}
                 .no-select, .kodirpc-settings *:not(input){-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;user-select: none;}
+                
+                
             `;
             let node = doc.createElement('style');
             node.setAttribute('type', "text/css");
