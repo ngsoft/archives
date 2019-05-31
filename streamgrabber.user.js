@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2
+// @version     1.5b2.1
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -1131,7 +1131,8 @@
 
             const plyropts = {
                 captions: { active: true, language: 'auto', update: true },
-                settings: ['captions', 'quality']
+                settings: ['captions', 'quality'],
+                keyboard: { focused: true, global: true }
             }, self = this;
 
             Object.assign(self, {
