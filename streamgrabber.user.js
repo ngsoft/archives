@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b
+// @version     1.5b2
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -1153,9 +1153,9 @@
              */
             function resizevideo() {
                 self.plyr.elements.wrapper.classList.remove('.plyr__video-wrapper--fixed-ratio');
-                self.plyr.elements.container.style.width = `${doc.documentElement.clientWidth}px`;
+                //self.plyr.elements.container.style.width = `${doc.documentElement.clientWidth}px`;
                 self.plyr.elements.container.style.height = `${doc.documentElement.clientHeight}px`;
-                self.video.style.width = `${doc.documentElement.clientWidth}px`;
+                //self.video.style.width = `${doc.documentElement.clientWidth}px`;
                 self.video.style.height = `${doc.documentElement.clientHeight}px`;
             }
 
@@ -1309,7 +1309,7 @@
                 self.loadTheme();
                 let jscount = 0;
                 [
-                    "https://cdn.jsdelivr.net/npm/subtitle@latest/dist/subtitle.bundle.js",
+                    "https://cdn.jsdelivr.net/npm/subtitle@latest/dist/subtitle.bundle.min.js",
                     "https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js",
                     "https://cdn.jsdelivr.net/npm/plyr@latest/dist/plyr.min.js"
                 ].forEach((src, index, array) => {
