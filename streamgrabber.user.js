@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.1.1
+// @version     1.5b2.1.2
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -1166,7 +1166,7 @@
             function loadsubtitles() {
                 self.altvideo.captions.forEach(caption => {
                     if (typeof caption.src === s) {
-                        let url = new URL(caption.src);
+                        let url = new URL(caption.src), src = caption.src;
                         if (url.origin !== doc.location.origin) {
                             url = "https://cors-anywhere.herokuapp.com/" + url.href;
                         } else {
@@ -1181,7 +1181,7 @@
                                             vtt = Subtitle.stringifyVtt(parsed);
                                             if (typeof vtt === s && vtt.length > 0) {
                                                 blob = new Blob([vtt], { type: "text/vtt" });
-                                                caption.element.dataset.src = url;
+                                                caption.element.dataset.src = src;
                                                 virtualurl = URL.createObjectURL(blob);
                                                 caption.element.src = virtualurl;
                                             }
