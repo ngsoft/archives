@@ -1633,7 +1633,7 @@
         }, 5000);
     }
 
-    if (/(vidstreaming|dramacool|kshows)/.test(doc.location.host)) {
+    if (/(vidstreaming|dramacool|watchasian|kshows)/.test(doc.location.host)) {
 
 
         let lstmore, css;
