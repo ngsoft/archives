@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.1.2
+// @version     1.5b2.1.3
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -31,6 +31,7 @@
 // @include     *://mcloud.*/embed/*
 // @include     *://embed.dramacool*.*/*
 // @include     *://kshows.to/*
+// @include     *://verystream.*/e/*
 // ==/UserScript==
 
 
@@ -1399,6 +1400,14 @@
 
     }
 
+    function getJWSources() {
+        const video = doc.querySelector('video.jw-video');
+        if (typeof jwplayer === f && video instanceof Element) {
+            const jw = jwplayer(video.parentElement.closest('div[id]').id);
+            const playlist = jw.getPlaylist()[0];
+            return playlist.sources;
+        }
+    }
 
     function JWPlayerToAltVideo(self) {
         const video = doc.querySelector('video.jw-video');
@@ -1607,7 +1616,7 @@
         });
 
         addcss(`
-            #videooverlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay , #overlay, .vjs-resize-manager, .vjs-over, .vjs-over *
+            #videooverlay, #videerlay, .videologo, .jw-logo, .jw-dock, .BetterJsPopOverlay , #overlay, .vjs-resize-manager, .vjs-over, .vjs-over *
             {position: fixed; right: auto; bottom: auto;top:-100%;left: -100%; height:1px; width:1px;opacity: 0;max-height:1px; max-width:1px;display:inline;z-index: -1;}
         `);
     })();
@@ -1673,8 +1682,8 @@
     }
 
 
-    if (/(openload|oload|streamango)/.test(doc.location.host)) {
-        find('#videooverlay', el => {
+    if (/(openload|oload|streamango|verystream)/.test(doc.location.host)) {
+        find('#videooverlay, #videerlay', el => {
             trigger(el, "click");
         });
 
@@ -1713,22 +1722,41 @@
     if (/(gdriveplayer)/.test(doc.location.host)) {
         addicon("https://www.google.com/drive/static/images/drive/favicon.ico");
 
-        return find('video.jw-video', video => {
-
-            window.alt = new AltPlayer(self => {
-                JWPlayerToAltVideo(self);
-                self.altvideo.captions = self.altvideo.captions.filter(caption => {
-                    let url = new URL(caption.src);
-                    if (url.searchParams.get('subtitle') === "1") {
-                        caption.element.remove();
-                        return false;
+        HostModule = class GdrivePlayer extends MainModule {
+            hostmodule(grabber) {
+                const video = grabber.video;
+                let subsrc = "";
+                const jw = jwplayer(video.parentElement.closest('div[id]').id);
+                const playlist = jw.getPlaylist()[0];
+                playlist.tracks.forEach(track => {
+                    let url = new URL(getURL(track.file));
+                    //console.debug(typeof url.searchParams.get('subtitle'));
+                    if (url.searchParams.get('subtitle') === "1" || url.searchParams.get('subtitle').length === 0) {
+                        return;
                     }
-                    return true;
+                    subsrc = url.href;
                 });
 
-            });
-        }, 5000);
+                try {
 
+
+                } catch (error) {
+                    subsrc = "";
+                }
+
+                grabber.onReady(() => {
+                    if (subsrc.length > 0) {
+                        grabber.elements.buttons.subtitles.href = subsrc;
+                        grabber.elements.buttons.subtitles.classList.remove('hidden');
+                    }
+                });
+
+            }
+        };
+
+        return find('video.jw-video', video => {
+            let grabber = window.grabber = new StreamGrabber(video, HostModule);
+        }, 5000);
     }
 
     if (/(fastdrama)/.test(doc.location.host)) {
