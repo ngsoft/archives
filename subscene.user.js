@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Subscene Search
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.1
 // @description  Search on Subscene
 // @author       daedelus
 // @icon         https://subscene.com/favicon.ico
-// @match        *://subscene.com/*?*q=*
+// @match        *://subscene.com/*?*search_query=*
 // @noframes
 // @grant none
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/subscene.user.js
@@ -36,7 +36,7 @@
 
     onDocEnd(()=>{
         let query, sp = new URLSearchParams(doc.location.search);
-        if ((query = sp.get('q'))) {
+        if ((query = sp.get('search_query'))) {
             const form = doc.querySelector('form#search-form'), input = form.querySelector('input#query');
             input.value = query;
             form.submit();
