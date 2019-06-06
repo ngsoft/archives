@@ -1,16 +1,16 @@
 // ==UserScript==
-// @name         SHOUPA and ESYY HLS Downloader
+// @name         SHOUPA HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      2.1
+// @version      3.0
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
+// @icon        https://files.ynfrfn.com/static/images/favicon.ico
 // @include     *.shoupa.com/v/*
-// @include     *://esyy007.com/*src*num*
 // @run-at      document-body
 // @noframes
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/shoupa.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/shoupa.user.js
-// @require     https://cdn.jsdelivr.net/npm/hls.js@latest
+// @require     https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js
 // @grant       GM_xmlhttpRequest
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -157,6 +157,20 @@
             if (typeof callback !== 'function' || src.length === 0) {
                 return;
             }
+
+            let protosrc = (src => {
+                let a = doc.createElement('a');
+                a.href = src;
+                try {
+                    let url = new URL(a.href);
+                    url.protocol = doc.location.protocol;
+                    return url.href;
+                } catch (e) {
+                    return a.href;
+                }
+            })(src);
+
+
             GM_xmlhttpRequest({
                 method: 'GET',
                 url: src,
@@ -304,7 +318,8 @@
                 if (app.elements.code.container.classList.contains('hidden')) {
                     if (app.code.length === 0) {
                         //set ffmpeg code
-                        app.code = `ffmpeg -protocol_whitelist "file,http,https,tcp,tls" -y -i "${app.realsrc.length > 0 ? app.realsrc : app.src}" -c copy "${app.title}"`;
+                        //app.code = `ffmpeg -protocol_whitelist "file,http,https,tcp,tls" -y -i "${app.realsrc.length > 0 ? app.realsrc : app.src}" -c copy "${app.title}"`;
+                        app.code = `ffmpeg -y -i "${app.realsrc.length > 0 ? app.realsrc : app.src}" -c copy "${app.title}"`;
                         app.elements.code.code.appendChild(text2element(app.code));
                     }
                     app.unhide(app.elements.code.container);
@@ -368,14 +383,6 @@
         build() {
             //insert all elements into the dom
             insertBefore(this.elements.container, this.video);
-
-            if (this.provider === "ESYY") {
-                let target = doc.querySelector('#box');
-                if (target instanceof Element) {
-                    insertBefore(this.elements.container, target);
-                    target.parentNode.removeChild(target);
-                }
-            }
 
             this.buildtoolbar(this.elements.container);
             this.buildcode(this.elements.container);
@@ -527,7 +534,7 @@
 
         addstyle(`
             .video-container{position:relative; width:100%; height:100%; overflow:hidden;max-width:100%;max-height:100%;font-size: 1rem;line-height:1;cursor:pointer;}
-            .video-container video{width:100%;height:100%;z-index:1;}
+            .video-container video{width:100%;height:100%;z-index:1;object-fit: fill;}
             .video-container .play{padding:0;background: none;color: inherit;}
             .video-container .video-error-message,
             .video-toolbar,
@@ -596,16 +603,6 @@
             #ckplayer_cms_player embed{position: absolute; top: 3rem;bottom:0; right:0; left:0;height:calc(675px - 3rem);}
         `);
 
-        if (doc.location.host.match(/esyy/i)) {
-
-            addstyle(`
-                html{font-size: 16px;}
-                .fav-icon{background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAADhklEQVRYha3XS2hdVRQG4K/HUoKEEkqQUkRLkUhBpUrrs4Oroq3iwEFGvqhWq9VBRS0OqriholaRiu/aqEUUhM5Eamk13j50oGmd1NiWEoJIkSAlSAgx1NTBPifZN7n35tzEf7TP2o9/7X32XutfC7SC4FLchjVYgTaMYxR/4hf0CgbKLrmgBOki3IfHcT2yEusex27sEYzN3YGgG29geQnSejiLbbkjLTgQtGOXuPPpOInDOIW/clsnrsTNuKrOnK/xoGB4dgeCTnyD1Yl1HJ/gPcGJuk5Pze/CU3gUFyc9/Vgn+KOxA8FiHMKqxHoUDwvONCWe6chy8RTvTKxncItgqDBkyQT4Yhr5u7i1ZfK43iDuwiuJ9QrsFSwsDBdNdlU8gWeSwW9hi2CiZfICVRdU9ar4V3y+cDn+UXWE4gSCJXg1mbofz9a9ucE1c3DlZXyZfG/LY8rkL9iCjrw9jI1Ndv6pYG+xQCkEsFkMVsTL+Xx0IP6PTcnwNwVnZ1myG78Knk7/5yxODGN7YtkgaM9QwdLcOIb3Sy3IYuzEz4IbS87Zg3N5ux3rM9yRDDggTA4oi1X4QbA7v0uNEYziq8SyLlMbcL5rkbxAJgaeU4JHhKb5IuVYnamN86fn6ECBTnyMQ0LdkDyd47JM/JcFRufpQIG1OCbYIdSEY9Rkx6xMap0rFuEBMYU3RIaR5LvtfyI/j7exUlCt41iBiYUYMHUPunBgnuQ/YbPgeIP+rqT9e4a+xHD7PIjPidHupibk0zn6MrXPYv2sb3kmJvCZeNwfNk1eQRvuTSwHF6IXQ7hEvAOb8FpJ8n7xuA+XHP8Qkxscwb5McB49yaCtuSpqhhExmVxbmjyKnZcSy+eCkeIZ7sTfeXsJdjUSkdiHqwWvC8ZLkUe8g2V5e0ye/qMgqRpVMYK78wEr0aZaJzRXfa86U1w2RfActiaW7ULMCaki6sMNomyCtSo6VBxUdaElwiliKl5QK3Z+xEbVeFmni9IOHFErrXtFgTLYIvkyUZTek1gHRFFaCJO6snypKMtTcTqKj/CBMEvCimp4M54Uc36B06IsH0yHNypMFotZrbtO7wlRqv8mFiYT4sUtCpPrzCzf9uP+elqjcWkWECujHbSg/2oxhBfR0yhAlSlO27ABj4m7K4N+sTjtEWqS3RwcqHVmhVjprBHfdJE9x8VC9Bi+FZwsu+R/dPvakN2rMrEAAAAASUVORK5CYII=');
-            `);
-        }
-
-
-
     });
 
 
@@ -651,34 +648,6 @@
 
             return;
 
-        }
-
-        if (doc.location.host.match(/esyy/i)) {
-            if (doc.location.search.match(/vod-play-(.*?)-src-(.*?)-num-/i)) {
-                app.init();
-                getElement('iframe[src*="ck.php"]', function() {
-                    app.video = this;
-                    let url = new URL(this.src);
-                    utils.getSteamURL(url.searchParams.get('url'), function(u) {
-                        app.realsrc = u;
-                    });
-                    app.src = url.searchParams.get('url');
-                });
-                getElement('.player .video-play-src a', function() {
-
-                    if (this.href === doc.location.href) {
-                        let m;
-                        app.number = 0;
-                        if ((m = /第([0-9]+)/.exec(this.title)) !== null) {
-                            app.number = parseInt(m[1]);
-                        }
-                    }
-                });
-                getElement('.tag-title-sm a:last-of-type', function() {
-                    app.show = this.innerText.split('(')[0];
-
-                });
-            }
         }
     });
 
