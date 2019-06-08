@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        KodiRPC
 // @namespace   https://github.com/ngsoft
-// @version     1.2
+// @version     1.2.1
 // @description Send Stream URL to Kodi using jsonRPC
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -106,6 +106,20 @@
             }
         }
     }
+
+    function getOffset(el) {
+        if (el instanceof Element) {
+            let _x = 0, _y = 0, orig = el;
+            while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+                _x += el.offsetLeft - el.scrollLeft;
+                _y += el.offsetTop - el.scrollTop;
+                el = el.offsetParent;
+            }
+            return { top: _y, left: _x, width: orig.offsetWidth, height: orig.offsetHeight };
+        }
+        return { top: 0, left: 0, width: 0, height: 0 };
+    }
+
     /**
      * Uses Mutation Observer + intervals(some sites blocks observers) to find new nodes
      * And test them against params
@@ -792,12 +806,35 @@
         video.addEventListener('pause', () => {
             self.elements.root.hidden = null;
         });
+
+        /**
+         * Toolbar positionning
+         */
+        function autopos() {
+            const offset = getOffset(self.video);
+            let right = doc.documentElement.clientWidth - (offset.left + offset.width), top = offset.top;
+            let postop = top + 70, posright = right + 32;
+            self.elements.root.style.top = `${postop}px`;
+            self.elements.root.style.right = `${posright}px`;
+        }
+
+
+
+
         let started = false;
         function start() {
             if (started) return;
             started = true;
             new KodiRPCModule(doc.body);
             doc.body.insertBefore(self.elements.root, doc.body.firstChild);
+
+            autopos();
+            doc.addEventListener('scroll', e => {
+                const offset = getOffset(self.video);
+                let y = e.pageY, top = offset.top - y, postop = top + 70;
+                self.elements.root.style.top = `${postop}px`;
+            });
+
         }
 
         function stop() {
@@ -819,8 +856,6 @@
                     start();
                 }
             });
-
-
         });
 
         obs.observe(video.parentElement, {
@@ -904,6 +939,8 @@
 
 
     onDocEnd(() => {
+
+
         if (typeof doc.body.KodiRPCModule !== u) {
             new KodiRPCModule(doc.body);
             return;
