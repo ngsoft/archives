@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        KodiRPC
 // @namespace   https://github.com/ngsoft
-// @version     1.1.3
+// @version     1.2
 // @description Send Stream URL to Kodi using jsonRPC
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -762,7 +762,8 @@
             },
             send() {
                 let src = "", source;
-                if (/^http/.test(video.src)) src = video.src;
+                if (typeof video.dataset.src === "string" && /^http/.test(video.dataset.src)) src = video.dataset.src;
+                else if (/^http/.test(video.src)) src = video.src;
                 else if ((source = video.querySelector('source[src^="http"]')) !== null) {
                     src = source.src;
                 }
@@ -907,10 +908,10 @@
             new KodiRPCModule(doc.body);
             return;
         }
-        find('video[src^="http"], video source[src^="http"]', (element, obs) => {
+        find('video[data-src^="http"], video[src^="http"], video source[src^="http"]', (element, obs) => {
             new KodiRPCUI(element.closest('video'));
             obs.stop();
-        }, 5000);
+        }, 15000);
 
     });
 

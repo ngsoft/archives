@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SHOUPA HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      3.1
+// @version      3.1.1
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @icon        https://files.ynfrfn.com/static/images/favicon.ico
@@ -672,7 +672,12 @@
             });
 
             getElement('.videourl li.selected a', function() {
-                app.number = parseInt(this.innerText);
+                let number = 0;
+                if(/^[0-9]+$/.test(this.innerText)){
+                    number = parseInt(this.innerText);
+                    if (isNaN(number)) number = 0;
+                }
+                app.number = number;
             });
 
         }
