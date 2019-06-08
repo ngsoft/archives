@@ -170,6 +170,7 @@
             el.innerHTML = text;
             el.style.opacity = 0;
             doc.body.appendChild(el);
+            console.debug(el);
             el.select();
             r = doc.execCommand("copy");
             doc.body.removeChild(el);

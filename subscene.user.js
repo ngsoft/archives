@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Subscene Search
 // @namespace    https://github.com/ngsoft
-// @version      1.1
+// @version      1.2
 // @description  Search on Subscene
 // @author       daedelus
 // @icon         https://subscene.com/favicon.ico
@@ -37,9 +37,12 @@
     onDocEnd(()=>{
         let query, sp = new URLSearchParams(doc.location.search);
         if ((query = sp.get('search_query'))) {
-            const form = doc.querySelector('form#search-form'), input = form.querySelector('input#query');
+            const form = doc.querySelector('form#search-form'),
+                    input = form.querySelector('input#query'),
+                    button = form.querySelector('button[type="submit"]');
             input.value = query;
-            form.submit();
+            //form.submit();
+            button.click();
         }
     });
 })(document);
