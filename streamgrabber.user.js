@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.1.3
+// @version     1.5b2.2
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -24,6 +24,7 @@
 // @include     *://*fembed.com/v/*
 // @include     *://*there.to/v/*
 // @include     *://*vidstreaming.io/*
+// @include     *://*vidcloud.icu/*
 // @include     *://kshows.to/*
 // @include     *://*gdriveplayer.us/*
 // @include     *://*fastdrama.*/embed/*
@@ -170,7 +171,6 @@
             el.innerHTML = text;
             el.style.opacity = 0;
             doc.body.appendChild(el);
-            console.debug(el);
             el.select();
             r = doc.execCommand("copy");
             doc.body.removeChild(el);
@@ -643,6 +643,7 @@
                 self.ready = true;
                 self.trigger('streamgrabber.ready');
                 if (video.paused) self.show();
+                console.debug(scriptname, "started");
             }
         }
 
@@ -683,7 +684,23 @@
                                 clipboard(e) {
                                     e.preventDefault();
                                     let link = self.videolink();
-                                    if (link !== undef) copyToClipboard(link);
+                                    if (link !== undef) {
+                                        /**
+                                         * jdtitle plugin
+                                         * jDownloader Rule (on top of the rules)
+                                         * set source URL to contains (regex checked) : jdtitle=(.*?)(&.*?)?$
+                                         * filename to : <jd:source:1>
+                                         */
+                                        let searchParams = new URLSearchParams(doc.location.search);
+                                        if (searchParams.has('jdtitle')) {
+                                            let a = doc.createElement("a"), url;
+                                            a.href = link;
+                                            url = new URL(a.href);
+                                            url.searchParams.set('jdtitle', searchParams.get('jdtitle'));
+                                            link = url.href;
+                                        }
+                                        copyToClipboard(link);
+                                    }
                                 },
                                 subtitles(e) {
                                     if (self.elements.buttons.subtitles.href === doc.location.href) e.preventDefault();
@@ -1235,10 +1252,6 @@
                 self.grabber = new StreamGrabber(self.video, typeof HostModule === f ? HostModule : MainModule);
 
 
-                /*self.altvideo.on('addtrack', (e) => {
-                    console.debug(e.track);
-                });*/
-
                 //loads Plyr
                 self.plyr = new Plyr(self.video, plyropts);
 
@@ -1284,9 +1297,7 @@
                             hls.on(Hls.Events.MEDIA_ATTACHED, () => {
                                 hls.loadSource(url);
                             });
-                            self.altvideo.on('addtrack', (e) => {
-                                console.debug(e.track);
-                            });
+
                             self.altvideo.one('play', () => {
                                 //reloads subs on plyr
                                 self.altvideo.captions.forEach(caption => {
@@ -1634,7 +1645,7 @@
         }, 5000);
     }
 
-    if (/(vidstreaming|dramacool|watchasian|kshows)/.test(doc.location.host)) {
+    if (/(vidstreaming|vidcloud|dramacool|watchasian|kshows)/.test(doc.location.host)) {
 
 
         let lstmore, css;
@@ -1730,7 +1741,6 @@
                 const playlist = jw.getPlaylist()[0];
                 playlist.tracks.forEach(track => {
                     let url = new URL(getURL(track.file));
-                    //console.debug(typeof url.searchParams.get('subtitle'));
                     if (url.searchParams.get('subtitle') === "1" || url.searchParams.get('subtitle').length === 0) {
                         return;
                     }
