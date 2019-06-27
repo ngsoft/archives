@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SHOUPA HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      3.1.1
+// @version      3.1.2
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @icon        https://files.ynfrfn.com/static/images/favicon.ico
@@ -301,7 +301,8 @@
             },
             scriptclick(e) {
                 e.preventDefault();
-                if (copyToClipboard(this.innerText)) {
+                let code = "echo " + app.title + " \n" + this.innerText + "\n";
+                if (copyToClipboard(code)) {
                     app.hide(app.elements.code.container);
                     app.notify('Copied to Clipboard...', 1000);
                 }
@@ -320,7 +321,7 @@
                     if (app.code.length === 0) {
                         //set ffmpeg code
                         //app.code = `ffmpeg -protocol_whitelist "file,http,https,tcp,tls" -y -i "${app.realsrc.length > 0 ? app.realsrc : app.src}" -c copy "${app.title}"`;
-                        app.code = `ffmpeg -y -i "${app.realsrc.length > 0 ? app.realsrc : app.src}" -c copy "${app.title}"`;
+                        app.code = `ffmpeg -v quiet -stats -y -i "${app.realsrc.length > 0 ? app.realsrc : app.src}" -c copy "${app.title}"`;
                         app.elements.code.code.appendChild(text2element(app.code));
                     }
                     app.unhide(app.elements.code.container);
