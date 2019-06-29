@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.3
+// @version     1.5b2.3.1
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -725,7 +725,7 @@
                                     e.preventDefault();
                                     let u = new URL(self.videolink()), split = u.pathname.split('/'),
                                             basename = split.pop(), text = "echo " + basename + "\n";
-                                    text += `ffmpeg -v quiet -stats -y -i "${u.href}" -c copy "${basename.replace(/m3u8$/i, 'mp4')}"` + "\n";
+                                    text += `ffmpeg -v quiet -stats -headers "Referer: ${doc.location.href}" -y -i "${u.href}" -c copy "${basename.replace(/m3u8$/i, 'mp4')}"` + "\n";
                                     copyToClipboard(text);
                                 }
                             }
