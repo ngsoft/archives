@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SHOUPA HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      3.1.3
+// @version      3.1.4
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @icon        https://files.ynfrfn.com/static/images/favicon.ico
@@ -174,13 +174,13 @@
 
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: src,
+                url: protosrc,
                 onload(xhr) {
                     let source;
                     let regex = /#EXT-X-STREAM-INF.*\n([^#].*)/, matches;
                     if (xhr.status === 200) {
                         if ((matches = regex.exec(xhr.response)) !== null) {
-                            let url = new URL(src);
+                            let url = new URL(protosrc);
                             let uri = matches[1].trim();
                             if (uri.match(/^\//) !== null) {
                                 url.pathname = uri;
