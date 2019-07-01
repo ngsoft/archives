@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SHOUPA HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      3.1.2
+// @version      3.1.3
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @icon        https://files.ynfrfn.com/static/images/favicon.ico
@@ -603,6 +603,7 @@
             .hidden, .hidden *{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
             /* Flash player integration */
             #ckplayer_cms_player embed{position: absolute; top: 3rem;bottom:0; right:0; left:0;height:calc(675px - 3rem);}
+            #playleft video.native_mode{max-height:550px;}
         `);
 
     });
