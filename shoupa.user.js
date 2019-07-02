@@ -665,7 +665,10 @@
             return;
 
         }
-        else if (/5nj/.test(doc.location.host)){
+        else if (/5nj/.test(doc.location.host)) {
+            getElement('[id*="jm_"]', function() {
+                this.classList.add("hidden");
+            });
             //videos 5nj
             if (/m=vod-play-id.*src.*num/.test(doc.location.search)) {
                 getElement('#playleft iframe[src*="/m3u8/"]', function() {
@@ -704,7 +707,7 @@
                 input.value = q;
                 form.querySelector('[type="submit"]').click();
             }
-f
+
         }
 
 
