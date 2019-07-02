@@ -1,35 +1,48 @@
 // ==UserScript==
-// @name        My ViKi
+// @name        ViKi+
 // @namespace   https://github.com/ngsoft
-// @version     5.2
+// @version     6.0
 // @description Viki+
 // @author      daedelus
 // @noframes
+// @require     https://cdn.jsdelivr.net/npm/subtitle@latest/dist/subtitle.bundle.min.js
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/myviki.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/myviki.user.js
 // @grant       GM_setValue
 // @grant       GM_getValue
-// @grant       GM_xmlhttpRequest
 // @match       *://www.viki.com/*
 // @icon        https://www.viki.com/favicon.ico
 // ==/UserScript==
 
 (function(doc, $, undef) {
 
-    function downloadString(text, fileName, server, convert) {
-        if (convert === true) {
-            fileName += ".srt";
-        } else {
-            fileName += ".vtt";
+    let GMinfo = (GM_info ? GM_info : (typeof GM === 'object' && GM !== null && typeof GM.info === 'object' ? GM.info : null));
+    let scriptname = `${GMinfo.script.name} version ${GMinfo.script.version}`;
+
+
+    /**
+     * @link https://stackoverflow.com/questions/32225904/programmatical-click-on-a-tag-not-working-in-firefox
+     * @param {string} text
+     * @param {string} filename
+     */
+    function createBlob(text, filename) {
+        let blob = new Blob([text], {type: "application/octet-stream"}),
+                link = doc.createElement("a"),
+                href = URL.createObjectURL(blob);
+        link.href = href;
+        link.download = filename;
+        link.dispatchEvent(new MouseEvent(`click`));
+    }
+    /**
+     * Convert vtt to SRT
+     * @param {string} vtt
+     * @returns {string|undefined}
+     */
+    function convertToSrt(vtt) {
+        let parsed;
+        if (Array.isArray((parsed = Subtitle.parse(vtt)))) {
+            return Subtitle.stringify(parsed);
         }
-        let form = $(`<form method="post" class="hidden" target="dlsubs" action=""><textarea name="data"></textarea><input type="submit" /></form>`);
-        form.attr('action', server.replace(/%filename%/, fileName));
-        form.find('textarea').text(text);
-        $('body').append(form);
-        if (convert === true) {
-            form.append(`<input type="hidden" name="convert" value="true" />`);
-        }
-        form.submit().remove();
     }
 
 
@@ -45,9 +58,7 @@
         let s = document.createElement('style');
         s.setAttribute('type', "text/css");
         s.appendChild(document.createTextNode('<!-- ' + css + ' -->'));
-        onReady(function() {
-            doc.body.appendChild(s);
-        });
+        doc.head.appendChild(s);
     }
 
     function listLocales() {
@@ -70,7 +81,7 @@
     class UserSettings {
         constructor(defaults) {
             if (typeof defaults === 'object') {
-                Object.keys(defaults).forEach(function(k) {
+                Object.keys(defaults).forEach(function (k) {
                     if (typeof GM_getValue(k) !== typeof defaults[k]) {
                         this.set(k, defaults[k]);
                     }
@@ -86,27 +97,26 @@
         }
     }
 
-
+    /**
+     * As 6.0  dropping support for server
+     * using Subtiles.js to convert and corrected blob downloader
+     */
     let defaults = {
         locale: '',
-        langs: [
-            /*'en', 'fr'*/
-        ],
-        converter: false,
-        server: 'http://127.0.0.1:8091/assets/srt/convert/%filename%'
-
+        langs: ['en', 'fr'],
+        converter: false
     }, settings = new UserSettings(defaults);
 
     /**
      * Easy access to datasets
      */
-    $.fn.dataset = function(k, v) {
+    $.fn.dataset = function (k, v) {
         let r = this;
 
         if (typeof k === "string") {
             //set
             if (typeof v !== typeof undef) {
-                this.each(function() {
+                this.each(function () {
                     if (v === null) {
                         delete(this.dataset[k]);
                         return;
@@ -143,17 +153,19 @@
     /**
      * trigger all events related to the target
      */
-    $.fn.triggerAll = function(eventType, extraParameters) {
+    $.fn.triggerAll = function (eventType, extraParameters) {
         if (typeof eventType === "string" && eventType.length > 0) {
 
-            this.each(function() {
-                let data = $._data(this, "events"), that = this;
+            this.each(function () {
+                let data = $._data(this, "events"),
+                    that = this;
                 if (typeof data === "object") {
-                    eventType.split(' ').forEach(function(event) {
+                    eventType.split(' ').forEach(function (event) {
                         let aevent = event.split('.');
-                        let evt = aevent.shift(), ns = aevent.join('.');
+                        let evt = aevent.shift(),
+                            ns = aevent.join('.');
                         if (data[evt]) {
-                            data[evt].forEach(function(e) {
+                            data[evt].forEach(function (e) {
                                 if (e.namespace !== ns) {
                                     return;
                                 }
@@ -177,7 +189,7 @@
      * App Style
      */
     addCSS(`
-        div.ads, div.ad, div.ad-1, div[id*="-ad-"], .hidden{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
+        div.ads, div.ad, div.ad-1, div[id*="-ad-"], .hidden{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0; z-index: -1;}
         /* CustomSelect Box */
         .select-wrapper{display: inline-block;position: relative; width: 100%;}
         .select-wrapper:not(.custom) > *:not(select){position: absolute;width: 1px;height: 1px;padding: 0;overflow: hidden;clip: rect(0, 0, 0, 0);white-space: nowrap;border: 0;}
@@ -222,7 +234,7 @@
     `);
 
 
-    $(doc).ready(function() {
+    $(doc).ready(function () {
 
         switchLocale(settings.get('locale'));
 
@@ -230,9 +242,10 @@
         /**
          * .switch
          */
-        $(doc).on('init.switch', '.switch [type="checkbox"]', function() {
+        $(doc).on('init.switch', '.switch [type="checkbox"]', function () {
             this.checked = $(this).dataset('default') === true;
-            let input = $(this), slider;
+            let input = $(this),
+                slider;
             if (input.length > 0) {
                 slider = input.next('.slider');
                 if (slider.length === 0) {
@@ -242,20 +255,20 @@
             }
             $(this).trigger('ready.switch');
 
-        }).on('ready.doc', '.switch [type="checkbox"]', function() {
+        }).on('ready.doc', '.switch [type="checkbox"]', function () {
             $(this).trigger('init.switch');
             return false;
-        }).on('reset.form', '.switch [type="checkbox"]', function() {
+        }).on('reset.form', '.switch [type="checkbox"]', function () {
             this.checked = $(this).dataset('default') === true;
         });
 
         /**
          * .select-wrapper
          */
-        $(doc).on('ready.doc', '.select-wrapper select', function(e) {
+        $(doc).on('ready.doc', '.select-wrapper select', function (e) {
             $(this).trigger('init.select');
             return false;
-        }).on('init.select', '.select-wrapper select', function() {
+        }).on('init.select', '.select-wrapper select', function () {
             let s = this;
             let p = $(s).dataset('placeholder') || "";
             if (p.length > 0) {
@@ -268,17 +281,17 @@
             }
             $(s).trigger('ready.select');
 
-        }).on('reset.form', '.select-wrapper select', function() {
+        }).on('reset.form', '.select-wrapper select', function () {
             this.selectedIndex = 0;
             $(this).trigger('init.select');
-        }).on('change', '.select-wrapper select', function() {
+        }).on('change', '.select-wrapper select', function () {
             $(this).removeClass('placeholder');
         });
 
         /**
          * Locale Selection
          */
-        $(doc).on('click', `div[data-react-class="modalApp.ModalSiteLanguage"] a.pad.inline-block`, function(e) {
+        $(doc).on('click', `div[data-react-class="modalApp.ModalSiteLanguage"] a.pad.inline-block`, function (e) {
             e.preventDefault();
             let url = new URL(this.href);
             let locale = url.searchParams.get('locale');
@@ -297,9 +310,10 @@
         /**
          * Subtitles download
          */
-        if (doc.location.pathname.match(/^\/videos\//i) !== null) {
+        if (/^\/videos\//i.test(doc.location.pathname)) {
 
-            $('body').append(`<iframe id="dlsubs" name="dlsubs" class="hidden"></iframe>`);
+            console.debug(scriptname, "Started");
+
             //let target = $('.card .card-content .row div.info');
             let target = $(`.video-meta .video-title`);
             let sbox = $(`<div class="dl-subs">
@@ -314,14 +328,15 @@
                         </div>`);
             target.prepend(sbox);
 
-            let select = $('select[name="subdl"]'), convert = $('input[name="subconvert"]');
-            convert.dataset('default', settings.get('converter')).on('change', function() {
+            let select = $('select[name="subdl"]'),
+                convert = $('input[name="subconvert"]');
+            convert.dataset('default', settings.get('converter')).on('change', function () {
                 settings.set('converter', this.checked);
                 select.trigger('reset.form');
                 return false;
             });
 
-            select.dataset('placeholder', $('.video-meta .video-title a').text()).on('change', function() {
+            select.dataset('placeholder', $('.video-meta .video-title a').text()).on('change', function () {
                 if (!this.value) {
                     return;
                 }
@@ -340,18 +355,24 @@
 
                 filename += '.' + opt.dataset('locale');
 
-
-                GM_xmlhttpRequest({
-                    method: 'GET',
-                    url: this.value,
-                    onload(xhr) {
-                        let txt = xhr.responseText;
-                        if (txt.length && txt.indexOf('WEBVTT') !== -1) {
-                            downloadString(txt, filename, settings.get('server'), settings.get('converter'));
+                /**
+                 * @link https://hacks.mozilla.org/2016/03/referrer-and-cache-control-apis-for-fetch/
+                 */
+                fetch(this.value, {cache: "no-store", redirect: 'follow'})
+                        .then(r => {
+                            if (r.status === 200) {
+                                r.text().then(text => {
+                                    let ext = ".vtt", txt = text;
+                                    if (settings.get("converter") === true) {
+                                        txt = convertToSrt(text);
+                                        ext = ".srt";
+                                    }
+                                    createBlob(txt, filename + ext);
+                                });
+                            }
                             select.trigger('reset.form');
-                        }
-                    }
-                });
+                        }).catch(ex => console.error(ex));
+
                 return false;
             });
 
@@ -360,11 +381,13 @@
              * Populate select box
              */
             if (typeof parsedSubtitles !== typeof undef && typeof video_json !== typeof undef) {
-                let subs = parsedSubtitles, infos = video_json, selection = [];
+                let subs = parsedSubtitles,
+                    infos = video_json,
+                    selection = [];
                 if (settings.get('langs') && Array.isArray(settings.get('langs')) && settings.get('langs').length > 0) {
                     selection = settings.get('langs');
                 }
-                subs.forEach(function(x) {
+                subs.forEach(function (x) {
                     if (selection.length > 0 && selection.indexOf(x.srclang) === -1) {
                         return;
                     }
@@ -391,4 +414,3 @@
 
 
 })(document, jQuery);
-
