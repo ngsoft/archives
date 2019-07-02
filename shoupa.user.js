@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         SHOUPA HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      3.2
+// @version      3.2.1
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
 // @icon        http://5nj.com/favicon.ico
 // @include     *.shoupa.com/v/*
-// @include     *://5nj.com/*
+// @include     *://*5nj.com/*
 // @run-at      document-body
 // @noframes
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/shoupa.user.js
