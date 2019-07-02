@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         SHOUPA HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      3.1.4
+// @version      3.1.5
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
-// @icon        https://files.ynfrfn.com/static/images/favicon.ico
+// @icon        http://5nj.com/favicon.ico
 // @include     *.shoupa.com/v/*
-// @include     *://5nj.com/*?*m=vod-play-id*-src-*-num-*
+// @include     *://5nj.com/*
 // @run-at      document-body
 // @noframes
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/shoupa.user.js
@@ -534,8 +534,14 @@
 
     onDocStart(function() {
 
+
+
         addstyle(`
-            .video-container{position:relative; width:100%; height:100%; overflow:hidden;max-width:100%;max-height:100%;font-size: 16px;line-height:1;cursor:pointer;}
+            #playleft video.native_mode{max-height:550px;}
+            .video-container{
+                position:relative; width:100%; height:100%; overflow:hidden;max-width:100%;max-height:100%;
+                font-size: 16px;line-height:1;cursor:pointer;
+            }
             .video-container video{width:100%;height:100%;z-index:1;object-fit: fill;}
             .video-container .play{padding:0;background: none;color: inherit;}
             .video-container .video-error-message,
@@ -600,17 +606,24 @@
 
             .unicon{font-family: "Segoe UI Symbol";font-style: normal;}
             .invert{filter: invert(100%);}
-            .hidden, .hidden *{position: fixed; top:-100%;right: -100%; height:1px; width:1px; opacity: 0;}
+            .hidden, .hidden *{
+                position: fixed !important; right: auto !important; bottom: auto !important; top:-100% !important; left: -100% !important;
+                height: 1px !important; width: 1px !important; opacity: 0 !important;max-height: 1px !important; max-width: 1px !important;
+                display: inline !important;z-index: -1 !important;
+            }
             /* Flash player integration */
             #ckplayer_cms_player embed{position: absolute; top: 3rem;bottom:0; right:0; left:0;height:calc(675px - 3rem);}
-            #playleft video.native_mode{max-height:550px;}
+
         `);
+
 
     });
 
 
+
+
     onDocEnd(function() {
-        if (doc.location.host.match(/shoupa/i)) {
+        if (/shoupa/i.test(doc.location.host)) {
             if (doc.location.pathname.match(/^\/v\//i) !== null) {
                 app.init();
                 getElement('#ckplayer_cms_player', function() {
@@ -652,37 +665,51 @@
             return;
 
         }
-        if(/5nj/.test(doc.location.host)){
-            getElement('#playleft iframe[src*="/m3u8/"]', function() {
-                app.init();
-                let url = new URL(this.src);
-                let sp = new URLSearchParams(url.search);
+        else if (/5nj/.test(doc.location.host)){
+            //videos 5nj
+            if (/m=vod-play-id.*src.*num/.test(doc.location.search)) {
+                getElement('#playleft iframe[src*="/m3u8/"]', function() {
+                    app.init();
+                    let url = new URL(this.src);
+                    let sp = new URLSearchParams(url.search);
 
-                let src = sp.get('id');
-                app.video = this;
+                    let src = sp.get('id');
+                    app.video = this;
 
-                if (src.length > 0) {
-                    app.src = src;
+                    if (src.length > 0) {
+                        app.src = src;
 
-                    utils.getSteamURL(src, function(u) {
-                        app.realsrc = u;
-                    });
-                }
-                app.provider = "esyy";
-                app.show = mac_name;
+                        utils.getSteamURL(src, function(u) {
+                            app.realsrc = u;
+                        });
+                    }
+                    app.provider = "esyy";
+                    app.show = mac_name;
 
-            });
+                });
 
-            getElement('.videourl li.selected a', function() {
-                let number = 0;
-                if(/^[0-9]+$/.test(this.innerText)){
-                    number = parseInt(this.innerText);
-                    if (isNaN(number)) number = 0;
-                }
-                app.number = number;
-            });
-
+                getElement('.videourl li.selected a', function() {
+                    let number = 0;
+                    if (/^[0-9]+$/.test(this.innerText)) {
+                        number = parseInt(this.innerText);
+                        if (isNaN(number)) number = 0;
+                    }
+                    app.number = number;
+                });
+            }
+            //5nj search module
+            else if (/q=.*/.test(doc.location.search)) {
+                let sq = new URLSearchParams(doc.location.search), q = sq.get('q');
+                let form = doc.querySelector('ul.search form'), input = form.querySelector('input#wd');
+                input.value = q;
+                form.querySelector('[type="submit"]').click();
+            }
+f
         }
+
+
+
+
 
 
 
