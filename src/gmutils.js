@@ -163,8 +163,25 @@ function copyToClipboard(text) {
     return r;
 }
 
+
+function trigger(el, type, data) {
+    if (el instanceof EventTarget) {
+        if (typeof type === s) {
+            type.split(" ").forEach((t) => {
+                let event = new Event(t, {bubbles: true, cancelable: true});
+                event.data = data;
+                el.dispatchEvent(event);
+            });
+        }
+    }
+}
+
 /**
- * Timer
+ * Creates a new Timer
+ * @param {function} callback
+ * @param {number|undefined} interval
+ * @param {number|undefined} timeout
+ * @returns {Timer}
  */
 class Timer {
 
@@ -194,6 +211,13 @@ class Timer {
         }
     }
 
+    /**
+     * Creates a new Timer
+     * @param {function} callback
+     * @param {number|undefined} interval
+     * @param {number|undefined} timeout
+     * @returns {Timer}
+     */
     constructor(callback, interval, timeout) {
         if (typeof callback === f) {
             const self = this;
