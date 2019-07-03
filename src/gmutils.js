@@ -1001,7 +1001,99 @@ class LSCache {
 
         return true;
     }
-
-
-
 }
+
+
+$.fn.dataset = function(k, v) {
+    let r = this;
+
+    if (typeof k === "string") {
+        //set
+        if (typeof v !== typeof undef) {
+            this.each(function() {
+                if (v === null) {
+                    delete(this.dataset[k]);
+                    return;
+                }
+                if (this.dataset) {
+                    this.dataset[k] = typeof v === "string" ? v : JSON.stringify(v);
+                }
+
+            });
+        } else if (arguments.length > 1) {
+            console.log('$.fn.dataset(' + k + ', undef) trying to set undefined value into dataset.', this);
+            return r;
+        } else if (this.length > 0) {
+            r = undef;
+            if (typeof this[0].dataset[k] !== typeof undef) {
+                try {
+                    r = JSON.parse(this[0].dataset[k]);
+                } catch (e) {
+                    r = this[0].dataset[k];
+                }
+            }
+        }
+    } else if (typeof k === "object" && Object.keys(k).length > 0 && typeof v === typeof undef) {
+
+        for (let key of Object.keys(k)) {
+            let val = k[key];
+            this.dataset(key, val);
+        }
+    }
+    return r;
+};
+
+/**
+ * Set or Get value from Element.dataset
+ * @param {string|object} key
+ * @param {any} value
+ * @returns {any}
+ */
+HTMLElement.prototype.data = function(key, value) {
+    const self = this;
+    if (typeof key === s) {
+        if (typeof value !== u) {
+            if (value === null) delete(self.dataset[key]);
+            else self.dataset[key] = typeof value === s ? value : JSON.stringify(value);
+        } else if ((value = self.dataset[key]) !== undef) {
+            let retval;
+            try {
+                retval = JSON.parse(value);
+            } catch (e) {
+                retval = value;
+            }
+            return retval;
+        }
+        return undef;
+    } else if (isPlainObject(key)) {
+        Object.keys(key).forEach((k) => {
+            self.data(k, key[k]);
+        });
+        return undef;
+    } else if (typeof key === u) {
+        //returns all data
+        let retval = {};
+        Object.keys(this.dataset).forEach((k) => {
+            retval[k] = self.data(k);
+        });
+        return retval;
+    }
+};
+
+/**
+ * Set or Get value from Element.dataset
+ * @param {string|object} key
+ * @param {any} value
+ * @returns {undefined}
+ */
+NodeList.prototype.data = function(key, value) {
+    const self = this;
+    if (((typeof key === s) || typeof key === u) && (typeof value === u)) {
+        //reads from first element
+        if (self.length > 0) return self[0].data(key);
+        return undef;
+    } else (self.forEach((el) => {
+            el.data(key, value);
+        }))
+};
+
