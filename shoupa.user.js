@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         SHOUPA HLS Downloader
 // @namespace    https://github.com/ngsoft
-// @version      3.2.1
+// @version      3.2.2
 // @description  FIX Stream for firefox Quantum + command to download stream
 // @author       daedelus
-// @icon        http://5nj.com/favicon.ico
+// @icon        http://www.5nj.com/favicon.ico
 // @include     *.shoupa.com/v/*
 // @include     *://*5nj.com/*
 // @run-at      document-body
@@ -18,6 +18,12 @@
 // ==/UserScript==
 
 (function(doc, $, undef) {
+
+    if (doc.location.host === "5nj.com") {
+        let u = new URL(doc.location.href);
+        u.host = "www.5nj.com";
+        doc.location.replace(u.href);
+    }
 
     let info = (GM_info ? GM_info : (typeof GM === 'object' && GM !== null && typeof GM.info === 'object' ? GM.info : null));
     let scriptname = `${info.script.name} version ${info.script.version}`;
