@@ -18,6 +18,7 @@
 // @icon        https://www.zhuijukan.com/favicon.ico
 // ==/UserScript==
 
+
 ((doc, undef) => {
 
     /* jshint expr: true */
