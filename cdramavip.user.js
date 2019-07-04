@@ -537,14 +537,30 @@
 
     //unified search module
     if (location.search.length > 0) {
-        let sp = URLSearchParams(location.search), q = sp.get('q');
+        let sp = new URLSearchParams(location.search), q = sp.get('q');
         if (typeof q === s) {
             if (/zhuijukan/.test(location.host)) {
+                find('form.ff-search', (form) => {
+                    let input = form.querySelector('input[name="wd"]'), btn = form.querySelector("button.search-button");
+                    input.value = q;
+                    btn.click();
+                });
+
 
             } else if (/16ys/.test(location.host)) {
+                find('#formsearch', (form) => {
+                    form.target = "";
+                    let input = form.querySelector("#keyword"), btn = form.querySelector("#searchbutton");
+                    input.value = q;
+                    btn.click();
+                });
 
             } else if (/5nj/.test(location.host)) {
-
+                find('ul.search form', (form) => {
+                    let input = form.querySelector('input[name="wd"]'), btn = form.querySelector('input[type="submit"]');
+                    input.value = q;
+                    btn.click();
+                });
             }
         }
 
