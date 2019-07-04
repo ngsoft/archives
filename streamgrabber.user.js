@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.3.1
+// @version     1.5b2.3.2
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -34,6 +34,7 @@
 // @include     *://embed.watchasian*.*/*
 // @include     *://kshows.to/*
 // @include     *://verystream.*/e/*
+// @include     *://jx.tvzb.cc/*
 // ==/UserScript==
 
 
@@ -641,18 +642,9 @@
                     }
                     return false;
                 });
-                try {
-                    //code for m3u8
-                    let url = new URL(self.videolink());
-                    if (/\.m3u8$/.test(url.pathname)) {
-                        self.elements.buttons.code.classList.remove('hidden');
-                    }
-
-                } catch (e) {
-
-                }
 
 
+                if (/\.m3u8/.test(self.videolink())) self.elements.buttons.code.classList.remove('hidden');
 
                 self.ready = true;
                 self.trigger('streamgrabber.ready');
@@ -724,7 +716,9 @@
                                 code(e) {
                                     e.preventDefault();
                                     let u = new URL(self.videolink()), split = u.pathname.split('/'),
-                                            basename = split.pop(), text = "echo " + basename + "\n";
+                                            basename = split.pop();
+                                    if (basename.indexOf('.') === -1) basename += ".mp4";
+                                    let text = "echo " + basename + "\n";
                                     text += `ffmpeg -v quiet -stats -headers "Referer: ${doc.location.href}" -y -i "${u.href}" -c copy "${basename.replace(/m3u8$/i, 'mp4')}"` + "\n";
                                     copyToClipboard(text);
                                 }
@@ -1861,6 +1855,16 @@
     find('video.jw-video', video => {
         window.alt = new AltPlayer(JWPlayerToAltVideo);
     }, 5000);
+
+    find('video.dplayer-video', video => {
+
+        window.alt = new AltPlayer(self => {
+            self.altvideo = new altvideo(video);
+
+        });
+
+    }, 5000);
+
 
 
 })(document, window);

@@ -684,7 +684,7 @@ class UserSettings extends gmStore {
 
     constructor(defaults) {
         super();
-        if (isplainobject(defaults)) {
+        if (isPlainObject(defaults)) {
             Object.keys(defaults).forEach((x) => {
                 if (typeof this.get(x) !== typeof defaults[x]) {
                     this.set(x, defaults[x]);
