@@ -71,7 +71,6 @@
                                 addscript(item.get());
                         }
                         if (typeof callback === f) callback();
-                        console.debug(url, "Downloaded");
                     });
                 }).catch(console.warn);
                 return;
@@ -84,7 +83,6 @@
                     addscript(item.get());
             }
             if (typeof callback === f) callback();
-            console.debug(url, "Loaded from cache");
         }
     }
 
@@ -158,8 +156,6 @@
             self.elements.toolbar.appendChild(self.elements.buttons.clip);
 
             self.elements.buttons.title.appendChild(document.createTextNode(self.title));
-            console.debug(videoplayer.videotitle);
-
 
             videoplayer.on("play pause", (e) => {
                 if (e.type === "play") self.elements.toolbar.classList.add("hidden");
@@ -485,7 +481,6 @@
             if (!(app instanceof AltVideoPlayer)) app = new AltVideoPlayer(el.parentElement);
             app.onReady(() => {
                 el.remove();
-                console.debug(app);
             });
             //
             find('.play .container h2.text-nowrap > small', (el) => {
@@ -531,12 +526,10 @@
             if(src === null) return;
             app.title = mac_name;
             find('.videourl li.selected a', (el) => {
-                console.debug(el, src, el.title);
                 let num = 0, matches;
                 if ((matches = /第([0-9]+)/.exec(el.title))) num = parseInt(matches[1]);
                 app.number = num;
                 app.src = src;
-                console.debug(app);
             });
         });
 
