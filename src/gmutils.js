@@ -1116,8 +1116,8 @@ NodeList.prototype.data = function(key, value) {
         //reads from first element
         if (self.length > 0) return self[0].data(key);
         return undef;
-    } else (self.forEach((el) => {
+    } else self.forEach((el) => {
             el.data(key, value);
-        }))
+        });
 };
 
