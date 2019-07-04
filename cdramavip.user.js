@@ -1,5 +1,5 @@
 // ==UserScript==
-// @version      0.9.a
+// @version      0.9.1.a
 // @name         CDRAMA VIP Downloader
 // @description  FIX Stream + download stream (FFMPEG)
 // @namespace    https://github.com/ngsoft
@@ -291,6 +291,10 @@
             }
         }
 
+        resize() {
+            this.video.style.height = this.plyr.elements.container.clientHeight + "px";
+        }
+
 
         start() {
             if (!this.__started__) {
@@ -314,13 +318,20 @@
 
                             let hls = self.hls = new Hls();
                             hls.on(Hls.Events.MANIFEST_PARSED, (e, data) => {
+                                self.resize();
                                 if (self.settings.get('autoplay') === true) self.video.play();
                             });
                             hls.on(Hls.Events.MEDIA_ATTACHED, () => {
                                 hls.loadSource(self.src);
                             });
-                            hls.attachMedia(self.video);
+                            addEventListener("resize", () => {
+                                self.resize();
+                            });
+                            self.on("play", () => {
+                                self.resize();
+                            });
 
+                            hls.attachMedia(self.video);
                             new ToolBar(self);
                             self.__started__ = true;
                             self.trigger("altvideoplayer.ready");
