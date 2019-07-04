@@ -6,7 +6,7 @@
 // @author       daedelus
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/cddramavip.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/cddramavip.user.js
-// @require     https://cdn.jsdelivr.net/gh/ngsoft/archives@latest/src/gmutils.min.js
+// @require     https://cdn.jsdelivr.net/gh/ngsoft/archives@master/src/gmutils.min.js
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_deleteValue
