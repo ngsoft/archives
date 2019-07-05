@@ -1842,6 +1842,47 @@
 
     }
 
+    if (/letv/.test(doc.location.host)) {
+
+
+
+        return find('video.dplayer-video', (video) => {
+            console.debug(video);
+
+            if (typeof main === s) {
+
+                let m3u8 = getURL(main);
+
+                window.alt = new AltPlayer(self => {
+                    self.altvideo = new altvideo();
+                    self.altvideo.addSource(m3u8, "default", "hls");
+                    self.altvideo.sources[0].selected = true;
+                    console.debug(m3u8, self);
+                });
+
+
+
+
+            }
+
+
+        }, 5000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
     /**
      * Start APP
      */
