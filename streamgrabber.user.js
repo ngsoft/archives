@@ -12,12 +12,14 @@
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/streamgrabber.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/streamgrabber.user.js
 // @icon        https://www.tampermonkey.net/favicon.ico
+//
 // @include     *://streamango.*/embed/*
-// @include     *://*rapidvideo.com/e/*
+// @include     *://*rapidvideo.com/*
+// @include     *://*rapidvid.to/*
 // @include     *://*mp4upload.com/embed*
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
-// @include     *://openload.*/embed/*
+// @include     *://openload.*/*
 // @include     *://oload.*/embed/*
 // @include     *://oloadblock.*/embed/*
 // @include     *://*xstreamcdn.com/v/*
@@ -25,8 +27,8 @@
 // @include     *://*there.to/v/*
 // @include     *://*vidstreaming.io/*
 // @include     *://*vidcloud.icu/*
-// @include     *://kshows.to/*
-// @include     *://*gdriveplayer.us/*
+// @include     *://*gdriveplayer.*/*
+// @include     *://kurinaofficial.com/*
 // @include     *://*fastdrama.*/embed/*
 // @include     *://*prettyfast.*/e/*
 // @include     *://mcloud.*/embed/*
@@ -34,6 +36,8 @@
 // @include     *://embed.watchasian*.*/*
 // @include     *://kshows.to/*
 // @include     *://verystream.*/e/*
+//
+// @include     *://letv.com-t-letv.com/*
 // @include     *://jx.tvzb.cc/*
 // ==/UserScript==
 
@@ -179,6 +183,17 @@
         }
         return r;
     }
+
+    function Text2File(text, filename){
+        if (typeof text === s && typeof filename === s) {
+            let link = doc.createElement("a"), blob = new Blob([text], {type: "application/octet-stream"});
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.dispatchEvent(new MouseEvent(`click`));
+        }
+    }
+
+
     function virtualclick(url) {
         if (typeof url === s && url.length > 0) {
             let a = html2element(`<a href="${url}" target="_blank" style="opacity: 0;" />`);
@@ -1731,9 +1746,9 @@
 
     }
 
-    if (/(rapidvideo)/.test(doc.location.host)) {
+    if (/(rapidvid)/.test(doc.location.host)) {
 
-        return find('video.vjs-tech[src]', video => {
+        find('video.vjs-tech[src]', video => {
 
             window.alt = new AltPlayer(self => {
                 self.altvideo.poster = video.getAttribute('poster');
@@ -1746,6 +1761,12 @@
         });
 
 
+        if (/^Action not permitted/.test(doc.body.innerText) && /^\/e\//.test(doc.location.pathname)) {
+            doc.location.pathname = doc.location.pathname.replace(/^\/e/, '/v');
+        }
+
+
+        return;
     }
 
     if (/(gdriveplayer)/.test(doc.location.host)) {
