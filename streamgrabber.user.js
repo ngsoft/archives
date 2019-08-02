@@ -1670,7 +1670,7 @@
     /**
      * Mods for hosts
      */
-    if (/(xstreamcdn|fembed|there)/.test(doc.location.host)) {
+    if (/(xstreamcdn|fembed|there|gcloud)/.test(doc.location.host)) {
         find('#resume', x => x.remove(), 5000);
         find('#loading .fakeplaybutton', button => {
             button.parentElement.remove();
