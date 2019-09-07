@@ -1758,7 +1758,7 @@
                 });
             });
 
-        });
+        }, 5000);
 
 
         if (/^Action not permitted/.test(doc.body.innerText) && /^\/e\//.test(doc.location.pathname)) {
@@ -1918,11 +1918,11 @@
         window.alt = new AltPlayer(JWPlayerToAltVideo);
     }, 5000);
 
-    find('video.dplayer-video', video => {
+    find('video.dplayer-video, video.fp-engine', video => {
 
         window.alt = new AltPlayer(self => {
             self.altvideo = new altvideo(video);
-
+            if (self.altvideo.sources.length > 0) self.altvideo.sources[0].selected = true;
         });
 
     }, 5000);
