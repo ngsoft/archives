@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.3.2
+// @version     1.5b2.4
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -13,16 +13,11 @@
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/streamgrabber.user.js
 // @icon        https://www.tampermonkey.net/favicon.ico
 //
-// @include     *://streamango.*/embed/*
-// @include     *://*rapidvideo.com/*
-// @include     *://*rapidvid.to/*
 // @include     *://*mp4upload.com/embed*
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
-// @include     *://openload.*/*
-// @include     *://oload.*/embed/*
-// @include     *://oloadblock.*/embed/*
 // @include     *://*xstreamcdn.com/v/*
+// @include     *://*gcloud.live/v/*
 // @include     *://*fembed.com/v/*
 // @include     *://*there.to/v/*
 // @include     *://*vidstreaming.io/*
@@ -39,6 +34,8 @@
 //
 // @include     *://letv.com-t-letv.com/*
 // @include     *://jx.tvzb.cc/*
+// @include     *://azvideo.net/embed/*
+// @include     *://*chipstream.xyz/*
 // ==/UserScript==
 
 
@@ -1732,49 +1729,6 @@
                 }
             }
         };
-    }
-
-
-    if (/(openload|oload|streamango|verystream)/.test(doc.location.host)) {
-
-        find('#videooverlay, #videerlay', el => {
-            trigger(el, "click");
-        });
-
-        return find('video.vjs-tech[src]', video => {
-            class OL extends AltPlayerModule {
-                module(self) {
-                    self.altvideo = new altvideo(video);
-                    self.altvideo.sources[0].size = 720;
-                }
-            }
-
-            window.alt = new AltPlayer(OL);
-        }, 10000);
-
-    }
-
-    if (/(rapidvid)/.test(doc.location.host)) {
-
-        find('video.vjs-tech[src]', video => {
-
-            window.alt = new AltPlayer(self => {
-                self.altvideo.poster = video.getAttribute('poster');
-                self.altvideo.src = video.src;
-                video.querySelectorAll("source").forEach(source => {
-                    self.altvideo.addSource(source.src, source.getAttribute("label"));
-                });
-            });
-
-        }, 5000);
-
-
-        if (/^Action not permitted/.test(doc.body.innerText) && /^\/e\//.test(doc.location.pathname)) {
-            doc.location.pathname = doc.location.pathname.replace(/^\/e/, '/v');
-        }
-
-
-        return;
     }
 
     if (/(gdriveplayer)/.test(doc.location.host)) {
