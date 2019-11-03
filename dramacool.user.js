@@ -35,7 +35,6 @@
             try {
                 let url = new URL(x.dataset.video);
                 url.searchParams.set('jdtitle', jdtitle);
-                alert(url.href);
                 x.dataset.video = url.href;
             } catch (e) {
                 console.error(e);

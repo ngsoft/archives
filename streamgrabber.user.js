@@ -733,8 +733,16 @@
                                     let u = new URL(self.videolink()), split = u.pathname.split('/'),
                                             basename = split.pop();
                                     if (basename.indexOf('.') === -1) basename += ".mp4";
-                                    let text = "echo " + basename + "\n";
-                                    text += `ffmpeg -v quiet -stats -headers "Referer: ${doc.location.href}" -y -i "${u.href}" -c copy "${basename.replace(/m3u8$/i, 'mp4')}"` + "\n";
+
+
+                                    let title = basename.replace(/m3u8$/i, 'mp4');
+                                    if (doc.location.search.length > 0) {
+                                        let ttitle = new URLSearchParams(doc.location.search);
+                                        if (ttitle.get('jdtitle') !== null) title = ttitle.get('jdtitle');
+                                    }
+                                    
+                                    let text = "echo " + title + "\n";
+                                    text += `ffmpeg -v quiet -stats -headers "Referer: ${doc.location.href}" -y -i "${u.href}" -c copy "${title}"` + "\n";
                                     copyToClipboard(text);
                                 }
                             }
@@ -1830,6 +1838,11 @@
                 } catch (error) {
                     self.altvideo = new altvideo(video);
                 }
+
+
+            });
+            alt.onReady((x) => {
+                x.grabber.elements.buttons.code.classList.remove('hidden');
             });
 
         }, 5000);
