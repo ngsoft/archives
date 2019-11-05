@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.5
+// @version     1.5b2.5.1
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -27,6 +27,7 @@
 // @include     *://*fastdrama.*/embed/*
 // @include     *://*prettyfast.*/e/*
 // @include     *://mcloud.*/embed/*
+// @include     *://*mystream.*/*
 // @include     *://embed.dramacool*.*/*
 // @include     *://embed.watchasian*.*/*
 // @include     *://kshows.to/*
@@ -700,7 +701,7 @@
                                 download(e) {
                                     let link = self.videolink();
                                     if (link === undef) e.preventDefault();
-                                    else self.buttons.download.href = link;
+                                    else self.elements.buttons.download.href = link;
                                 },
                                 clipboard(e) {
                                     e.preventDefault();
