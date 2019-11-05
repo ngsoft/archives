@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.4
+// @version     1.5b2.5
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -36,6 +36,7 @@
 // @include     *://jx.tvzb.cc/*
 // @include     *://azvideo.net/embed/*
 // @include     *://*chipstream.xyz/*
+// @include     *://*k-vid.*/*
 // ==/UserScript==
 
 
@@ -1683,11 +1684,11 @@
         }, 5000);
     }
 
-    if (/(vidstreaming|vidcloud|dramacool|watchasian|kshows)/.test(doc.location.host)) {
+    if (/(vidstreaming|vidcloud|dramacool|watchasian|kshows|k\-vid)/.test(doc.location.host)) {
 
 
         let lstmore, css;
-        find('[style*="position: static"], [href*="bodelen.com"]', x => x.remove());
+        find('[style*="position: static"], [href*="bodelen.com"], [id*="p_"]', x => x.remove());
 
         find("#list-server-more", el => {
             lstmore = el;
