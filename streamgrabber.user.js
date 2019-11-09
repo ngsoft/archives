@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.5.1
+// @version     1.5b2.6
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -31,13 +31,13 @@
 // @include     *://embed.dramacool*.*/*
 // @include     *://embed.watchasian*.*/*
 // @include     *://kshows.to/*
-// @include     *://verystream.*/e/*
 //
 // @include     *://letv.com-t-letv.com/*
 // @include     *://jx.tvzb.cc/*
 // @include     *://azvideo.net/embed/*
 // @include     *://*chipstream.xyz/*
 // @include     *://*k-vid.*/*
+// @include     *://player.drama3s.*/*
 // ==/UserScript==
 
 
@@ -1856,19 +1856,9 @@
         }, 5000);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     }
+
+
 
     /**
      * Start APP
