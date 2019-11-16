@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.6
+// @version     1.5b2.6.1
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -13,6 +13,7 @@
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/streamgrabber.user.js
 // @icon        https://www.tampermonkey.net/favicon.ico
 //
+// @include     *://onlystream.tv/e/*
 // @include     *://*mp4upload.com/embed*
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
