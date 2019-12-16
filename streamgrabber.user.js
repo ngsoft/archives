@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.6.1
+// @version     1.5b2.6.2
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -1865,6 +1865,21 @@
      * Start APP
      */
     find('video.vjs-tech', video => {
+
+        const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
+
+    }, 5000);
+
+
+
+    find('video.vjs-tech source', source => {
+        const video = source.parentElement;
+
+        window.alt = new AltPlayer(self => {
+            self.altvideo = new altvideo(video);
+            if (self.altvideo.sources.length > 0) self.altvideo.sources[0].selected = true;
+        });
+
 
         const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
 
