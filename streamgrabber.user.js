@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.6.2
+// @version     1.5b2.6.3
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -39,6 +39,8 @@
 // @include     *://*chipstream.xyz/*
 // @include     *://*k-vid.*/*
 // @include     *://player.drama3s.*/*
+//
+// @include     *://vidoza.net/embed-*.html
 // ==/UserScript==
 
 
