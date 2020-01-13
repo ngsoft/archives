@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name        Kurina Official
 // @namespace   https://github.com/ngsoft
-// @version     1.0
+// @version     1.1
 // @description UI Remaster
 // @author      daedelus
-// @icon        https://kurinaofficial.com/wp-content/uploads/2019/02/cropped-icon-32x32.png
+// @icon        https://kurina.co/wp-content/uploads/2019/02/cropped-icon-32x32.png
 // @run-at      document-body
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/kurina.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/kurina.user.js
@@ -12,7 +12,7 @@
 // @compatible  firefox+tampermonkey
 // @compatible  chrome+tampermonkey
 // @grant       none
-// @include     *://kurinaofficial.com/*
+// @include     *://kurina*.*/*
 // ==/UserScript==
 
 
