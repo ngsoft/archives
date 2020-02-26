@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.6.5
+// @version     1.5b2.6.6
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -43,6 +43,7 @@
 //
 // @include     *://vidoza.net/embed-*.html
 // @include     *://*novelplanet.*/v/*
+// @include     *://*gaobook.*/v/*
 // ==/UserScript==
 
 
@@ -1682,7 +1683,7 @@
     /**
      * Mods for hosts
      */
-    if (/(xstreamcdn|fembed|feurl|there|gcloud|novelplanet)/.test(doc.location.host)) {
+    if (/(xstreamcdn|fembed|feurl|there|gcloud|novelplanet|gaobook)/.test(doc.location.host)) {
         find('#resume', x => x.remove(), 5000);
         find('#loading .fakeplaybutton', button => {
             button.parentElement.remove();
