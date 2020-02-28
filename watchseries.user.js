@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Watch Series 2.0
 // @namespace    https://github.com/ngsoft
-// @version      2.0
+// @version      2.0.1
 // @description  UI Remaster
 // @author       daedelus
 // @include	/^https?:\/\/(\w+\.)?watch(\-)?series\.\w+\//
@@ -28,7 +28,7 @@
 
     find('[style*="z-index: 2147483"], .ads, [id*="p_"]', (el) => {
         el.classList.add('hidden');
-    });
+    }, 5000);
 
     let css = `
         .hidden, .hidden *{
