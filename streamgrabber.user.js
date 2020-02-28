@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.6.6
+// @version     1.5b2.6.7
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -23,7 +23,7 @@
 // @include     *://*feurl.*/v/*
 // @include     *://*there.to/v/*
 // @include     *://*vidstreaming.io/*
-// @include     *://*vidcloud.icu/*
+// @include     *://*vidcloud*/*
 // @include     *://*gdriveplayer.*/*
 // @include     *://kurinaofficial.com/*
 // @include     *://*fastdrama.*/embed/*
