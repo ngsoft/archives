@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      6.2.1
+// @version      6.3
 // @description  Subtitle downloader
 // @author       daedelus
 // @include     /^https?://(www.)?dimsum.my//
@@ -319,6 +319,12 @@
         .download-button:hover{border-color: #ec1c24; background: #ec1c24;}
         .player-fullscreen{z-index: 9000;}
         button.jw-settings-content-item + .download-button{width:24px;height:23px;}
+        .hidden, .hidden *, [id*="hola_"]
+        {
+            position: fixed !important; right: auto !important; bottom: auto !important; top:-100% !important; left: -100% !important;
+            height: 1px !important; width: 1px !important; opacity: 0 !important;max-height: 1px !important; max-width: 1px !important;
+            display: inline !important;z-index: -1 !important;
+        }
     `;
     addcss(styles);
 
