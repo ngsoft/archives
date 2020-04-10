@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dimsum.my
 // @namespace    https://github.com/ngsoft
-// @version      6.3
+// @version      6.3.1
 // @description  Subtitle downloader
 // @author       daedelus
 // @include     /^https?://(www.)?dimsum.my//
@@ -376,7 +376,7 @@
                         title = baseTitle.replace(/[\|&;\$%@"\'’<>\(\)\+,]/g, ".");
                         break;
                     case "episode":
-                        if ((matches = playerModuleJw._title.match(/E([0-9]+) (.*?)$/i)) !== null) {
+                        if ((matches = playerModuleJw._title.match(/E([0-9]+)(?:\s+)?(.*?)$/i)) !== null) {
                             title = matches[2].replace(/[\|&;\$%@"\'’<>\(\)\+,]/g, ".").replace(/S[0-9]+$/, "").trim() + ".";
                             season = parseInt(playerModuleJw.gtmData.seasonNumber);
                             episode = parseInt(matches[1]);
