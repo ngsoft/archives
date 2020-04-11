@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MDN + PHP Web Docs
 // @namespace   https://github.com/ngsoft
-// @version     2.0.1
+// @version     2.1
 // @description Use MDN Web Docs UI and PHP UI to store lang and auto redirect to the choosen lang
 // @author      daedelus
 // @include     *://developer.mozilla.org/*
@@ -11,9 +11,10 @@
 // run-at       document-end
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/mdn.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/mdn.user.js
+// @icon        https://developer.mozilla.org/favicon.ico
 // ==/UserScript==
 
-(function() {
+(function(doc, undef){
 
     if (typeof Storage === 'undefined' || !window.hasOwnProperty('localStorage') || !(window.localStorage instanceof Storage)) {
         return;
@@ -77,27 +78,18 @@
 
     if (location.host === "developer.mozilla.org") {
 
-        if (!(langs = document.querySelectorAll('#languages-menu-submenu ul#translations bdi > a')).length) {
-            return;
-        }
-        let  btauto;
+        doc.querySelectorAll('#language-menu a').forEach(a => {
+            let locale = a.parentElement.getAttribute('lang');
 
-        Array.from(langs).forEach(function(element) {
-            tools.on(element, 'click', disablelang);
-        });
-        if ((btauto = document.getElementById('locale-permanent-yes'))) {
-            tools.on(btauto, 'click', function() {
-                selectlang(this.dataset.locale);
+            tools.on(a, 'click', e => {
+                e.preventDefault();
+                selectlang(locale);
+                location.replace(a.href);
             });
-        }
-        if (lang !== null) {
-            Array.from(langs).forEach(function(element) {
-                if (element.dataset.locale && lang === element.dataset.locale) {
-                    //redirect without new entry in the history
-                    window.location.replace(element.href);
-                }
-            }.bind(this));
-        }
+
+            if ((lang === locale) && location.href !== a.href) location.replace(a.href);
+        });
+
     }
 
     /**
@@ -187,4 +179,4 @@
         }
     }
 
-})();
+})(document);
