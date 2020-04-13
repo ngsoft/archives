@@ -327,8 +327,8 @@
                 value: self, configurable: true
             });
             element.addEventListener('kodirpc.settings', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
+                //e.preventDefault();
+                //e.stopPropagation();
                 let open, close;
                 if (typeof e.data !== u) {
                     if (typeof e.data.open === f) open = e.data.open;
