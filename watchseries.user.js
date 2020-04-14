@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Watch Series 2.0
 // @namespace    https://github.com/ngsoft
-// @version      2.0.2
+// @version      2.0.3
 // @description  UI Remaster
 // @author       daedelus
 // @include	/^https?:\/\/(\w+\.)?watch(\-)?series\.\w+\//
@@ -9,7 +9,7 @@
 // @icon        https://www.tampermonkey.net/favicon.ico
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/watchseries.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/watchseries.user.js
-// @require	https://cdn.jsdelivr.net/gh/ngsoft/userscripts@1.1.9/dist/gmutils.min.js
+// @require	https://cdn.jsdelivr.net/gh/ngsoft/userscripts@1.2/dist/gmutils.min.js
 // ==/UserScript==
 
 ((doc, undef) => {
