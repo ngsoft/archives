@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MDN + PHP Web Docs
 // @namespace   https://github.com/ngsoft
-// @version     2.1
+// @version     2.2
 // @description Use MDN Web Docs UI and PHP UI to store lang and auto redirect to the choosen lang
 // @author      daedelus
 // @include     *://developer.mozilla.org/*
@@ -20,9 +20,9 @@
         return;
     }
 
-    var lang = localStorage.getItem('lang'), langs;
+    var lang = localStorage.getItem('lang') || "", langs;
 
-    function selectlang(newlang) {
+    function selectlang(newlang){
         if (typeof newlang === typeof "") {
             localStorage.setItem('lang', newlang);
             lang = newlang;
@@ -76,18 +76,23 @@
      * just override events
      */
 
-    if (location.host === "developer.mozilla.org") {
+    if (location.hostname === "developer.mozilla.org") {
 
         doc.querySelectorAll('#language-menu a').forEach(a => {
-            let locale = a.parentElement.getAttribute('lang');
+            let locale = a.parentElement.getAttribute('lang') || "";
 
             tools.on(a, 'click', e => {
                 e.preventDefault();
                 selectlang(locale);
                 location.replace(a.href);
             });
+            //console.debug(locale, lang, a);
+            if (locale.length > 0 ? (lang === locale ? location.href !== a.href : false) : false) {
+                location.replace(a.href);
 
-            if ((lang === locale) && location.href !== a.href) location.replace(a.href);
+            }
+
+
         });
 
     }
