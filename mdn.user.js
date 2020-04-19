@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        MDN + PHP Web Docs
 // @namespace   https://github.com/ngsoft
-// @version     2.2
-// @description Use MDN Web Docs UI and PHP UI to store lang and auto redirect to the choosen lang
+// @version     2.3
+// @description Use MDN Web Docs and PHP UI to store locale and auto redirect to the choosen on every pages
 // @author      daedelus
 // @include     *://developer.mozilla.org/*
 // @include     *://*php.net/manual/*
@@ -34,12 +34,16 @@
                 }
 
                 set current(lang){
-                    if (typeof lang === typeof "" ? lang.length > 0 : false) localStorage.setItem(this.key, lang);
+                    if (this.isValid(lang)) localStorage.setItem(this.key, lang);
                     else if (lang === null) localStorage.removeItem(this.key);
                 }
 
                 is(lang){
-                    return typeof lang === typeof "" ? (lang.length > 0 ? lang === this.current : false) : false;
+                    return this.isValid(lang) ? lang === this.current : false;
+                }
+
+                isValid(lang){
+                    return typeof lang === typeof "" ? /^[a-z]{2,3}(?:[-_][a-z]{2,3})?$/i.test(lang) : false;
                 }
 
             }),
@@ -56,21 +60,25 @@
                     if (typeof callback !== "function" || typeof type !== typeof "") return;
                     const self = this;
                     el = this._getTarget(el);
-                    if (el instanceof EventTarget) el.addEventListener(type, callback, capture === true);
+                    if (el instanceof EventTarget) type.split(/\s+/).forEach(t => el.addEventListener(t, callback, capture === true));
                     else if (el instanceof NodeList) el.forEach(x => self.on(x, type, callback, capture));
                 }
                 off(el, type, callback, capture){
                     if (typeof callback !== "function" || typeof type !== typeof "") return;
                     const self = this;
                     el = this._getTarget(el);
-                    if (el instanceof EventTarget) el.removeEventListener(type, callback, capture === true);
+                    if (el instanceof EventTarget) type.split(/\s+/).forEach(t => el.removeEventListener(t, callback, capture === true));
                     else if (el instanceof NodeList) el.forEach(x => self.off(x, type, callback, capture));
                 }
                 trigger(el, type, bubbles, cancelable){
                     if (typeof type !== typeof "") return;
                     const self = this;
                     el = this._getTarget(el);
-                    if (el instanceof EventTarget) el.dispatchEvent(new Event(type, {bubbles: bubbles !== false, cancelable: cancelable !== false}));
+                    if (el instanceof EventTarget){
+                        type.split(/\s+/).forEach(t => {
+                            el.dispatchEvent(new Event(t, {bubbles: bubbles !== false, cancelable: cancelable !== false}));
+                        });
+                    }
                     else if (el instanceof NodeList) el.forEach(x => self.trigger(x, type, callback));
                 }
             });
@@ -92,10 +100,13 @@
             if (t !== null) {
                 e.preventDefault();
                 let locale = t.getAttribute('lang') || "", a = t.firstElementChild;
-                if (locale.length > 0 ? a instanceof Element : false) {
-                    lang.current = locale;
-                    location.replace(a.href);
+                if(a instanceof Element){
+                    if (locale.length > 0) {
+                        lang.current = locale;
+                        location.replace(a.href); //no history change
+                    } else location.href = a.href; //must be contribute page
                 }
+
             }
         });
 
@@ -106,17 +117,42 @@
 
         });
 
-
-
     }
 
     /**
      * php.net
      * Add a button and override event
      */
-    if (location.host.match(/php.net$/i) !== null) {
+    if (location.hostname.match(/php.net$/i) !== null) {
 
+        //detects locales and redirects to the stored one
+        doc.querySelectorAll('select#changelang-langs').forEach(x => {
+            
+            x.querySelectorAll('option').forEach(o => {
+                let
+                        locale = o.value.split('/').shift(),
+                        uri = '/manual/' + o.value;
+                        
+                if (lang.is(locale) && location.pathname !== uri) location.replace(uri);
+            });
+            //remove default event
+            x.onchange = null;
 
+        });
+        //replace the event
+        tools.on('form#changelang', 'change', e => {
+            let t = e.target.closest('select#changelang-langs');
+            if(t !== null){
+                e.preventDefault();
+                let
+                        value = t.value,
+                        locale = value.split('/').shift();
+
+                if (lang.isValid(locale)) lang.current = locale;
+                //restore default event
+                t.form.submit();
+            }
+        });
     }
 
 })(document);
