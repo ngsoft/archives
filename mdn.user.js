@@ -20,54 +20,66 @@
         return;
     }
 
-    var lang = localStorage.getItem('lang') || "", langs;
+    const
+            GMinfo = (GM_info ? GM_info : (typeof GM === 'object' && GM !== null && typeof GM.info === 'object' ? GM.info : null)),
+            UUID = GMinfo.script.uuid,
+            lang = (new class {
 
-    function selectlang(newlang){
-        if (typeof newlang === typeof "") {
-            localStorage.setItem('lang', newlang);
-            lang = newlang;
-        }
-    }
+                get key(){
+                    return UUID + ":" + "locale";
+                }
 
-    function disablelang() {
-        localStorage.removeItem('lang');
-        lang = null;
-    }
+                get current(){
+                    return localStorage.getItem(this.key) || "";
+                }
 
-    let tools = {
-        on(el, evt, callback, capture) {
-            if (typeof callback !== "function" || typeof evt !== typeof "") {
-                return;
-            }
-            if (el instanceof Element) {
-                el.addEventListener(evt, callback, capture === true);
-            } else if (el instanceof NodeList) {
-                Array.from(el).forEach(x => tools.on(x, evt, callback, capture));
-            }
+                set current(lang){
+                    if (typeof lang === typeof "" ? lang.length > 0 : false) localStorage.setItem(this.key, lang);
+                    else if (lang === null) localStorage.removeItem(this.key);
+                }
 
-        },
-        off(el, evt, callback, capture) {
-            if (typeof callback !== "function" || typeof evt !== typeof "") {
-                return;
-            }
-            if (el instanceof Element) {
-                el.removeEventListener(evt, callback, capture === true);
-            } else if (el instanceof NodeList) {
-                Array.from(el).forEach(x => tools.off(x, evt, callback, capture));
-            }
+                is(lang){
+                    return typeof lang === typeof "" ? (lang.length > 0 ? lang === this.current : false) : false;
+                }
 
-        },
-        trigger(el, evt, bubbles, cancelable) {
-            if (typeof evt !== typeof "") {
-                return;
-            }
-            if (el instanceof Element) {
-                el.dispatchEvent(new Event(evt, {bubbles: bubbles !== false, cancelable: cancelable !== false}));
-            } else if (el instanceof NodeList) {
-                Array.from(el).forEach(x => tools.trigger(x, evt, callback));
-            }
-        }
-    };
+            }),
+            tools = (new class {
+                on(el, evt, callback, capture){
+                    if (typeof callback !== "function" || typeof evt !== typeof "") {
+                        return;
+                    }
+                    if (el instanceof Element) {
+                        el.addEventListener(evt, callback, capture === true);
+                    } else if (el instanceof NodeList) {
+                        Array.from(el).forEach(x => tools.on(x, evt, callback, capture));
+                    }
+
+                }
+                off(el, evt, callback, capture){
+                    if (typeof callback !== "function" || typeof evt !== typeof "") {
+                        return;
+                    }
+                    if (el instanceof Element) {
+                        el.removeEventListener(evt, callback, capture === true);
+                    } else if (el instanceof NodeList) {
+                        Array.from(el).forEach(x => tools.off(x, evt, callback, capture));
+                    }
+
+                }
+                trigger(el, evt, bubbles, cancelable){
+                    if (typeof evt !== typeof "") {
+                        return;
+                    }
+                    if (el instanceof Element) {
+                        el.dispatchEvent(new Event(evt, {bubbles: bubbles !== false, cancelable: cancelable !== false}));
+                    } else if (el instanceof NodeList) {
+                        Array.from(el).forEach(x => tools.trigger(x, evt, callback));
+                    }
+                }
+            });
+
+
+
 
 
 
@@ -78,22 +90,26 @@
 
     if (location.hostname === "developer.mozilla.org") {
 
-        doc.querySelectorAll('#language-menu a').forEach(a => {
-            let locale = a.parentElement.getAttribute('lang') || "";
-
-            tools.on(a, 'click', e => {
+        tools.on(doc.querySelector('#language-menu'), "click", e => {
+            let t = e.target.closest('li[lang]');
+            if (t !== null) {
                 e.preventDefault();
-                selectlang(locale);
-                location.replace(a.href);
-            });
-            //console.debug(locale, lang, a);
-            if (locale.length > 0 ? (lang === locale ? location.href !== a.href : false) : false) {
-                location.replace(a.href);
-
+                let locale = t.getAttribute('lang') || "", a = t.firstElementChild;
+                if (locale.length > 0 ? a instanceof Element : false) {
+                    lang.current = locale;
+                    location.replace(a.href);
+                }
             }
+        });
 
+
+        doc.querySelectorAll('#language-menu li[lang]').forEach(li => {
+            let locale = li.getAttribute('lang') || "", a = li.firstElementChild;
+            if (lang.is(locale) && (a instanceof Element ? location.href !== a.href : false)) location.replace(a.href);
 
         });
+
+
 
     }
 
@@ -101,7 +117,9 @@
      * php.net
      * Add a button and override event
      */
-    if(location.host.match(/php.net$/i) !== null){
+    if (location.host.match(/php.net$/i) !== null) {
+
+        let langs;
 
         if ((langs = document.querySelector('#layout-content #changelang select#changelang-langs')) === null) {
             return;
