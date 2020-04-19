@@ -95,11 +95,14 @@
 
     if (location.hostname === "developer.mozilla.org") {
 
-        tools.on(doc.querySelector('#language-menu'), "click", e => {
+        tools.on('#language-menu', "click", e => {
             let t = e.target.closest('li[lang]');
             if (t !== null) {
                 e.preventDefault();
-                let locale = t.getAttribute('lang') || "", a = t.firstElementChild;
+                let
+                        locale = t.getAttribute('lang') || "",
+                        a = t.firstElementChild;
+
                 if(a instanceof Element){
                     if (locale.length > 0) {
                         lang.current = locale;
@@ -133,7 +136,7 @@
                         locale = o.value.split('/').shift(),
                         uri = '/manual/' + o.value;
                         
-                if (lang.is(locale) && location.pathname !== uri) location.replace(uri);
+                if (lang.is(locale) ? location.pathname !== uri : false) location.replace(uri);
             });
             //remove default event
             x.onchange = null;
