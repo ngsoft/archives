@@ -44,37 +44,34 @@
 
             }),
             tools = (new class {
-                on(el, evt, callback, capture){
-                    if (typeof callback !== "function" || typeof evt !== typeof "") {
-                        return;
-                    }
-                    if (el instanceof Element) {
-                        el.addEventListener(evt, callback, capture === true);
-                    } else if (el instanceof NodeList) {
-                        Array.from(el).forEach(x => tools.on(x, evt, callback, capture));
-                    }
 
+                _getTarget(el){
+                    if (typeof el === typeof "") return doc.querySelectorAll(el);
+                    if (el instanceof Element ? true : el instanceof NodeList) return el;
+                    return null;
                 }
-                off(el, evt, callback, capture){
-                    if (typeof callback !== "function" || typeof evt !== typeof "") {
-                        return;
-                    }
-                    if (el instanceof Element) {
-                        el.removeEventListener(evt, callback, capture === true);
-                    } else if (el instanceof NodeList) {
-                        Array.from(el).forEach(x => tools.off(x, evt, callback, capture));
-                    }
 
+
+                on(el, type, callback, capture){
+                    if (typeof callback !== "function" || typeof type !== typeof "") return;
+                    const self = this;
+                    el = this._getTarget(el);
+                    if (el instanceof EventTarget) el.addEventListener(type, callback, capture === true);
+                    else if (el instanceof NodeList) el.forEach(x => self.on(x, type, callback, capture));
                 }
-                trigger(el, evt, bubbles, cancelable){
-                    if (typeof evt !== typeof "") {
-                        return;
-                    }
-                    if (el instanceof Element) {
-                        el.dispatchEvent(new Event(evt, {bubbles: bubbles !== false, cancelable: cancelable !== false}));
-                    } else if (el instanceof NodeList) {
-                        Array.from(el).forEach(x => tools.trigger(x, evt, callback));
-                    }
+                off(el, type, callback, capture){
+                    if (typeof callback !== "function" || typeof type !== typeof "") return;
+                    const self = this;
+                    el = this._getTarget(el);
+                    if (el instanceof EventTarget) el.removeEventListener(type, callback, capture === true);
+                    else if (el instanceof NodeList) el.forEach(x => self.off(x, type, callback, capture));
+                }
+                trigger(el, type, bubbles, cancelable){
+                    if (typeof type !== typeof "") return;
+                    const self = this;
+                    el = this._getTarget(el);
+                    if (el instanceof EventTarget) el.dispatchEvent(new Event(type, {bubbles: bubbles !== false, cancelable: cancelable !== false}));
+                    else if (el instanceof NodeList) el.forEach(x => self.trigger(x, type, callback));
                 }
             });
 
@@ -119,87 +116,7 @@
      */
     if (location.host.match(/php.net$/i) !== null) {
 
-        let langs;
 
-        if ((langs = document.querySelector('#layout-content #changelang select#changelang-langs')) === null) {
-            return;
-        }
-        Array.from(langs.children).forEach(x => x.style.color = "#333");
-
-        function getSelectedLang() {
-            let el = langs.querySelector(`[value="${langs.value}"]`);
-            return el !== null ? el.innerText : el;
-        }
-
-        function redirectToLang(value) {
-            if (typeof value === typeof "" && value.length > 0) {
-                let u = new URL(location.href);
-                u.pathname = '/manual/' + value;
-                if (location.pathname !== u.pathname) {
-                    location.replace(u.href);
-                    return;
-                }
-            }
-        }
-
-        let changeSaveButton = (function() {
-            let el;
-            el = document.createElement('button');
-            el.innerHTML = "Save";
-            el.type = "button";
-            el.style['font-size'] = ".75rem";
-            el.style.cursor = "auto";
-            langs.parentNode.appendChild(el);
-            tools.on(el, 'click', function() {
-                if (getSelectedLang() !== null) {
-                    tools.trigger(langs, 'selectlang');
-                }
-            });
-            if (lang !== null) {
-                el.disabled = true;
-            }
-            return el;
-        })();
-
-        langs.onchange = "";
-        tools.on(langs, "change", function() {
-            let selected = getSelectedLang();
-            if (selected !== lang) {
-                changeSaveButton.removeAttribute('disabled');
-                disablelang();
-                this.style.color = "";
-            } else {
-                changeSaveButton.disabled = true;
-                this.style.color = "#8892BF";
-            }
-        });
-
-        tools.on(langs, "selectlang", function() {
-            let newlang = getSelectedLang();
-            if ((newlang !== null) && newlang !== lang) {
-                selectlang(newlang);
-                this.style.color = "#8892BF";
-                changeSaveButton.disabled = true;
-            }
-            if (this.value.length > 0) {
-                redirectToLang(this.value);
-            }
-
-        });
-
-        if (lang !== null && lang !== getSelectedLang()) {
-            let uri;
-            Array.from(langs.children).forEach(function(el) {
-                if (el.innerText === lang) {
-                    uri = el.value;
-                }
-            });
-            if(uri !== undefined){
-                redirectToLang(uri);
-            }
-        } else if (lang !== null && lang === getSelectedLang()) {
-            langs.style.color = "#8892BF";
-        }
     }
 
 })(document);
