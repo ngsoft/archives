@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.6.7
+// @version     1.5b2.6.8
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -20,6 +20,7 @@
 // @include     *://*xstreamcdn.com/v/*
 // @include     *://*gcloud.live/v/*
 // @include     *://*fembed.com/v/*
+// @include     *://*fcdn.stream/v/*
 // @include     *://*feurl.*/v/*
 // @include     *://*there.to/v/*
 // @include     *://*vidstreaming.io/*
@@ -1683,7 +1684,7 @@
     /**
      * Mods for hosts
      */
-    if (/(xstreamcdn|fembed|feurl|there|gcloud|novelplanet|gaobook)/.test(doc.location.host)) {
+    if (/(xstreamcdn|fembed|feurl|there|gcloud|novelplanet|gaobook|fcdn)/.test(doc.location.host)) {
         find('#resume', x => x.remove(), 5000);
         find('#loading .fakeplaybutton', button => {
             button.parentElement.remove();
