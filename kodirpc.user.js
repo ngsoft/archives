@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        KodiRPC
 // @namespace   https://github.com/ngsoft
-// @version     1.2.1
+// @version     1.2.2
 // @description Send Stream URL to Kodi using jsonRPC
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -912,6 +912,7 @@
         send(link) {
             const self = this;
             self.notify('Sending link to Kodi');
+            copyToClipboard(link);
             trigger(this.elements.root, 'kodirpc.send', {
                 link: link,
                 success() {
