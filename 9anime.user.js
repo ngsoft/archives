@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.4
+// @version      2.9.5
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -244,10 +244,23 @@
                                         first=false;
                                         ctrl = n.parentNode;
                                         ctrl.insertBefore(link, n);
+                                        let title, u = new URL(cp.href), tel;
+
+                                        if ((tel = document.querySelector('.widget-title h1.title')) !== null) {
+                                            title = tel.innerText.trim();
+                                            title += ".E";
+                                            let epn = document.querySelector('.episodes.range.active a.active');
+                                            if (epn !== null) {
+                                                title += epn.innerText.trim();
+                                                title += ".mp4";
+                                                u.searchParams.set('jdtitle', title);
+                                            }
+                                        }
+                                        cp.href = u.href;
                                         ctrl.insertBefore(cp, n);
                                         cp.addEventListener('click', (ev) => {
                                             ev.preventDefault();
-                                            if(copyToClipboard(cp.href)){
+                                            if (copyToClipboard(cp.href)) {
                                                 alertify.notify("Link Copied to Clipboard.");
                                             }
                                         });
