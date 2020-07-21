@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.3
+// @version      2.9.4
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -67,6 +67,19 @@
         }
         !w() || (w.i = setInterval(w, 200));
     };
+
+    function copyToClipboard(text){
+        let r = false;
+        if (typeof text === "string" && text.length > 0) {
+            let el = html2element(`<textarea>${text}</textarea>"`);
+            document.body.appendChild(el);
+            el.style.opacity = 0;
+            el.select();
+            r = document.execCommand("copy");
+            document.body.removeChild(el);
+        }
+        return r;
+    }
 
     let w = setInterval(function() {
 
@@ -221,14 +234,26 @@
                         let frame, i = setInterval(function() {
                             if ((frame = el.querySelector("#player > iframe")) !== null) {
                                 clearInterval(i);
-                                let find, ctrl, link = html2element(`<a class="report control tip" target="_blank" href="${frame.src}"><i class="icon icon-info-circle"></i><span> Video Link</span></a>`);
-                                if ((find = document.querySelector('#controls .report.control.tip')) !== null) {
-                                    ctrl = find.parentNode;
-                                    ctrl.insertBefore(link, find);
-                                    find.remove();
-                                }
-
-
+                                let first = true,
+                                        find,
+                                        ctrl,
+                                        link = html2element(`<a class="report control tip" target="_blank" href="${frame.src}"><i class="icon icon-info-circle"></i><span> Video Link</span></a>`),
+                                        cp = html2element(`<a class="report control tip" href="${frame.src}"><i class="icon icon-info-circle"></i><span> Copy Link</span></a>`);
+                                document.querySelectorAll('#controls .report.control.tip').forEach((n) => {
+                                    if(first === true){
+                                        first=false;
+                                        ctrl = n.parentNode;
+                                        ctrl.insertBefore(link, n);
+                                        ctrl.insertBefore(cp, n);
+                                        cp.addEventListener('click', (ev) => {
+                                            ev.preventDefault();
+                                            if(copyToClipboard(cp.href)){
+                                                alertify.notify("Link Copied to Clipboard.");
+                                            }
+                                        });
+                                    }
+                                    n.remove();
+                                });
                             }
                         }, 3);
                     });
