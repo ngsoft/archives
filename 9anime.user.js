@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.5
+// @version      2.9.6
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -251,7 +251,10 @@
                                             title += ".E";
                                             let epn = document.querySelector('.episodes.range.active a.active');
                                             if (epn !== null) {
-                                                title += epn.innerText.trim();
+                                                epn = epn.innerText.trim();
+                                                epn = parseInt(epn);
+                                                if (epn < 10) epn = "0" + epn;
+                                                title += epn;
                                                 title += ".mp4";
                                                 u.searchParams.set('jdtitle', title);
                                             }
