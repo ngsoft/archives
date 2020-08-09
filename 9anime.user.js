@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.6
+// @version      2.9.7
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://9anime.*/*
@@ -14,13 +14,7 @@
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
 // ==/UserScript==
 
-/**
- * Works best with following line in hosts file
- * 0.0.0.0 st.bebi.com ads.2mdnsys.com cfa.2mdnsys.com defpush.com
- */
-
-
-(function() {
+(function(){
     /* jshint expr: true */
     /* jshint -W018 */
     const ondomready = this.ondomready = function(callback) {
@@ -248,8 +242,9 @@
 
                                         if ((tel = document.querySelector('.widget-title h1.title')) !== null) {
                                             title = tel.innerText.trim();
+                                            title = title.replace(' (Dub)', '');
                                             title += ".E";
-                                            let epn = document.querySelector('.episodes.range.active a.active');
+                                            let epn = document.querySelector('.episodes.range a.active');
                                             if (epn !== null) {
                                                 epn = epn.innerText.trim();
                                                 epn = parseInt(epn);
