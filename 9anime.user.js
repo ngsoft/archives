@@ -1,17 +1,19 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.7
+// @version      2.9.8
 // @description  UI Remaster
 // @author       daedelus
-// @include     *://9anime.*/*
-// @include     *://*.9anime.*/*
-// @icon        https://9anime.to/assets/favicons/favicon.png
+
 // @grant none
 // @run-at      document-start
 // @noframes
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
+//
+//
+// @icon        https://staticf.akacdn.ru/assets/9anime/favicons/favicon-32x32.png
+// @include     /^https?:\/\/(\w+\.)?9anime\.\w+\//
 // ==/UserScript==
 
 (function(){
