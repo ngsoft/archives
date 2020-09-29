@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.9
+// @version      2.9.9.1
 // @description  UI Remaster
 // @author       daedelus
 
@@ -105,6 +105,10 @@
                 .widget.quickfilter .widget-title ul{display:inline!important;padding: 4px!important;}
                 .widget.quickfilter .widget-title ul label{min-width: 110px; text-align: right;}
                 body.watch .list-film{max-width: 75%; margin: 0 auto;}
+                .player-wrapper #controls > a { padding: 0 8px; display: inline-block; cursor: pointer;
+                    color: #ababab; height: 38px; line-height: 38px; -webkit-transition: all .15s;
+                    -moz-transition: all .15s; transition: all .15s; }
+                .player-wrapper #controls > a:hover { background: #141414; color: #eee; }
             `);
             ondomready(function() {
                 let el;
@@ -148,17 +152,14 @@
                 }());
 
                 //setting main page tab to subbed
-                if ((el = document.querySelectorAll('div.widget.hotnew span.tab[data-name]')) && el.length) {
+                if ((el = document.querySelectorAll('.main .tabs > span[data-name]')) && el.length) {
                     let t = el[0].parentNode.dataset.target;
                     for (let e of el) {
                         e.classList.remove('active');
-                        if (e.dataset.name === "sub") {
-                            e.classList.add('active');
+                        if (e.dataset.name === "updated_sub") {
+                            // e.classList.add('active');
+                            e.click();
                         }
-                    }
-                    for (let e of document.querySelectorAll(t)) {
-                        e.classList.add('hidden');
-                        if (e.dataset.name === "sub") e.classList.remove("hidden");
                     }
                 }
                 /**
@@ -226,7 +227,7 @@
                     }
                 }, 200);
                 //get direct video link
-                document.querySelectorAll('.widget.player').forEach(function(el) {
+                document.querySelectorAll('.player-container').forEach(function(el){
                     el.addEventListener("change", function() {
                         let frame, i = setInterval(function() {
                             if ((frame = el.querySelector("#player > iframe")) !== null) {
@@ -234,9 +235,9 @@
                                 let first = true,
                                         find,
                                         ctrl,
-                                        link = html2element(`<a class="report control tip" target="_blank" href="${frame.src}"><i class="icon icon-info-circle"></i><span> Video Link</span></a>`),
-                                        cp = html2element(`<a class="report control tip" href="${frame.src}"><i class="icon icon-info-circle"></i><span> Copy Link</span></a>`);
-                                document.querySelectorAll('#controls .report.control.tip').forEach((n) => {
+                                        link = html2element(`<a style="float: right;" target="_blank" href="${frame.src}"><i class="far fa-clipboard"></i><span> Video Link</span></a>`),
+                                        cp = html2element(`<a style="float: right;" href="${frame.src}"><i class="fas fa-external-link-alt"></i><span> Copy Link</span></a>`);
+                                document.querySelectorAll('#controls .report').forEach((n) => {
                                     if(first === true){
                                         first=false;
                                         ctrl = n.parentNode;
@@ -275,18 +276,18 @@
                 if (document.querySelectorAll('#player').length > 0) {
 
                     let ws = setInterval(function() {
-                        if(document.querySelectorAll('.widget.servers ul.episodes a').length == 0){
+                        if (document.querySelectorAll('#episodes ul.episodes a').length == 0) {
                             return;
                         }
                         clearInterval(ws);
-                        document.querySelectorAll('.widget.servers ul.episodes a').forEach(function(el) {
+                        document.querySelectorAll('#episodes ul.episodes a').forEach(function(el){
                             el.addEventListener('click', function(e) {
                                 e.preventDefault();
-                                document.querySelector('.widget.player').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
+                                document.querySelector('.player-container').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
                             });
                         });
                         if ((el = document.querySelector("#player > iframe")) !== null) {
-                            document.querySelector('.widget.player').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
+                            document.querySelector('.player-container').dispatchEvent(new Event("change", {bubbles: true, cancelable: true}));
                         }
                     }, 500);
 
