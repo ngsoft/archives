@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.9.1
+// @version      2.9.9.2
 // @description  UI Remaster
 // @author       daedelus
 
@@ -244,11 +244,11 @@
                                         ctrl.insertBefore(link, n);
                                         let title, u = new URL(cp.href), tel;
 
-                                        if ((tel = document.querySelector('.widget-title h1.title')) !== null) {
+                                        if ((tel = document.querySelector('.navbc h2[data-jtitle]')) !== null) {
                                             title = tel.innerText.trim();
                                             title = title.replace(' (Dub)', '');
                                             title += ".E";
-                                            let epn = document.querySelector('.episodes.range a.active');
+                                            let epn = document.querySelector('#episodes .episodes a.active');
                                             if (epn !== null) {
                                                 epn = epn.innerText.trim();
                                                 epn = parseInt(epn);
