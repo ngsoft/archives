@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.9.2
+// @version      2.9.9.3
 // @description  UI Remaster
 // @author       daedelus
 
@@ -235,8 +235,8 @@
                                 let first = true,
                                         find,
                                         ctrl,
-                                        link = html2element(`<a style="float: right;" target="_blank" href="${frame.src}"><i class="far fa-clipboard"></i><span> Video Link</span></a>`),
-                                        cp = html2element(`<a style="float: right;" href="${frame.src}"><i class="fas fa-external-link-alt"></i><span> Copy Link</span></a>`);
+                                        link = html2element(`<a class="report" style="float: right;" target="_blank" href="${frame.src}"><i class="far fa-clipboard"></i><span> Video Link</span></a>`),
+                                        cp = html2element(`<a class="report" style="float: right;" href="${frame.src}"><i class="fas fa-external-link-alt"></i><span> Copy Link</span></a>`);
                                 document.querySelectorAll('#controls .report').forEach((n) => {
                                     if(first === true){
                                         first=false;
