@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.9.3
+// @version      2.9.9.4
 // @description  UI Remaster
 // @author       daedelus
 
@@ -16,7 +16,7 @@
 // @include     /^https?:\/\/(\w+\.)?9anime\.\w+\//
 // ==/UserScript==
 
-(function(){
+(function(doc, undef){
     /* jshint expr: true */
     /* jshint -W018 */
     const ondomready = this.ondomready = function(callback) {
@@ -77,6 +77,46 @@
         return r;
     }
 
+
+    class Toast {
+
+        static notify(message){
+            if (typeof message === "string") {
+                let
+                        root = this.root,
+                        notification = html2element('<div style="min-width: 392px; text-align: center;"/>');
+                //notification.classList.add('hidden');
+                notification.innerHTML = message;
+                root.appendChild(notification);
+                //notification.classList.remove('hidden');
+                $(notification).fadeIn(() => {
+                    setTimeout(function(){
+                        $(notification).fadeOut(() => {
+                            root.removeChild(notification);
+                            if (root.classList.contains('tmp')) root.remove();
+                        });
+
+                    }, 1500);
+                });
+
+                
+
+            }
+        }
+
+        static get root(){
+            let root = doc.querySelector('#toast-wrapper');
+            if (root === null) {
+                root = html2element('<div id="toast-wrapper" class="tmp"/>');
+                doc.body.appendChild(root);
+            }
+            return root;
+        }
+
+    }
+
+
+
     let w = setInterval(function() {
 
         if (document.body !== null) {
@@ -95,7 +135,7 @@
                 div[id*="BB_SK"],div[id*="bb_sa"], div[class*="ads_"],div[id*="rcjsload"], div[id*="-ps"],
                 .ads-outsite, #disqus_thread, .this-message-does-not-harm-to-you-dont-remove-it,
                  .adsbox, #controls div.report.control.tip, body > div > div[style*="fixed"], :not(#player) > iframe:not([title="recaptcha challenge"]), .grecaptcha-badge,
-                .content div[id*="p_"], [style*="position: fixed;"], [style*="z-index: 10000;"]
+                .content div[id*="p_"], [style*="position: fixed;"], [style*="z-index: 10000;"], section.sda
                 {visibility: hidden !important; opacity: 0 !important; position: fixed !important; z-index: -1 !important;}
                 .widget.crop, .widget.comment ,body.watch #sidebar{visibility: hidden!important;}
                 /*#main > .content > .widget.slider + div,*/
@@ -263,7 +303,7 @@
                                         cp.addEventListener('click', (ev) => {
                                             ev.preventDefault();
                                             if (copyToClipboard(cp.href)) {
-                                                alertify.notify("Link Copied to Clipboard.");
+                                                Toast.notify("Link Copied to Clipboard.");
                                             }
                                         });
                                     }
@@ -315,4 +355,4 @@
         }
     }, 20);
 
-})();
+})(document);
