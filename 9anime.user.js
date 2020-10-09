@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.9.4
+// @version      2.9.9.5
 // @description  UI Remaster
 // @author       daedelus
 
