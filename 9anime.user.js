@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         9anime
 // @namespace    https://github.com/ngsoft
-// @version      2.9.9.5
+// @version      2.9.9.6
 // @description  UI Remaster
 // @author       daedelus
 
 // @grant none
 // @run-at      document-start
 // @noframes
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/9anime.user.js
+// @updateURL   https://raw.githubusercontent.com/ngsoft/userscripts/master/src/9anime.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/userscripts/master/src/9anime.user.js
 //
 //
 // @icon        https://staticf.akacdn.ru/assets/9anime/favicons/favicon-32x32.png
@@ -351,18 +351,6 @@
 
                 document.querySelectorAll('.widget.crop, .widget.comment ,body.watch #sidebar').forEach(x => x.remove());
                 document.querySelectorAll('body.dark').forEach(x => x.classList.remove('dark'));
-
-                if (/\/watch\//i.test(location.pathname)) {
-
-                    doc.querySelectorAll('aside.sidebar').forEach((node) => {
-                        node.remove();
-                    });
-                    doc.querySelectorAll('aside.main').forEach((node) => {
-                        node.classList.remove('main');
-                    });
-
-
-                }
 
 
             });
