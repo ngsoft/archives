@@ -351,6 +351,20 @@
 
                 document.querySelectorAll('.widget.crop, .widget.comment ,body.watch #sidebar').forEach(x => x.remove());
                 document.querySelectorAll('body.dark').forEach(x => x.classList.remove('dark'));
+
+                if (/\/watch\//i.test(location.pathname)) {
+
+                    doc.querySelectorAll('aside.sidebar').forEach((node) => {
+                        node.remove();
+                    });
+                    doc.querySelectorAll('aside.main').forEach((node) => {
+                        node.classList.remove('main');
+                    });
+
+
+                }
+
+
             });
         }
     }, 20);
