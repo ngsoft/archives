@@ -12,6 +12,7 @@
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/streamgrabber.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/streamgrabber.user.js
 // @icon        https://www.tampermonkey.net/favicon.ico
+// @require     https://cdn.jsdelivr.net/gh/ngsoft/userscripts@1.2.5/dist/gmutils.min.js
 //
 // @include     *://onlystream.tv/e/*
 // @include     *://*mp4upload.com/embed*
@@ -45,6 +46,7 @@
 // @include     *://vidoza.net/embed-*.html
 // @include     *://*novelplanet.*/v/*
 // @include     *://*gaobook.*/v/*
+// @include     *://*streamtape.*/e/*
 // ==/UserScript==
 
 
@@ -1904,6 +1906,9 @@
         });
 
     }, 5000);
+    NodeFinder.find('.plyr-container video#mainvideo[src*="http"]', video => {
+        const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
+    });
 
 
 

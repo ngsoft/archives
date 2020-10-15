@@ -5,7 +5,7 @@
 // @description  Anti ads
 // @author       daedelus
 // @include     *://yts.*/*
-// @icon        https://yts.am/assets/images/website/favicon-32x32.png
+// @icon        https://yts.mx/assets/images/website/favicon-32x32.png
 // @noframes
 // @run-at      document-body
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/yts.user.js
@@ -166,7 +166,7 @@
         console.debug(scriptname, 'Started.');
 
         new ElementObserver({
-            selector: 'div[style*="position: static !important;"], div[class*="box-bordered"]',
+            selector: 'div[style*="position: static !important;"], div[class*="-bordered"]',
             onload(el, obs) {
                 el.remove();
             }
