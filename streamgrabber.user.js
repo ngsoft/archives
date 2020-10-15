@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.6.8
+// @version     1.5b2.6.9
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -1866,6 +1866,19 @@
 
 
     }
+    
+    if (/streamtape/.test(doc.location.host)) {
+
+
+
+        NodeFinder.find('iframe', x => x.remove());
+        return NodeFinder.find('.plyr-container video#mainvideo[src*="streamtape"]', video => {
+            //video.pause();
+            const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
+        });
+
+
+    }
 
 
 
@@ -1875,6 +1888,8 @@
     find('video.vjs-tech', video => {
 
         const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
+
+
 
     }, 5000);
 
@@ -1906,9 +1921,8 @@
         });
 
     }, 5000);
-    NodeFinder.find('.plyr-container video#mainvideo[src*="http"]', video => {
-        const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
-    });
+    
+
 
 
 
