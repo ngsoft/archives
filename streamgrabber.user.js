@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.6.9
+// @version     1.5b2.7
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -47,6 +47,8 @@
 // @include     *://*novelplanet.*/v/*
 // @include     *://*gaobook.*/v/*
 // @include     *://*streamtape.*/e/*
+//
+// @include     *://hls.hdv*/imdb/*
 // ==/UserScript==
 
 
@@ -1208,6 +1210,7 @@
                 altvideo: new altvideo(),
                 grabber: null,
                 plyr: null,
+                plyropts: plyropts,
                 ready: false,
                 elements: {
                     root: html2element(`<div class="altplayer" />`),
@@ -1302,7 +1305,7 @@
 
 
                 //loads Plyr
-                self.plyr = new Plyr(self.video, plyropts);
+                self.plyr = new Plyr(self.video, self.plyropts);
 
                 self.plyr.on('ready', e => {
                     self.plyr.elements.container.id = "altplayer" + Math.floor(+new Date() / 1000);
@@ -1876,6 +1879,46 @@
             //video.pause();
             const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
         });
+
+
+    }
+
+    if (/hdv/.test(doc.location.host)) {
+
+        return NodeFinder.find('video#player', video => {
+            console.debug(video);
+            if ((typeof dt === o) && Array.isArray(dt)) {
+                video.remove();
+                const opts = [], sources = {};
+                window.alt = alt = new AltPlayer(self => {
+                    self.altvideo = new altvideo();
+                    self.altvideo.poster = video.poster;
+                    dt.forEach((item, i) => {
+                        let src = doc.location.origin;
+                        src += '/m3u8/';
+                        src += item.name;
+                        src += '.m3u8';
+                        let size = item.res + i;
+                        self.altvideo.addSource(src, size, "hls");
+                        opts.push(size);
+                        sources[size] = src;
+                    });
+                    self.altvideo.sources[0].selected = true;
+                    self.plyropts.quality = {
+                        default: opts[0],
+                        options: opts,
+                        forced: true,
+                        onChange(size){
+                            self.altvideo.element.src = sources[size];
+                        }
+                    };
+                });
+            }
+
+        });
+
+
+
 
 
     }
