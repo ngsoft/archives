@@ -1886,7 +1886,6 @@
     if (/hdv/.test(doc.location.host)) {
 
         return NodeFinder.find('video#player', video => {
-            console.debug(video);
             if ((typeof dt === o) && Array.isArray(dt)) {
                 video.remove();
                 const opts = [], sources = {};
@@ -1916,11 +1915,6 @@
             }
 
         });
-
-
-
-
-
     }
 
 
