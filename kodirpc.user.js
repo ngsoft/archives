@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name        KodiRPC
 // @namespace   https://github.com/ngsoft
-// @version     1.2.2
+// @version     1.3
 // @description Send Stream URL to Kodi using jsonRPC
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
 // @run-at      document-end
 // @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/kodirpc.user.js
 // @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/kodirpc.user.js
+// @require     https://cdn.jsdelivr.net/gh/ngsoft/userscripts@1.2.5/dist/gmutils.min.js
 // @compatible  firefox+greasemonkey(3.17)
 // @compatible  firefox+tampermonkey
 // @compatible  chrome+tampermonkey
@@ -23,89 +24,6 @@
     /* jshint -W018 */
     /* jshint -W083 */
 
-    const GMinfo = (GM_info ? GM_info : (typeof GM === 'object' && GM !== null && typeof GM.info === 'object' ? GM.info : null));
-    const scriptname = `${GMinfo.script.name} version ${GMinfo.script.version}`;
-
-    const s = "string", b = "boolean", f = "function", o = "object", u = "undefined", n = "number";
-
-    function isPlainObject(v) {
-        return v instanceof Object && Object.getPrototypeOf(v) === Object.prototype;
-    }
-
-    function onBody(callback) {
-        if (typeof callback === f) {
-            let i = setInterval(function () {
-                if (doc.body !== null) {
-                    clearInterval(i);
-                    callback();
-                }
-            }, 1);
-        }
-    }
-    function onDocIddle(callback) {
-        if (typeof callback === f) {
-            if (doc.readyState === "loading") {
-                return doc.addEventListener('DOMContentLoaded', function DOMContentLoaded() {
-                    doc.removeEventListener('DOMContentLoaded', DOMContentLoaded);
-                    callback();
-                });
-            }
-            callback();
-        }
-    }
-    function onDocEnd(callback) {
-        if (typeof callback === f) {
-            if (doc.readyState !== "complete") {
-                return addEventListener('load', function load() {
-                    callback();
-                });
-            }
-            callback();
-        }
-    }
-    function html2element(html) {
-        if (typeof html === "string") {
-            let template = doc.createElement('template');
-            html = html.trim();
-            template.innerHTML = html;
-            return template.content.firstChild;
-        }
-    }
-
-    function addcss(css) {
-        if (typeof css === "string" && css.length > 0) {
-            let s = doc.createElement('style');
-            s.setAttribute('type', "text/css");
-            s.appendChild(doc.createTextNode('<!-- ' + css + ' -->'));
-            onBody(function () {
-                doc.body.appendChild(s);
-            });
-
-        }
-    }
-    function copyToClipboard(text) {
-        let r = false;
-        if (typeof text === "string" && text.length > 0) {
-            let el = html2element(`<textarea>${text}</textarea>"`);
-            doc.body.appendChild(el);
-            el.style.opacity = 0;
-            el.select();
-            r = doc.execCommand("copy");
-            doc.body.removeChild(el);
-        }
-        return r;
-    }
-    function trigger(el, type, data) {
-        if (el instanceof EventTarget) {
-            if (typeof type === s) {
-                type.split(" ").forEach((t) => {
-                    let event = new Event(t, { bubbles: true, cancelable: true });
-                    event.data = data;
-                    el.dispatchEvent(event);
-                });
-            }
-        }
-    }
 
     function getOffset(el) {
         if (el instanceof Element) {
@@ -120,118 +38,6 @@
         return { top: 0, left: 0, width: 0, height: 0 };
     }
 
-    /**
-     * Uses Mutation Observer + intervals(some sites blocks observers) to find new nodes
-     * And test them against params
-     */
-    const find = (function () {
-
-        const obsopts = {
-            attributes: true,
-            //characterData: true,
-            //childList: true,
-            subtree: true
-        }, defaults = {
-            selector: "",
-            onload: null,
-            timeout: 0,
-            interval: 0
-        };
-
-        class SimpleObserver {
-            start() {
-                const self = this;
-                if (self.worker.params.interval > 0) {
-                    self.worker.interval = setInterval(self.worker.runner, self.worker.params.interval);
-                    if (self.worker.params.timeout > 0) {
-                        self.worker.timeout = setTimeout(function () {
-                            clearInterval(self.worker.interval);
-                        }, self.worker.params.timeout);
-                    }
-                }
-                self.worker.observer.observe(self.worker.params.base, obsopts);
-            }
-            stop() {
-                if (typeof this.worker.timeout !== u) clearTimeout(this.worker.timeout);
-                if (typeof this.worker.interval !== u) clearInterval(this.worker.interval);
-                if (typeof this.worker.observer !== u) this.worker.observer.disconnect();
-            }
-            constructor(runner, obs, params) {
-                this.worker = {
-                    params: params,
-                    observer: obs,
-                    runner: runner
-                };
-            }
-        }
-
-        return function findNode(options) {
-            let params = Object.assign({}, defaults), base = doc;
-            for (let i = 0; i < arguments.length; i++) {
-                let arg = arguments[i];
-                switch (typeof arg) {
-                    case o:
-                        if (arg instanceof Element || arg instanceof Document) {
-                            base = arg;
-                        } else if (isPlainObject(arg)) {
-                            Object.assign(params, arg);
-                        }
-                        break;
-                    case f:
-                        params.onload = arg;
-                        break;
-                    case s:
-                        params.selector = arg;
-                        break;
-                    case n:
-                        params.interval = 10;
-                        params.timeout = arg;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if (typeof params.onload === f && typeof params.selector === s && typeof base.addEventListener === f) {
-
-                const matches = [];
-                let simpleobs, interval, timeout, observer;
-                params.base = base;
-
-                const runner = function runner() {
-                    base.querySelectorAll(params.selector).forEach(function (element) {
-                        if (!matches.includes(element)) {
-                            matches.push(element);
-                            trigger(element, 'DOMNodeCreated', { element: element, params: params, observer: simpleobs });
-                            params.onload.call(element, element, simpleobs, params);
-                        }
-                    });
-                };
-                observer = new MutationObserver(mutations => {
-                    mutations.forEach(mutation => {
-                        mutation.addedNodes.forEach(node => {
-                            if (node instanceof Element) {
-                                if ((node = node.closest(params.selector)) !== null) {
-                                    if (!matches.includes(node)) {
-                                        matches.push(node);
-                                        trigger(node, 'DOMNodeCreated', { element: node, params: params, observer: simpleobs });
-                                        params.onload.call(node, node, simpleobs, params);
-                                    }
-
-                                }
-                            }
-                        });
-                    });
-                });
-                simpleobs = new SimpleObserver(runner, observer, params);
-                simpleobs.start();
-                if (doc.readyState !== "complete") {
-                    addEventListener('load', runner);
-                } else runner();
-            }
-
-        };
-
-    })();
 
 
     class KodiClient {
@@ -939,14 +745,14 @@
 
 
 
-    onDocEnd(() => {
+    on.loaded(() => {
 
 
         if (typeof doc.body.KodiRPCModule !== u) {
             new KodiRPCModule(doc.body);
             return;
         }
-        find('video[data-src^="http"], video[src^="http"], video source[src^="http"]', (element, obs) => {
+        NodeFinder.find('video[data-src^="http"], video[src^="http"], video source[src^="http"]', (element, obs) => {
             new KodiRPCUI(element.closest('video'));
             obs.stop();
         }, 15000);
