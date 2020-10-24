@@ -1956,10 +1956,10 @@
                         forced: true,
                         onChange(size){
 
-                            self.altvideo.element.querySelectorAll('track').forEach(track => track.remove());
-                            self.altvideo.captions = [];
+                            //  self.altvideo.element.querySelectorAll('track').forEach(track => track.remove());
+                            // self.altvideo.captions = [];
                             self.altvideo.element.src = sources[size].src;
-                            if ((typeof sub === o) && (typeof sub[sources[size].fid] === o)) {
+                            /* if ((typeof sub === o) && (typeof sub[sources[size].fid] === o)) {
                                 Object.keys(sub[sources[size].fid]).forEach(lang => {
                                     if(/(english|french)/.test(lang)){
                                         let caption = self.altvideo.addCaption('https://sub1.hdv.fun/vtt1/' + sub[sources[size].fid][lang][0][1] + '.vtt', null, lang);
@@ -1967,7 +1967,7 @@
                                     }
 
                                 });
-                            }
+                            }*/
 
 
                         }
