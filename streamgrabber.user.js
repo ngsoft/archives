@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.7.3
+// @version     1.5b2.7.4
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -853,7 +853,7 @@
                 elements: {
                     root: html2element(`<div class="altplayer" />`),
                     buttons: {
-                        bigplay: html2element(`<span class="bigplay-button no-focus" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="bigplay-icn"><path fill="currentColor" d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"></path></svg></span>`)
+
                     }
                 }
             });
@@ -927,10 +927,7 @@
                 self.plyr.on('ready', e => {
                     self.plyr.elements.container.id = "altplayer" + Math.floor(+new Date() / 1000);
 
-                    //bigplay button
-                    self.plyr.elements.container.insertBefore(self.elements.buttons.bigplay, self.plyr.elements.container.firstChild);
-                    Events(self.elements.buttons.bigplay).on('click', e => self.altvideo.play());
-                    self.altvideo.one('play', e => self.elements.buttons.bigplay.hidden = true);
+
                     self.altvideo.on('click', e => self.altvideo.playpause());
 
                     //quality change (save to localStorage)
