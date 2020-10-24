@@ -19,6 +19,11 @@
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
 // @include     *://*xstreamcdn.com/v/*
+// @include     *://*gcloud.live/v/*
+// @include     *://*fembed.com/v/*
+// @include     *://*fcdn.stream/v/*
+// @include     *://*feurl.*/v/*
+// @include     *://*there.to/v/*
 // @include     *://*vidstreaming.io/*
 // @include     *://*vidcloud*/*
 // @include     *://*gdriveplayer.*/*
@@ -39,6 +44,8 @@
 // @include     *://player.drama3s.*/*
 //
 // @include     *://vidoza.net/embed-*.html
+// @include     *://*novelplanet.*/v/*
+// @include     *://*gaobook.*/v/*
 // @include     *://*streamtape.*/e/*
 //
 // @include     *://hls.hdv*/imdb/*
@@ -1078,26 +1085,35 @@
         }
     }
 
+
+    function JWPlayerPlaylistToAltVideo(playlist){
+        const altvid = new altvideo();
+        if (isPlainObject(playlist) && playlist.sources) {
+            let poster = playlist.image || "";
+            if (poster.length > 0) poster = getURL(poster);
+            
+            altvid.poster = poster;
+            playlist.sources.forEach(source => {
+                altvid.addSource(source.file, source.label, source.type);
+            });
+            playlist.tracks.forEach(track => {
+                altvid.addCaption(track.file, track.name, track.label);
+            });
+            if (altvid.sources.length === 1) {
+                altvid.sources[0].selected = true;
+            }
+        }
+        return altvid;
+
+    }
+
     function JWPlayerToAltVideo(self) {
         const video = doc.querySelector('video.jw-video');
         if (typeof jwplayer === f && video instanceof Element) {
             try {
-                const jw = jwplayer(video.parentElement.closest('div[id]').id);
-                const playlist = jw.getPlaylist()[0], poster = playlist.image || "";
-
-                self.altvideo.poster = poster;
+                let jw = jwplayer(video.parentElement.closest('div[id]').id);
+                self.altvideo = JWPlayerPlaylistToAltVideo(jw.getPlaylist()[0]);
                 if (/^http/.test(video.src)) self.altvideo.src = video.src; //fallback
-                playlist.sources.forEach(source => {
-                    let cs = self.altvideo.addSource(source.file, source.label, source.type);
-                    if (video.src === source.file) cs.selected = true;
-                });
-                playlist.tracks.forEach(track => {
-                    let ct = self.altvideo.addCaption(track.file, track.name, track.label);
-                });
-                if (self.altvideo.sources.length === 1 && !self.altvideo.src) {
-                    self.altvideo.sources[0].selected = true;
-                }
-
             } catch (error) {
                 self.altvideo = new altvideo(video);
             }
@@ -1291,7 +1307,24 @@
     })();
 
 
+    /**
+     * Mods for hosts
+     */
+    if (/(xstreamcdn|fembed|feurl|there|gcloud|novelplanet|gaobook|fcdn)/.test(doc.location.host)) {
 
+
+        new Timer(timer => {
+
+            if (typeof clientSide === o && typeof clientSide.pl === o && typeof clientSide.pl.sources === o && clientSide.pl.sources.length > 0) {
+                timer.stop();
+                new AltPlayer(self=>{ 
+                    self.altvideo= JWPlayerPlaylistToAltVideo(clientSide.pl);
+                });
+            }
+        });
+        return;
+
+    }
 
     if (/(vidstreaming|vidcloud|dramacool|watchasian|kshows|k\-vid)/.test(doc.location.host)) {
 
