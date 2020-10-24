@@ -747,13 +747,20 @@
 
 
     on.loaded(() => {
+
         if (typeof doc.body.KodiRPCModule !== u) {
             new KodiRPCModule(doc.body);
             return;
         }
+
+        let ui, module;
         NodeFinder.find('video[data-src^="http"], video[src^="http"], video source[src^="http"]', (element, obs) => {
-            new KodiRPCUI(element.closest('video'));
-            obs.stop();
+            if (typeof doc.body.KodiRPCModule === u) {
+                ui = ui || new KodiRPCUI(element.closest('video'));
+                obs.stop();
+            } else if (typeof doc.body.KRPCM === u) {
+                new KodiRPCModule(doc.body);
+            }
         });
 
     });

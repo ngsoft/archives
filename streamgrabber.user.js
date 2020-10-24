@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.7.1
+// @version     1.5b2.7.2
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -58,15 +58,10 @@
     /* jshint -W018 */
     /* jshint -W083 */
 
-    const GMinfo = (GM_info ? GM_info : (typeof GM === 'object' && GM !== null && typeof GM.info === 'object' ? GM.info : null));
-    const scriptname = `${GMinfo.script.name} version ${GMinfo.script.version}`;
+
 
     //=======================================   Deps   =======================================================
-    const s = "string", b = "boolean", f = "function", o = "object", u = "undefined", n = "number";
 
-    function isPlainObject(v) {
-        return v instanceof Object && Object.getPrototypeOf(v) === Object.prototype;
-    }
 
     function onBody(callback) {
         if (typeof callback === f) {
@@ -99,109 +94,13 @@
             callback();
         }
     }
-    function html2element(html) {
-        if (typeof html === "string") {
-            let template = doc.createElement('template');
-            html = html.trim();
-            template.innerHTML = html;
-            return template.content.firstChild;
-        }
-    }
 
-    function addcss(css) {
-        if (typeof css === "string" && css.length > 0) {
-            let s = doc.createElement('style');
-            s.setAttribute('type', "text/css");
-            s.appendChild(doc.createTextNode('<!-- ' + css + ' -->'));
-            onBody(function () {
-                doc.body.appendChild(s);
-            });
 
-        }
-    }
-    function addstyle(css) {
-        if (typeof css === "string" && css.length > 0) {
-            let s = doc.createElement('style');
-            s.setAttribute('type', "text/css");
-            s.appendChild(doc.createTextNode('<!-- ' + css + ' -->'));
-            doc.head.appendChild(s);
-        }
-    }
 
-    function isValidUrl(url) {
-        const weburl = new RegExp("^(?:(?:(?:https?|ftp):)?\\/\\/)(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z0-9\\u00a1-\\uffff][a-z0-9\\u00a1-\\uffff_-]{0,62})?[a-z0-9\\u00a1-\\uffff]\\.)+(?:[a-z\\u00a1-\\uffff]{2,}\\.?))(?::\\d{2,5})?(?:[/?#]\\S*)?$", "i");
-        if (typeof url === s && url.length > 0) {
-            return weburl.test(url);
-        }
-        return false;
-    }
-    function getURL(uri) {
-        let retval;
-        if (typeof uri === s && uri.length > 0) {
-            try {
-                let a = doc.createElement("a"), url;
-                a.href = uri;
-                //throws error if url not valid
-                url = new URL(a.href);
-                retval = url.href;
-            } catch (error) {
-                retval = undef;
-            }
-
-        }
-        return retval;
-
-    }
     function addicon(src) {
         if ((src = getURL(src))) doc.head.appendChild(html2element(`<link href="${src}" rel="icon" />`));
     }
-    function loadjs(src, callback, defer) {
-        if (isValidUrl(src)) {
-            let script = doc.createElement('script');
-            script.type = 'text/javascript';
-            if (defer === true) script.defer = true;
-            if (typeof callback === f) {
-                script.onload = callback;
-            }
-            doc.head.appendChild(script);
-            script.src = src;
-        }
-    }
-    function loadcss(src) {
-        if (isValidUrl(src)) {
-            let style = doc.createElement('link');
-            style.rel = "stylesheet";
-            style.type = 'text/css';
-            doc.head.appendChild(style);
-            style.href = src;
-        }
-    }
 
-
-    function copyToClipboard(text) {
-        let r = false;
-        if (typeof text === "string" && text.length > 0) {
-
-            //let el = html2element(`<textarea>${text}</textarea>"`);
-            let el = doc.createElement('textarea');
-            el.innerHTML = text;
-            el.style.opacity = 0;
-            doc.body.appendChild(el);
-            el.select();
-            r = doc.execCommand("copy");
-            doc.body.removeChild(el);
-        }
-        return r;
-    }
-
-    function Text2File(text, filename){
-        if (typeof text === s && typeof filename === s) {
-            let link = doc.createElement("a"), blob = new Blob([text], {type: "application/octet-stream"});
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.dispatchEvent(new MouseEvent(`click`));
-        }
-    }
 
 
     function virtualclick(url) {
@@ -214,321 +113,6 @@
             a.click();
         }
     }
-    function trigger(el, type, data) {
-        if (el instanceof EventTarget) {
-            if (typeof type === s) {
-                type.split(" ").forEach((t) => {
-                    let event = new Event(t, { bubbles: true, cancelable: true });
-                    event.data = data;
-                    el.dispatchEvent(event);
-                });
-            }
-        }
-    }
-
-    /**
-     * Timer
-     */
-    class Timer {
-
-        start() {
-            if (this.started !== true && typeof this.params.callback === f) {
-                const self = this;
-                self.__interval = setInterval(() => {
-                    self.params.callback.call(self, self);
-                }, self.params.interval);
-                if (self.params.timeout > 0) {
-                    self.__timeout = setTimeout(() => {
-                        self.stop();
-                    }, self.params.timeout);
-                }
-                self.started = true;
-            }
-
-        }
-        stop() {
-            if (this.started === true) {
-                const self = this;
-                self.started = false;
-                if (self.__interval !== null) clearInterval(self.__interval);
-                if (self.__timeout !== null) clearTimeout(self.__timeout);
-                self.__timeout = null;
-                self.__interval = null;
-            }
-        }
-
-        constructor(callback, interval, timeout) {
-            if (typeof callback === f) {
-                const self = this;
-                Object.assign(self, {
-                    params: {
-                        callback: callback,
-                        interval: 10,
-                        timeout: 0
-                    },
-                    started: false,
-                    __interval: null,
-                    __timeout: null
-                });
-                if (typeof interval === n) self.params.interval = interval;
-                if (typeof timeout === n) self.params.timeout = interval;
-                self.start();
-            }
-        }
-    }
-
-    /**
-     * Uses Mutation Observer + intervals(some sites blocks observers) to find new nodes
-     * And test them against params
-     */
-    const find = (function () {
-
-        const obsopts = {
-            attributes: true,
-            //characterData: true,
-            //childList: true,
-            subtree: true
-        }, defaults = {
-            selector: "",
-            onload: null,
-            timeout: 0,
-            interval: 0
-        };
-
-        class SimpleObserver {
-            start() {
-                const self = this;
-                if (self.worker.params.interval > 0) {
-                    self.worker.interval = setInterval(self.worker.runner, self.worker.params.interval);
-                    if (self.worker.params.timeout > 0) {
-                        self.worker.timeout = setTimeout(function () {
-                            clearInterval(self.worker.interval);
-                        }, self.worker.params.timeout);
-                    }
-                }
-                self.worker.observer.observe(self.worker.params.base, obsopts);
-            }
-            stop() {
-                if (typeof this.worker.timeout !== u) clearTimeout(this.worker.timeout);
-                if (typeof this.worker.interval !== u) clearInterval(this.worker.interval);
-                if (typeof this.worker.observer !== u) this.worker.observer.disconnect();
-            }
-            constructor(runner, obs, params) {
-                this.worker = {
-                    params: params,
-                    observer: obs,
-                    runner: runner
-                };
-            }
-        }
-        return function findNode(options) {
-            let params = Object.assign({}, defaults), base = doc;
-            for (let i = 0; i < arguments.length; i++) {
-                let arg = arguments[i];
-                switch (typeof arg) {
-                    case o:
-                        if (arg instanceof Element || arg instanceof Document) {
-                            base = arg;
-                        } else if (isPlainObject(arg)) {
-                            Object.assign(params, arg);
-                        }
-                        break;
-                    case f:
-                        params.onload = arg;
-                        break;
-                    case s:
-                        params.selector = arg;
-                        break;
-                    case n:
-                        params.interval = 10;
-                        params.timeout = arg;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (typeof params.onload === f && typeof params.selector === s && typeof base.addEventListener === f) {
-
-                const matches = [];
-                let simpleobs, interval, timeout, observer;
-                params.base = base;
-
-                const runner = function runner() {
-                    base.querySelectorAll(params.selector).forEach(function (element) {
-                        if (!matches.includes(element)) {
-                            matches.push(element);
-                            trigger(element, 'DOMNodeCreated', { element: element, params: params, observer: simpleobs });
-                            params.onload.call(element, element, simpleobs, params);
-                        }
-                    });
-                };
-
-                observer = new MutationObserver(mutations => {
-                    mutations.forEach(mutation => {
-                        mutation.addedNodes.forEach(node => {
-                            if (node instanceof Element) {
-                                if ((node = node.closest(params.selector)) !== null) {
-                                    if (!matches.includes(node)) {
-                                        matches.push(node);
-                                        trigger(node, 'DOMNodeCreated', { element: node, params: params, observer: simpleobs });
-                                        params.onload.call(node, node, simpleobs, params);
-                                    }
-
-                                }
-                            }
-                        });
-                    });
-                });
-                simpleobs = new SimpleObserver(runner, observer, params);
-                simpleobs.start();
-                if (doc.readyState !== "complete") {
-                    addEventListener('load', runner);
-                } else runner();
-            }
-
-        };
-
-    })();
-
-
-    /**
-     * Small Event Wrapper
-     */
-    function Events(target, binding) {
-
-        if (this instanceof Events) {
-            const self = this;
-            binding = binding instanceof Object ? binding : target;
-            if (!(target instanceof EventTarget)) target = doc.createElement('div');
-            if (!(binding instanceof EventTarget)) {
-                ["on", "off", "one", "trigger"].forEach(method => {
-                    binding[method] = function (...args) {
-                        self[method].apply(self, args);
-                        return this;
-                    };
-                });
-            }
-            Object.assign(this, {
-                target: target,
-                binding: binding,
-                events: []
-            });
-            return this;
-        } else if (target instanceof EventTarget) return new Events(...arguments);
-
-    }
-    Events.prototype = {
-        on(type, listener, options) {
-            if (typeof type === s && typeof listener === f) {
-                const self = this, params = { once: false, capture: false }, handler = listener.bind(self.binding);
-                if (typeof options === b) params.capture = options;
-                else if (isPlainObject(options)) Object.keys(params).forEach(key => {
-                    params[key] = options[key] === true;
-                });
-                type.split(' ').forEach(type => {
-                    self.events.push({ type: type, listener: listener, handler: handler, options: params });
-                    self.target.addEventListener(type, handler, params);
-                });
-            }
-            return this;
-        },
-        one(type, listener, capture) {
-            if (typeof type === s && typeof listener === f) this.on(type, listener, { once: true, capture: capture === true });
-            return this;
-        },
-        off(type, listener, capture) {
-            if (typeof type === s) {
-                const self = this, params = { capture: false };
-                let callback;
-                for (let i = 1; i < arguments.length; i++) {
-                    let arg = arguments[i];
-                    switch (typeof arg) {
-                        case b:
-                            params.capture = arg;
-                            break;
-                        case f:
-                            callback = arg;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                type.split(' ').forEach(type => {
-                    self.events = self.events.filter(evt => {
-                        if (typeof callback === f) {
-                            if (type === evt.type && params.capture === evt.params.capture && callback === evt.listener) {
-                                self.target.removeEventListener(type, evt.handler, params.capture);
-                                return false;
-                            }
-                        } else if (type === evt.type) {
-                            self.target.removeEventListener(type, evt.handler, evt.params.capture);
-                            return false;
-                        }
-                        return true;
-                    });
-                });
-            }
-            return this;
-        },
-        trigger(type, data) {
-            if (typeof type === s) {
-                const self = this;
-                data = data !== undef ? data : {};
-                type.split(' ').forEach(type => {
-                    let event = new Event(type, { bubbles: true, cancelable: true });
-                    event.data = data;
-                    self.target.dispatchEvent(event);
-                });
-            }
-        }
-
-
-    };
-
-    /**
-     * Get Langage infos using langcode
-     * @param {string} langcode
-     * @returns {Object}
-     */
-    function getLangInfos(langcode) {
-        let result = {
-            lang: "Undetermined",
-            codes: ["und", "und"]
-        };
-        if (typeof langcode === s && langcode.length > 0) {
-            if (langcode.length > 1 && langcode.length < 4) result = getLangInfos.map.get(langcode.toLowerCase()) || result;
-            else result = getLangInfos.reverse.get(langcode.toLowerCase()) || result;
-        }
-        return result;
-    }
-    /**
-     * ISO Language Codes (639-1 and 693-2) and IETF Language Types
-     * language-codes-3b2
-     * @link https://datahub.io/core/language-codes
-     *
-     */
-    (() => {
-        const data = JSON.parse(`[{"English": "Afar", "alpha2": "aa", "alpha3-b": "aar"},{"English": "Abkhazian", "alpha2": "ab", "alpha3-b": "abk"},{"English": "Afrikaans", "alpha2": "af", "alpha3-b": "afr"},{"English": "Akan", "alpha2": "ak", "alpha3-b": "aka"},{"English": "Albanian", "alpha2": "sq", "alpha3-b": "alb"},{"English": "Amharic", "alpha2": "am", "alpha3-b": "amh"},{"English": "Arabic", "alpha2": "ar", "alpha3-b": "ara"},{"English": "Aragonese", "alpha2": "an", "alpha3-b": "arg"},{"English": "Armenian", "alpha2": "hy", "alpha3-b": "arm"},{"English": "Assamese", "alpha2": "as", "alpha3-b": "asm"},{"English": "Avaric", "alpha2": "av", "alpha3-b": "ava"},{"English": "Avestan", "alpha2": "ae", "alpha3-b": "ave"},{"English": "Aymara", "alpha2": "ay", "alpha3-b": "aym"},{"English": "Azerbaijani", "alpha2": "az", "alpha3-b": "aze"},{"English": "Bashkir", "alpha2": "ba", "alpha3-b": "bak"},{"English": "Bambara", "alpha2": "bm", "alpha3-b": "bam"},{"English": "Basque", "alpha2": "eu", "alpha3-b": "baq"},{"English": "Belarusian", "alpha2": "be", "alpha3-b": "bel"},{"English": "Bengali", "alpha2": "bn", "alpha3-b": "ben"},{"English": "Bihari languages", "alpha2": "bh", "alpha3-b": "bih"},{"English": "Bislama", "alpha2": "bi", "alpha3-b": "bis"},{"English": "Bosnian", "alpha2": "bs", "alpha3-b": "bos"},{"English": "Breton", "alpha2": "br", "alpha3-b": "bre"},{"English": "Bulgarian", "alpha2": "bg", "alpha3-b": "bul"},{"English": "Burmese", "alpha2": "my", "alpha3-b": "bur"},{"English": "Catalan; Valencian", "alpha2": "ca", "alpha3-b": "cat"},{"English": "Chamorro", "alpha2": "ch", "alpha3-b": "cha"},{"English": "Chechen", "alpha2": "ce", "alpha3-b": "che"},{"English": "Chinese", "alpha2": "zh", "alpha3-b": "chi"},{"English": "Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic", "alpha2": "cu", "alpha3-b": "chu"},{"English": "Chuvash", "alpha2": "cv", "alpha3-b": "chv"},{"English": "Cornish", "alpha2": "kw", "alpha3-b": "cor"},{"English": "Corsican", "alpha2": "co", "alpha3-b": "cos"},{"English": "Cree", "alpha2": "cr", "alpha3-b": "cre"},{"English": "Czech", "alpha2": "cs", "alpha3-b": "cze"},{"English": "Danish", "alpha2": "da", "alpha3-b": "dan"},{"English": "Divehi; Dhivehi; Maldivian", "alpha2": "dv", "alpha3-b": "div"},{"English": "Dutch; Flemish", "alpha2": "nl", "alpha3-b": "dut"},{"English": "Dzongkha", "alpha2": "dz", "alpha3-b": "dzo"},{"English": "English", "alpha2": "en", "alpha3-b": "eng"},{"English": "Esperanto", "alpha2": "eo", "alpha3-b": "epo"},{"English": "Estonian", "alpha2": "et", "alpha3-b": "est"},{"English": "Ewe", "alpha2": "ee", "alpha3-b": "ewe"},{"English": "Faroese", "alpha2": "fo", "alpha3-b": "fao"},{"English": "Fijian", "alpha2": "fj", "alpha3-b": "fij"},{"English": "Finnish", "alpha2": "fi", "alpha3-b": "fin"},{"English": "French", "alpha2": "fr", "alpha3-b": "fre"},{"English": "Western Frisian", "alpha2": "fy", "alpha3-b": "fry"},{"English": "Fulah", "alpha2": "ff", "alpha3-b": "ful"},{"English": "Georgian", "alpha2": "ka", "alpha3-b": "geo"},{"English": "German", "alpha2": "de", "alpha3-b": "ger"},{"English": "Gaelic; Scottish Gaelic", "alpha2": "gd", "alpha3-b": "gla"},{"English": "Irish", "alpha2": "ga", "alpha3-b": "gle"},{"English": "Galician", "alpha2": "gl", "alpha3-b": "glg"},{"English": "Manx", "alpha2": "gv", "alpha3-b": "glv"},{"English": "Greek, Modern (1453-)", "alpha2": "el", "alpha3-b": "gre"},{"English": "Guarani", "alpha2": "gn", "alpha3-b": "grn"},{"English": "Gujarati", "alpha2": "gu", "alpha3-b": "guj"},{"English": "Haitian; Haitian Creole", "alpha2": "ht", "alpha3-b": "hat"},{"English": "Hausa", "alpha2": "ha", "alpha3-b": "hau"},{"English": "Hebrew", "alpha2": "he", "alpha3-b": "heb"},{"English": "Herero", "alpha2": "hz", "alpha3-b": "her"},{"English": "Hindi", "alpha2": "hi", "alpha3-b": "hin"},{"English": "Hiri Motu", "alpha2": "ho", "alpha3-b": "hmo"},{"English": "Croatian", "alpha2": "hr", "alpha3-b": "hrv"},{"English": "Hungarian", "alpha2": "hu", "alpha3-b": "hun"},{"English": "Igbo", "alpha2": "ig", "alpha3-b": "ibo"},{"English": "Icelandic", "alpha2": "is", "alpha3-b": "ice"},{"English": "Ido", "alpha2": "io", "alpha3-b": "ido"},{"English": "Sichuan Yi; Nuosu", "alpha2": "ii", "alpha3-b": "iii"},{"English": "Inuktitut", "alpha2": "iu", "alpha3-b": "iku"},{"English": "Interlingue; Occidental", "alpha2": "ie", "alpha3-b": "ile"},{"English": "Interlingua (International Auxiliary Language Association)", "alpha2": "ia", "alpha3-b": "ina"},{"English": "Indonesian", "alpha2": "id", "alpha3-b": "ind"},{"English": "Inupiaq", "alpha2": "ik", "alpha3-b": "ipk"},{"English": "Italian", "alpha2": "it", "alpha3-b": "ita"},{"English": "Javanese", "alpha2": "jv", "alpha3-b": "jav"},{"English": "Japanese", "alpha2": "ja", "alpha3-b": "jpn"},{"English": "Kalaallisut; Greenlandic", "alpha2": "kl", "alpha3-b": "kal"},{"English": "Kannada", "alpha2": "kn", "alpha3-b": "kan"},{"English": "Kashmiri", "alpha2": "ks", "alpha3-b": "kas"},{"English": "Kanuri", "alpha2": "kr", "alpha3-b": "kau"},{"English": "Kazakh", "alpha2": "kk", "alpha3-b": "kaz"},{"English": "Central Khmer", "alpha2": "km", "alpha3-b": "khm"},{"English": "Kikuyu; Gikuyu", "alpha2": "ki", "alpha3-b": "kik"},{"English": "Kinyarwanda", "alpha2": "rw", "alpha3-b": "kin"},{"English": "Kirghiz; Kyrgyz", "alpha2": "ky", "alpha3-b": "kir"},{"English": "Komi", "alpha2": "kv", "alpha3-b": "kom"},{"English": "Kongo", "alpha2": "kg", "alpha3-b": "kon"},{"English": "Korean", "alpha2": "ko", "alpha3-b": "kor"},{"English": "Kuanyama; Kwanyama", "alpha2": "kj", "alpha3-b": "kua"},{"English": "Kurdish", "alpha2": "ku", "alpha3-b": "kur"},{"English": "Lao", "alpha2": "lo", "alpha3-b": "lao"},{"English": "Latin", "alpha2": "la", "alpha3-b": "lat"},{"English": "Latvian", "alpha2": "lv", "alpha3-b": "lav"},{"English": "Limburgan; Limburger; Limburgish", "alpha2": "li", "alpha3-b": "lim"},{"English": "Lingala", "alpha2": "ln", "alpha3-b": "lin"},{"English": "Lithuanian", "alpha2": "lt", "alpha3-b": "lit"},{"English": "Luxembourgish; Letzeburgesch", "alpha2": "lb", "alpha3-b": "ltz"},{"English": "Luba-Katanga", "alpha2": "lu", "alpha3-b": "lub"},{"English": "Ganda", "alpha2": "lg", "alpha3-b": "lug"},{"English": "Macedonian", "alpha2": "mk", "alpha3-b": "mac"},{"English": "Marshallese", "alpha2": "mh", "alpha3-b": "mah"},{"English": "Malayalam", "alpha2": "ml", "alpha3-b": "mal"},{"English": "Maori", "alpha2": "mi", "alpha3-b": "mao"},{"English": "Marathi", "alpha2": "mr", "alpha3-b": "mar"},{"English": "Malay", "alpha2": "ms", "alpha3-b": "may"},{"English": "Malagasy", "alpha2": "mg", "alpha3-b": "mlg"},{"English": "Maltese", "alpha2": "mt", "alpha3-b": "mlt"},{"English": "Mongolian", "alpha2": "mn", "alpha3-b": "mon"},{"English": "Nauru", "alpha2": "na", "alpha3-b": "nau"},{"English": "Navajo; Navaho", "alpha2": "nv", "alpha3-b": "nav"},{"English": "Ndebele, South; South Ndebele", "alpha2": "nr", "alpha3-b": "nbl"},{"English": "Ndebele, North; North Ndebele", "alpha2": "nd", "alpha3-b": "nde"},{"English": "Ndonga", "alpha2": "ng", "alpha3-b": "ndo"},{"English": "Nepali", "alpha2": "ne", "alpha3-b": "nep"},{"English": "Norwegian Nynorsk; Nynorsk, Norwegian", "alpha2": "nn", "alpha3-b": "nno"},{"English": "Bokm\u00e5l, Norwegian; Norwegian Bokm\u00e5l", "alpha2": "nb", "alpha3-b": "nob"},{"English": "Norwegian", "alpha2": "no", "alpha3-b": "nor"},{"English": "Chichewa; Chewa; Nyanja", "alpha2": "ny", "alpha3-b": "nya"},{"English": "Occitan (post 1500); Proven\u00e7al", "alpha2": "oc", "alpha3-b": "oci"},{"English": "Ojibwa", "alpha2": "oj", "alpha3-b": "oji"},{"English": "Oriya", "alpha2": "or", "alpha3-b": "ori"},{"English": "Oromo", "alpha2": "om", "alpha3-b": "orm"},{"English": "Ossetian; Ossetic", "alpha2": "os", "alpha3-b": "oss"},{"English": "Panjabi; Punjabi", "alpha2": "pa", "alpha3-b": "pan"},{"English": "Persian", "alpha2": "fa", "alpha3-b": "per"},{"English": "Pali", "alpha2": "pi", "alpha3-b": "pli"},{"English": "Polish", "alpha2": "pl", "alpha3-b": "pol"},{"English": "Portuguese", "alpha2": "pt", "alpha3-b": "por"},{"English": "Pushto; Pashto", "alpha2": "ps", "alpha3-b": "pus"},{"English": "Quechua", "alpha2": "qu", "alpha3-b": "que"},{"English": "Romansh", "alpha2": "rm", "alpha3-b": "roh"},{"English": "Romanian; Moldavian; Moldovan", "alpha2": "ro", "alpha3-b": "rum"},{"English": "Rundi", "alpha2": "rn", "alpha3-b": "run"},{"English": "Russian", "alpha2": "ru", "alpha3-b": "rus"},{"English": "Sango", "alpha2": "sg", "alpha3-b": "sag"},{"English": "Sanskrit", "alpha2": "sa", "alpha3-b": "san"},{"English": "Sinhala; Sinhalese", "alpha2": "si", "alpha3-b": "sin"},{"English": "Slovak", "alpha2": "sk", "alpha3-b": "slo"},{"English": "Slovenian", "alpha2": "sl", "alpha3-b": "slv"},{"English": "Northern Sami", "alpha2": "se", "alpha3-b": "sme"},{"English": "Samoan", "alpha2": "sm", "alpha3-b": "smo"},{"English": "Shona", "alpha2": "sn", "alpha3-b": "sna"},{"English": "Sindhi", "alpha2": "sd", "alpha3-b": "snd"},{"English": "Somali", "alpha2": "so", "alpha3-b": "som"},{"English": "Sotho, Southern", "alpha2": "st", "alpha3-b": "sot"},{"English": "Spanish; Castilian", "alpha2": "es", "alpha3-b": "spa"},{"English": "Sardinian", "alpha2": "sc", "alpha3-b": "srd"},{"English": "Serbian", "alpha2": "sr", "alpha3-b": "srp"},{"English": "Swati", "alpha2": "ss", "alpha3-b": "ssw"},{"English": "Sundanese", "alpha2": "su", "alpha3-b": "sun"},{"English": "Swahili", "alpha2": "sw", "alpha3-b": "swa"},{"English": "Swedish", "alpha2": "sv", "alpha3-b": "swe"},{"English": "Tahitian", "alpha2": "ty", "alpha3-b": "tah"},{"English": "Tamil", "alpha2": "ta", "alpha3-b": "tam"},{"English": "Tatar", "alpha2": "tt", "alpha3-b": "tat"},{"English": "Telugu", "alpha2": "te", "alpha3-b": "tel"},{"English": "Tajik", "alpha2": "tg", "alpha3-b": "tgk"},{"English": "Tagalog", "alpha2": "tl", "alpha3-b": "tgl"},{"English": "Thai", "alpha2": "th", "alpha3-b": "tha"},{"English": "Tibetan", "alpha2": "bo", "alpha3-b": "tib"},{"English": "Tigrinya", "alpha2": "ti", "alpha3-b": "tir"},{"English": "Tonga (Tonga Islands)", "alpha2": "to", "alpha3-b": "ton"},{"English": "Tswana", "alpha2": "tn", "alpha3-b": "tsn"},{"English": "Tsonga", "alpha2": "ts", "alpha3-b": "tso"},{"English": "Turkmen", "alpha2": "tk", "alpha3-b": "tuk"},{"English": "Turkish", "alpha2": "tr", "alpha3-b": "tur"},{"English": "Twi", "alpha2": "tw", "alpha3-b": "twi"},{"English": "Uighur; Uyghur", "alpha2": "ug", "alpha3-b": "uig"},{"English": "Ukrainian", "alpha2": "uk", "alpha3-b": "ukr"},{"English": "Urdu", "alpha2": "ur", "alpha3-b": "urd"},{"English": "Uzbek", "alpha2": "uz", "alpha3-b": "uzb"},{"English": "Venda", "alpha2": "ve", "alpha3-b": "ven"},{"English": "Vietnamese", "alpha2": "vi", "alpha3-b": "vie"},{"English": "Volap\u00fck", "alpha2": "vo", "alpha3-b": "vol"},{"English": "Welsh", "alpha2": "cy", "alpha3-b": "wel"},{"English": "Walloon", "alpha2": "wa", "alpha3-b": "wln"},{"English": "Wolof", "alpha2": "wo", "alpha3-b": "wol"},{"English": "Xhosa", "alpha2": "xh", "alpha3-b": "xho"},{"English": "Yiddish", "alpha2": "yi", "alpha3-b": "yid"},{"English": "Yoruba", "alpha2": "yo", "alpha3-b": "yor"},{"English": "Zhuang; Chuang", "alpha2": "za", "alpha3-b": "zha"},{"English": "Zulu", "alpha2": "zu", "alpha3-b": "zul"}]`);
-        const map = new Map();
-        const reversemap = new Map();
-
-        getLangInfos.data = data.map((entry, index) => {
-            let newentry = {
-                lang: entry.English,
-                codes: [entry.alpha2, entry["alpha3-b"]]
-            };
-            map.set(entry.alpha2, newentry);
-            map.set(entry["alpha3-b"], newentry);
-            reversemap.set(entry.English.toLowerCase(), newentry);
-            return newentry;
-        });
-
-        getLangInfos.map = map;
-        getLangInfos.reverse = reversemap;
-    })();
-
-
 
 
 
@@ -736,7 +320,32 @@
                                     }
                                 },
                                 subtitles(e) {
-                                    if (self.elements.buttons.subtitles.href === doc.location.href) e.preventDefault();
+                                    e.preventDefault();
+                                    if (self.elements.buttons.subtitles.href === doc.location.href) return;
+                                    let
+                                            src = new URL(self.elements.buttons.subtitles.href),
+                                            pos = src.pathname.lastIndexOf('/') + 1,
+                                            filename = src.pathname.substr(pos),
+                                            convert = !(/\.srt/.test(src.pathname));
+
+                                    if (filename.lastIndexOf('.') !== -1) filename = filename.substr(0, filename.lastIndexOf('.'));
+                                    filename += ".srt";
+
+                                    fetch(src.href, {cache: "default", redirect: 'follow'})
+                                            .then(r => {
+                                                if (r.status === 200) {
+                                                    r.text().then(text => {
+                                                        let parsed, srt;
+                                                        if (Array.isArray(parsed = Subtitle.parse(text)) && parsed.length > 0) {
+                                                            srt = Subtitle.stringify(parsed);
+                                                            Text2File(srt, filename);
+                                                        }
+                                                    });
+                                                }
+                                            }).catch(ex => console.error(ex));
+
+
+
                                 },
                                 code(e) {
                                     e.preventDefault();
@@ -1025,7 +634,7 @@
 
         set lang(langcode) {
             if (typeof langcode === s) {
-                let entry = getLangInfos(langcode);
+                let entry = isoCode(langcode);
                 this.label = entry.lang;
                 this.element.setAttribute('srclang', entry.codes[0]);
             }
@@ -1037,6 +646,35 @@
 
         constructor(src, lang = "") {
             this.__element = html2element(`<track kind="subtitles" label="Caption" srclang="" src="" />`);
+            Events(this.__element).on('load error', e => {
+                let target = e.target, src = target.src;
+
+                if (/^blob/.test(src)) return;
+                if (target.data('loading') === true) return;
+                target.data('loading', true);
+
+
+                if (e.type === "error") src = "https://cors-anywhere.herokuapp.com/" + src;
+
+                fetch(src, {cache: "default", redirect: 'follow'})
+                        .then(r => {
+                            if (r.status === 200) {
+                                r.text().then(text => {
+                                    let parsed, vtt, blob, virtualurl;
+                                    if (Array.isArray(parsed = Subtitle.parse(text)) && parsed.length > 0) {
+                                        vtt = Subtitle.stringifyVtt(parsed);
+                                        if (typeof vtt === s && vtt.length > 0) {
+                                            blob = new Blob([vtt], {type: "text/vtt"});
+                                            e.target.dataset.src = e.target.src;
+                                            virtualurl = URL.createObjectURL(blob);
+                                            e.target.src = virtualurl;
+                                            target.data('loading', null);
+                                        }
+                                    }
+                                });
+                            }
+                        }).catch(ex => console.error(ex));
+            });
             if (typeof src === s && src.length > 0) this.src = src;
             this.lang = lang;
         }
@@ -1114,7 +752,7 @@
         constructor(video) {
             const self = this;
             Object.assign(self, {
-                __element: html2element(`<video controls src="" preload="none" tabindex="-1" class="altvideo" />`),
+                __element: html2element(`<video controls src="" crossorigin="" preload="none" tabindex="-1" class="altvideo" />`),
                 sources: [],
                 captions: []
             });
@@ -1200,7 +838,7 @@
             }*/
 
             const plyropts = {
-                captions: { active: true, language: 'auto', update: true },
+                captions: {active: false, language: 'auto', update: true},
                 settings: ['captions', 'quality'],
                 keyboard: { focused: true, global: true }
             }, self = this;
@@ -1231,40 +869,6 @@
                 self.video.style.height = `${doc.documentElement.clientHeight}px`;
             }
 
-            /**
-             * Loads Subtitle tracks
-             */
-            function loadsubtitles() {
-                self.altvideo.captions.forEach(caption => {
-                    if (typeof caption.src === s) {
-                        let url = new URL(caption.src), src = caption.src;
-                        if (url.origin !== doc.location.origin) {
-                            url = "https://cors-anywhere.herokuapp.com/" + url.href;
-                        } else {
-                            url = url.href;
-                        }
-                        fetch(url, { cache: "default", redirect: 'follow' })
-                            .then(r => {
-                                if (r.status === 200) {
-                                    r.text().then(text => {
-                                        let parsed, vtt, blob, virtualurl;
-                                        if (Array.isArray(parsed = Subtitle.parse(text)) && parsed.length > 0) {
-                                            vtt = Subtitle.stringifyVtt(parsed);
-                                            if (typeof vtt === s && vtt.length > 0) {
-                                                blob = new Blob([vtt], { type: "text/vtt" });
-                                                caption.element.dataset.src = src;
-                                                virtualurl = URL.createObjectURL(blob);
-                                                caption.element.src = virtualurl;
-                                            }
-                                        }
-                                    });
-                                }
-                            }).catch(ex => console.error(ex));
-                    }
-                });
-            }
-
-            this.loadsubtitles = loadsubtitles;
 
             /**
              * add subs #sub=
@@ -1301,11 +905,21 @@
                 self.elements.root.insertBefore(self.video, self.elements.root.firstChild);
                 doc.body.innerHTML = "";
                 doc.body.insertBefore(self.elements.root, doc.body.firstChild);
-
-                self.loadsubtitles();
                 //loads StreamGrabber
                 self.grabber = new StreamGrabber(self.video, typeof HostModule === f ? HostModule : MainModule);
 
+                self.altvideo.on('languagechange', e => {
+                    let
+                            btn = self.grabber.elements.buttons.subtitles,
+                            captions = self.altvideo.captions,
+                            detail = e.detail.plyr.captions,
+                            id = detail.currentTrack;
+                    btn.classList.add('hidden');
+                    if (id !== -1) {
+                        btn.classList.remove('hidden');
+                        btn.href = captions[id].element.data('src') || captions[id].element.src;
+                    }
+                });
 
                 //loads Plyr
                 self.plyr = new Plyr(self.video, self.plyropts);
@@ -1347,30 +961,25 @@
                                 self.grabber.videolink = () => {
                                     return self.video.dataset.src;
                                 };
+                                //reload tracks
+                                let ct = self.plyr.captions.currentTrack;
+                                self.plyr.captions.currentTrack = -1;
+                                if(ct !== -1){
+                                    let track = self.altvideo.captions[ct].element, src = track.data('src') || track.src;
+                                    track.src = src;
+                                    self.plyr.captions.currentTrack = ct;
+                                }
+
+
                                 self.altvideo.play();
                             });
                             hls.on(Hls.Events.MEDIA_ATTACHED, () => {
                                 hls.loadSource(url);
                             });
-
-                            self.altvideo.one('play', () => {
-                                //reloads subs on plyr
-                                self.altvideo.captions.forEach(caption => {
-                                    caption.src = caption.src;
-                                });
-
-
-                            });
                             hls.attachMedia(self.video);
                         }
                     });
-                    //activate first subtitle track
-                    let currentTrack = self.plyr.currentTrack;
-                    if (self.altvideo.captions.length > 0 && currentTrack === -1) {
-                        setTimeout(() => {
-                            self.plyr.currentTrack = currentTrack = 0;
-                        }, 600);
-                    }
+
                     //video auto size
                     window.addEventListener('resize', resizevideo);
                     resizevideo();
@@ -1849,7 +1458,7 @@
 
 
         return find('video.dplayer-video', (video) => {
-            console.debug(video);
+
 
             if (typeof main === s) {
 
@@ -1859,7 +1468,7 @@
                     self.altvideo = new altvideo();
                     self.altvideo.addSource(m3u8, "default", "hls");
                     self.altvideo.sources[0].selected = true;
-                    console.debug(m3u8, self);
+
                 });
 
 
@@ -1889,91 +1498,75 @@
     if (/hdv/.test(doc.location.host)) {
 
         return NodeFinder.find('video#player', video => {
-            if ((typeof dt === o) && Array.isArray(dt)) {
-                video.remove();
-                const opts = [], sources = {}, urls = [];
-                window.alt = alt = new AltPlayer(self => {
-                    self.altvideo = new altvideo();
-                    self.altvideo.poster = video.poster;
-                    if(typeof dt === o){
-                        dt.forEach((item, i) => {
-                            let src = doc.location.origin;
-                            src += '/m3u8/';
-                            src += item.name;
-                            src += '.m3u8';
-                            let size = item.res + i;
-                            self.altvideo.addSource(src, size, "hls");
-                            opts.push(size);
-                            sources[size] = {
-                                src: src,
-                                fid: item.fid
-                            };
-                            urls.push(src);
-                        });
-                    }
-                    if (typeof hd === o) {
-                        hd.forEach((item, i) => {
-                            let src = doc.location.origin;
-                            src += '/m3u8/';
-                            src += item.name;
-                            src += '.m3u8';
-                            if (urls.includes(src)) return;
-                            let size = item.res + i;
-                            self.altvideo.addSource(src, size, "hls");
-                            opts.push(size);
-                            sources[size] = {
-                                src: src,
-                                fid: item.fid
-                            };
-                            urls.push(src);
-                        });
-                    }
-                    if (typeof sd === o) {
-                        sd.forEach((item, i) => {
-                            let src = doc.location.origin;
-                            src += '/m3u8/';
-                            src += item.name;
-                            src += '.m3u8';
-                            if (urls.includes(src)) return;
-                            let size = item.res + i;
-                            self.altvideo.addSource(src, size, "hls");
-                            opts.push(size);
-                            sources[size] = {
-                                src: src,
-                                fid: item.fid
-                            };
-                            urls.push(src);
-                        });
-                    }
-                    
+            //here
+            video.remove();
+            let opts = [], sources = {}, urls = [], list = [];
+            if (typeof dt === o) list = list.concat(dt);
+            if (typeof hd === o) list = list.concat(hd);
+            if (typeof sd === o) list = list.concat(sd);
+            window.alt = alt = new AltPlayer(self => {
+                const altvid = self.altvideo = new altvideo();
+                altvid.poster = video.poster;
+                
 
-                    // self.loadsubtitles = x => x;
+                
+                list.forEach((item, i)=>{
+                    let
+                            src = doc.location.origin + '/m3u8/' + item.name + '.m3u8',
+                            size = item.res + i;
+                    if (urls.includes(src)) return;
+                    opts.push(size);
+                    urls.push(src);
 
-                    self.altvideo.sources[0].selected = true;
-                    self.plyropts.quality = {
-                        default: opts[0],
-                        options: opts,
-                        forced: true,
-                        onChange(size){
-
-                            //  self.altvideo.element.querySelectorAll('track').forEach(track => track.remove());
-                            // self.altvideo.captions = [];
-                            self.altvideo.element.src = sources[size].src;
-                            /* if ((typeof sub === o) && (typeof sub[sources[size].fid] === o)) {
-                                Object.keys(sub[sources[size].fid]).forEach(lang => {
-                                    if(/(english|french)/.test(lang)){
-                                        let caption = self.altvideo.addCaption('https://sub1.hdv.fun/vtt1/' + sub[sources[size].fid][lang][0][1] + '.vtt', null, lang);
-                                        self.loadsubtitles();
-                                    }
-
-                                });
-                            }*/
-
-
-                        }
+                    sources[size] = {
+                        src: src,
+                        fid: item.fid,
+                        captions: []
                     };
+                    if ((typeof sub === o) && (typeof sub[sources[size].fid] === o)) {
+                        Object.keys(sub[sources[size].fid]).forEach(lang => {
+                            if (!(/(english|french)/i.test(lang))) return;
+
+
+                            if (Array.isArray(sub[sources[size].fid][lang])) {
+                                let c = 0;
+                                sub[sources[size].fid][lang].forEach(arr => {
+                                    c++;
+                                    if (c > 5) return;
+                                    sources[size].captions.push({
+                                        src: 'https://sub1.hdv.fun/vtt1/' + arr[1] + '.vtt',
+                                        lang: lang
+                                    });
+                                });
+                            }
+
+                        });
+                    }
+                    altvid.addSource(src, size, "hls");
+
                 });
-            }
+
+
+                self.plyropts.quality = {
+                    default: opts[0],
+                    options: opts,
+                    forced: true,
+                    onChange(size){
+                        let current = altvid.element.data('src') || altvid.element.src;
+                        const item = sources[size];
+                        if(item.src !== current){
+                            altvid.element.querySelectorAll('track').forEach(track => track.remove());
+                            altvid.captions = [];
+                            item.captions.forEach(entry => {
+                                altvid.addCaption(entry.src, null, entry.lang);
+                            });
+                            altvid.element.src = item.src;
+                        }
+                    }
+                };
+                // altvid.sources[0].selected = true;
+            });
+
 
         });
     }
