@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.7
+// @version     1.5b2.7.1
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -1263,6 +1263,9 @@
                     }
                 });
             }
+
+            this.loadsubtitles = loadsubtitles;
+
             /**
              * add subs #sub=
              */
@@ -1299,7 +1302,7 @@
                 doc.body.innerHTML = "";
                 doc.body.insertBefore(self.elements.root, doc.body.firstChild);
 
-                loadsubtitles();
+                self.loadsubtitles();
                 //loads StreamGrabber
                 self.grabber = new StreamGrabber(self.video, typeof HostModule === f ? HostModule : MainModule);
 
@@ -1888,27 +1891,85 @@
         return NodeFinder.find('video#player', video => {
             if ((typeof dt === o) && Array.isArray(dt)) {
                 video.remove();
-                const opts = [], sources = {};
+                const opts = [], sources = {}, urls = [];
                 window.alt = alt = new AltPlayer(self => {
                     self.altvideo = new altvideo();
                     self.altvideo.poster = video.poster;
-                    dt.forEach((item, i) => {
-                        let src = doc.location.origin;
-                        src += '/m3u8/';
-                        src += item.name;
-                        src += '.m3u8';
-                        let size = item.res + i;
-                        self.altvideo.addSource(src, size, "hls");
-                        opts.push(size);
-                        sources[size] = src;
-                    });
+                    if(typeof dt === o){
+                        dt.forEach((item, i) => {
+                            let src = doc.location.origin;
+                            src += '/m3u8/';
+                            src += item.name;
+                            src += '.m3u8';
+                            let size = item.res + i;
+                            self.altvideo.addSource(src, size, "hls");
+                            opts.push(size);
+                            sources[size] = {
+                                src: src,
+                                fid: item.fid
+                            };
+                            urls.push(src);
+                        });
+                    }
+                    if (typeof hd === o) {
+                        hd.forEach((item, i) => {
+                            let src = doc.location.origin;
+                            src += '/m3u8/';
+                            src += item.name;
+                            src += '.m3u8';
+                            if (urls.includes(src)) return;
+                            let size = item.res + i;
+                            self.altvideo.addSource(src, size, "hls");
+                            opts.push(size);
+                            sources[size] = {
+                                src: src,
+                                fid: item.fid
+                            };
+                            urls.push(src);
+                        });
+                    }
+                    if (typeof sd === o) {
+                        sd.forEach((item, i) => {
+                            let src = doc.location.origin;
+                            src += '/m3u8/';
+                            src += item.name;
+                            src += '.m3u8';
+                            if (urls.includes(src)) return;
+                            let size = item.res + i;
+                            self.altvideo.addSource(src, size, "hls");
+                            opts.push(size);
+                            sources[size] = {
+                                src: src,
+                                fid: item.fid
+                            };
+                            urls.push(src);
+                        });
+                    }
+                    
+
+                    // self.loadsubtitles = x => x;
+
                     self.altvideo.sources[0].selected = true;
                     self.plyropts.quality = {
                         default: opts[0],
                         options: opts,
                         forced: true,
                         onChange(size){
-                            self.altvideo.element.src = sources[size];
+
+                            self.altvideo.element.querySelectorAll('track').forEach(track => track.remove());
+                            self.altvideo.captions = [];
+                            self.altvideo.element.src = sources[size].src;
+                            if ((typeof sub === o) && (typeof sub[sources[size].fid] === o)) {
+                                Object.keys(sub[sources[size].fid]).forEach(lang => {
+                                    if(/(english|french)/.test(lang)){
+                                        let caption = self.altvideo.addCaption('https://sub1.hdv.fun/vtt1/' + sub[sources[size].fid][lang][0][1] + '.vtt', null, lang);
+                                        self.loadsubtitles();
+                                    }
+
+                                });
+                            }
+
+
                         }
                     };
                 });
