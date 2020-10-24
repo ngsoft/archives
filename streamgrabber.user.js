@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.7.4
+// @version     1.5b2.7.5
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -47,6 +47,7 @@
 // @include     *://*novelplanet.*/v/*
 // @include     *://*gaobook.*/v/*
 // @include     *://*streamtape.*/e/*
+// @include     *://*streamtape.*/v/*
 //
 // @include     *://hls.hdv*/imdb/*
 // ==/UserScript==
@@ -1497,6 +1498,9 @@
     }
     
     if (/streamtape/.test(doc.location.host)) {
+        if (/^\/v\//.test(doc.location.pathname)) {
+            location.replace(location.pathname.replace(/^\/v\//, '/e/'));
+        }
 
 
 
