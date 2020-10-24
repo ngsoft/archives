@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.7.2
+// @version     1.5b2.7.3
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -19,11 +19,6 @@
 // @include     *://*uptostream.com/iframe/*
 // @include     *://*yourupload.com/embed/*
 // @include     *://*xstreamcdn.com/v/*
-// @include     *://*gcloud.live/v/*
-// @include     *://*fembed.com/v/*
-// @include     *://*fcdn.stream/v/*
-// @include     *://*feurl.*/v/*
-// @include     *://*there.to/v/*
 // @include     *://*vidstreaming.io/*
 // @include     *://*vidcloud*/*
 // @include     *://*gdriveplayer.*/*
@@ -44,8 +39,6 @@
 // @include     *://player.drama3s.*/*
 //
 // @include     *://vidoza.net/embed-*.html
-// @include     *://*novelplanet.*/v/*
-// @include     *://*gaobook.*/v/*
 // @include     *://*streamtape.*/e/*
 //
 // @include     *://hls.hdv*/imdb/*
@@ -1298,16 +1291,7 @@
     })();
 
 
-    /**
-     * Mods for hosts
-     */
-    if (/(xstreamcdn|fembed|feurl|there|gcloud|novelplanet|gaobook|fcdn)/.test(doc.location.host)) {
-        find('#resume', x => x.remove(), 5000);
-        find('#loading .fakeplaybutton', button => {
-            button.parentElement.remove();
-            clientSide.setup();
-        }, 5000);
-    }
+
 
     if (/(vidstreaming|vidcloud|dramacool|watchasian|kshows|k\-vid)/.test(doc.location.host)) {
 
