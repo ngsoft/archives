@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        KodiRPC
 // @namespace   https://github.com/ngsoft
-// @version     1.3.1
+// @version     1.4
 // @description Send Stream URL to Kodi using jsonRPC
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
@@ -77,7 +77,176 @@
             });
         }
 
-        send(link, success, error) {
+
+        sendRPC(method, params){
+            let  address = this.address;
+
+            return new Promise((resolve, reject) => {
+                params = params || {};
+                if (typeof method !== s || method.length === 0) reject();
+                const data = JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: method,
+                    params: params,
+                    id: Math.floor(Math.random() * (99 - 1) + 1)
+                });
+                GM_xmlhttpRequest({
+                    method: 'POST',
+                    url: address,
+                    data: data,
+                    headers: {"Content-Type": "application/json"},
+                    onload(xhr){
+                        if (xhr.status === 200) resolve(JSON.parse(xhr.response));
+                        else reject();
+                    },
+                    onerror(){
+                        reject();
+                    }
+                });
+            });
+        }
+
+        _clearPlaylist(){
+            const params = {
+                playlistid: 1
+            };
+
+            return this.sendRPC("Playlist.Clear", params);
+        }
+
+        _addToPlaylist(file){
+            const params = {
+                playlistid: 1,
+                item: {
+                    file: file
+                }
+            };
+
+            return this.sendRPC("Playlist.Add", params);
+        }
+        _playFromPlaylist(position = 0){
+            const params = {
+                item: {
+                    playlistid: 1,
+                    position: position
+                }
+            };
+
+            return this.sendRPC("Player.Open", params);
+        }
+
+        _getActivePlayers(){
+            const params = {};
+            return this.sendRPC("Player.GetActivePlayers", params);
+        }
+        _queue(file){
+            return new Promise((resolve, reject) => {
+
+                if (!file)
+                {
+                    reject();
+                    return;
+                }
+
+                this._addToPlaylist(file)
+                        .then(response => {
+
+                            if (response.result == "OK") {
+                                return this._getActivePlayers();
+                            }
+                            return reject();
+                        })
+                        .then(response => {
+
+                            const result = response.result;
+                            // check if no video is playing and start the first video in queue
+                            if (result && result.length <= 0) {
+                                return this._playFromPlaylist();
+                            }
+                        })
+                        .then(response => {
+                            resolve(response);
+                        })
+                        .catch(() => {
+                            reject();
+                        });
+
+            });
+
+        }
+
+        ping(){
+            return this.sendRPC("JSONRPC.Ping");
+        }
+
+
+        playVideo(file){
+            return new Promise((resolve, reject) => {
+
+                this._clearPlaylist()
+                        .then(response => {
+                            return this._addToPlaylist(file);
+                        })
+                        .then(response => {
+                            return this._playFromPlaylist();
+                        })
+                        .then(response => {
+                            resolve(response);
+                        }).catch(() => {
+                    reject();
+                });
+            });
+        }
+
+
+        queueVideo(file){
+            return new Promise((resolve, reject) => {
+
+                this._getActivePlayers()
+                        .then(response => {
+
+                            const result = response.result;
+                            if (result && result.length <= 0)
+                            {
+                                return this._clearPlaylist();
+                            }
+                        })
+                        .then(response => {
+                            return this._queue(file);
+                        })
+                        .then(response => {
+
+                            resolve(response);
+                        })
+                        .catch(() => {
+
+                            reject();
+                        });
+            });
+        }
+
+        send(link, success, error){
+            const self = this;
+            return new Promise((resolve, reject)=>{
+                if (typeof link === s && /^http/.test(link)) {
+                    this
+                            .queueVideo(link)
+                            .then(() => {
+                                if (typeof success === f) success.call(self, link);
+                                resolve();
+
+                            })
+                            .catch(() => {
+                                if (typeof error === f) error.call(self, link);
+                                reject();
+                            });
+                }
+            });
+
+
+        }
+
+        oldsend(link, success, error){
             if (typeof link === s && /^http/.test(link)) {
                 let server = this.address, self = this, data = JSON.stringify({
                     jsonrpc: '2.0',
