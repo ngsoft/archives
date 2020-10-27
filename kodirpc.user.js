@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name        KodiRPC
 // @namespace   https://github.com/ngsoft
-// @version     1.4
+// @version     1.4.1
 // @description Send Stream URL to Kodi using jsonRPC
 // @author      daedelus
 // @icon        https://kodi.tv/favicon.ico
 // @run-at      document-end
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/kodirpc.user.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/kodirpc.user.js
+// @updateURL   https://raw.githubusercontent.com/ngsoft/userscripts/master/src/kodirpc.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/userscripts/master/src/kodirpc.user.js
 // @require     https://cdn.jsdelivr.net/gh/ngsoft/userscripts@1.2.5/dist/gmutils.min.js
 // @compatible  firefox+greasemonkey(3.17)
 // @compatible  firefox+tampermonkey
