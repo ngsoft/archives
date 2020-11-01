@@ -1516,7 +1516,7 @@
                             })
                             .then(url => {
                                 mainvideo.data('src', url);
-                                mainvideo.src = url;
+                                mainvideo.src = videolink;
                                 player.currentTrack = 0;
                                 if (overlay instanceof Element) overlay.remove();
 
@@ -1533,10 +1533,7 @@
         return NodeFinder.find('.plyr-container video#mainvideo[src*="tape"]', video => {
             //video.pause();
             const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
-            grabber.videolink = function(){
-                let src = video.data('src') || getURL(video.src);
-                return src;
-            };
+
         });
 
     }
