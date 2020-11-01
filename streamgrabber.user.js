@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.7.5
+// @version     1.5b2.7.6
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -1485,10 +1485,6 @@
                     self.altvideo.sources[0].selected = true;
 
                 });
-
-
-
-
             }
 
 
@@ -1500,16 +1496,48 @@
     if (/streamtape/.test(doc.location.host)) {
         if (/^\/v\//.test(doc.location.pathname)) {
             location.replace(location.pathname.replace(/^\/v\//, '/e/'));
+            return;
         }
 
 
+        on.loaded().then(() => {
+            try {
+                let
+                        videolink = doc.getElementById("videolink").innerText + "&stream=1",
+                        mainvideo = doc.querySelector('#mainvideo'),
+                        overlay = doc.querySelector('.plyr-overlay');
 
-        NodeFinder.find('iframe', x => x.remove());
-        return NodeFinder.find('.plyr-container video#mainvideo[src*="streamtape"]', video => {
-            //video.pause();
-            const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
+                if (mainvideo instanceof Element && typeof player === o) {
+                    fetch(getURL(videolink), {cache: 'no-store', redirect: 'follow', credentials: 'same-origin'})
+                            .then(response => {
+                                console.debug(response);
+                                if (response.redirected === true) return response.url;
+                                throw new Error('Cannot redirect to video')
+                            })
+                            .then(url => {
+                                mainvideo.data('src', url);
+                                mainvideo.src = url;
+                                player.currentTrack = 0;
+                                if (overlay instanceof Element) overlay.remove();
+
+                            })
+                            .catch(x => x);
+                }
+            
+        } catch (e) {  }
+
+
         });
 
+        NodeFinder.find('iframe, .plyr__resume', x => x.remove());
+        return NodeFinder.find('.plyr-container video#mainvideo[src*="tape"]', video => {
+            //video.pause();
+            const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
+            grabber.videolink = function(){
+                let src = video.data('src') || getURL(video.src);
+                return src;
+            };
+        });
 
     }
 
