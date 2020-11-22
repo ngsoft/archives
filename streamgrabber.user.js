@@ -2,7 +2,7 @@
 // @name        Stream Grabber
 // @author      daedelus
 // @namespace   https://github.com/ngsoft
-// @version     1.5b2.7.8
+// @version     1.5b2.7.9
 // @description Helps to download streams (videojs, jwvideo based sites)
 // @grant       none
 // @run-at      document-body
@@ -1540,7 +1540,50 @@
 
     if (/hdv/.test(doc.location.host)) {
 
+
+
+        const algo = {
+            Qe(e){
+                try {
+                    if (void 0 !== window.Storage) {
+                        let t = localStorage.getItem(e);
+                        if (t) return t;
+                        {
+                            let t = document.cookie.match(new RegExp("(^| )" + e + "=([^;]+)"));
+                            if (t) return t[2];
+                        }
+                    } else {
+                        let t = document.cookie.match(new RegExp("(^| )" + e + "=([^;]+)"));
+                        if (t) return t[2];
+                    }
+                } catch (rt) {
+                    try {
+                        let t = document.cookie.match(new RegExp("(^| )" + e + "=([^;]+)"));
+                        if (t) return t[2];
+                    } catch (t) {
+                    }
+                }
+            },
+            et(e){
+                try {
+                    return e.split("").reverse().join("");
+                } catch (rt) {
+                    return "";
+                }
+            },
+            token(){
+                let r = this.Qe("hdv_user");
+                r || (r = window.hdv_user);
+                return btoa(this.et(btoa(this.et(r))));
+
+            }
+        };
+
+
         return NodeFinder.find('video#player', video => {
+
+            const token = algo.token();
+
             //here
             video.remove();
             let opts = [], sources = {}, urls = [], list = [];
@@ -1555,7 +1598,7 @@
                 
                 list.forEach((item, i)=>{
                     let
-                            src = doc.location.origin + '/m3u8/' + item.name + '.m3u8',
+                            src = doc.location.origin + '/m3u8/' + item.name + '.m3u8?u=' + token,
                             size = item.res + i;
                     if (urls.includes(src)) return;
                     opts.push(size);
@@ -1569,7 +1612,6 @@
                     if ((typeof sub === o) && (typeof sub[sources[size].fid] === o)) {
                         Object.keys(sub[sources[size].fid]).forEach(lang => {
                             if (!(/(english|french)/i.test(lang))) return;
-
 
                             if (Array.isArray(sub[sources[size].fid][lang])) {
                                 let c = 0;
