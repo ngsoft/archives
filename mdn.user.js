@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MDN + PHP Web Docs
 // @namespace   https://github.com/ngsoft
-// @version     2.3
+// @version     2.3.1
 // @description Use MDN Web Docs and PHP UI to store locale and auto redirect to the choosen on every pages
 // @author      daedelus
 // @include     *://developer.mozilla.org/*
@@ -30,6 +30,7 @@
                 }
 
                 get current(){
+                    console.debug(this.key);
                     return localStorage.getItem(this.key) || "";
                 }
 
@@ -94,31 +95,35 @@
      */
 
     if (location.hostname === "developer.mozilla.org") {
+        
+        
+        tools.on('.locale-container form.language-menu', 'submit', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            let target = e.target.closest('form');
+            if (target.elements.language) {
 
-        tools.on('#language-menu', "click", e => {
-            let t = e.target.closest('li[lang]');
-            if (t !== null) {
-                e.preventDefault();
                 let
-                        locale = t.getAttribute('lang') || "",
-                        a = t.firstElementChild;
+                        select = target.elements.language,
+                        selectedIndex = select.selectedIndex,
+                        option = select[selectedIndex],
+                        matches;
 
-                if(a instanceof Element){
-                    if (locale.length > 0) {
-                        lang.current = locale;
-                        location.replace(a.href); //no history change
-                    } else location.href = a.href; //must be contribute page
+                if (matches = /^\/([\w\-]+)\//.exec(option.value)) {
+                    lang.current = matches[1];
+                    location.replace(option.value);
+                } else if (/^[\w\-]$/.test(option.value)) {
+                    lang.current = option.value;
                 }
 
             }
         });
-
-
-        doc.querySelectorAll('#language-menu li[lang]').forEach(li => {
-            let locale = li.getAttribute('lang') || "", a = li.firstElementChild;
-            if (lang.is(locale) && (a instanceof Element ? location.href !== a.href : false)) location.replace(a.href);
-
-        });
+        if (lang.current.length > 0) {
+            let option;
+            if (option = doc.querySelector(`.locale-container form.language-menu option[value*="/${lang.current}/"]`)) {
+                location.replace(option.value);
+            }
+        }
 
     }
 
