@@ -48,6 +48,8 @@
 // @include     *://*gaobook.*/v/*
 // @include     *://*streamtape.*/e/*
 // @include     *://*streamtape.*/v/*
+// @include     *://*streamta.*/v/*
+// @include     *://*streamta.*/e/*
 //
 // @include     *://hls.hdv*/imdb/*
 // ==/UserScript==
@@ -1493,7 +1495,7 @@
 
     }
     
-    if (/streamtape/.test(doc.location.host)) {
+    if (/streamta/.test(doc.location.host)) {
         if (/^\/v\//.test(doc.location.pathname)) {
             location.replace(location.pathname.replace(/^\/v\//, '/e/'));
             return;
@@ -1530,7 +1532,7 @@
         });
 
         NodeFinder.find('iframe, .plyr__resume', x => x.remove());
-        return NodeFinder.find('.plyr-container video#mainvideo[src*="tape"]', video => {
+        return NodeFinder.find('.plyr-container video#mainvideo[src*="tape"], .plyr-container video#mainvideo[src*="get_video"]', video => {
             //video.pause();
             const grabber = window.grabber = new StreamGrabber(video, typeof HostModule === f ? HostModule : MainModule);
 
