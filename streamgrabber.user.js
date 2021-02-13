@@ -50,6 +50,9 @@
 // @include     *://*streamtape.*/v/*
 // @include     *://*streamta.*/v/*
 // @include     *://*streamta.*/e/*
+// @include     *://*strtape.*/v/*
+// @include     *://*strtape.*/e/*
+//
 //
 // @include     *://hls.hdv*/imdb/*
 // ==/UserScript==
@@ -1495,7 +1498,7 @@
 
     }
     
-    if (/streamta/.test(doc.location.host)) {
+    if (/str(eam)?ta/.test(doc.location.host)) {
         if (/^\/v\//.test(doc.location.pathname)) {
             location.replace(location.pathname.replace(/^\/v\//, '/e/'));
             return;
