@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MDN + PHP Web Docs
 // @namespace   https://github.com/ngsoft
-// @version     2.3.1
+// @version     2.3.2
 // @description Use MDN Web Docs and PHP UI to store locale and auto redirect to the choosen on every pages
 // @author      daedelus
 // @include     *://developer.mozilla.org/*
@@ -9,8 +9,8 @@
 // @noframes
 // @grant       none
 // run-at       document-end
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/mdn.user.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/mdn.user.js
+// @updateURL   https://raw.githubusercontent.com/ngsoft/userscripts/master/src/mdn.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/userscripts/master/src/mdn.user.js
 // @icon        https://developer.mozilla.org/favicon.ico
 // ==/UserScript==
 
