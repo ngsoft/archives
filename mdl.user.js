@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MyDramaList
 // @namespace    https://github.com/ngsoft
-// @version      1.0
+// @version      1.1
 // @description  UI Remaster
 // @author       daedelus
 // @include     *://mydramalist.*/*
@@ -9,8 +9,10 @@
 // @grant none
 // @run-at      document-start
 // @noframes
-// @updateURL   https://raw.githubusercontent.com/ngsoft/archives/master/mdl.user.js
-// @downloadURL https://raw.githubusercontent.com/ngsoft/archives/master/mdl.user.js
+// @updateURL   https://raw.githubusercontent.com/ngsoft/userscripts/master/src/mdl.user.js
+// @downloadURL https://raw.githubusercontent.com/ngsoft/userscripts/master/src/mdl.user.js
+// @icon        https://mydramalist.com/favicon.ico
+//
 // ==/UserScript==
 
 
