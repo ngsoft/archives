@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Novel Audio Reader
 // @namespace  https://github.com/ngsoft
-// @version    1.0.4
+// @version    1.0.5
 // @author     daedelus
 // @icon       data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAADAFBMVEVHcEwBAQEcGhoKCAkZFxcSDQ3HXEskGBglGxs1HRsEAgIuLi4MCgoPDg0RDw8JCQkJCgm9UkENCwsQDg4RDAwJCQkEBAQQDg3egnqMIh4aGRn1lJE0Li4AAAAXFRZaVlYzMTEhICA7LCtGQ0O4fXk4Nzg8OTlYUE8JCQnThYBwcHBZRkZxcHGtX1ZpZWRlGRZdFhNdEAtbTk3AUj9LS0vYiobIcGQLCwvUgnxCLSvBSzgSCgpCQkJIRkZAP0BGEhILCQnrkY05FBGLU04uLS09PT3CWkm7VERBQkHhkI5iYmJSUVFXSEgICAjGXUxMR0fShH49PDytSz7FXU3kjoeKIiHlk4+6SjilpaWPQD+lpaV9eHiOjo5AGBheYF9jEw15eHl5enmde3mAgoK6LBUTExO6KRS+LBgVFRUoKSgREREfHx+3JxMSCQkXDg4jIyMaGRnBLhyyIw4dEBAPDg61JBFhEhEvLy82NjYeFRUYFhcMCAlBQEAUCws8PDy8Qy+0LBW/TTq4NyKwIQzJMyK+SDQcGxu3Mx26Pyq6OyYPEhLBUj/GMR/1josGBASJFQ6zJxLqfHUkHR1KSkpWVlVGRkavJRLcYlfha2KnIg9OTU1QUFBkZGRcW1t/f3+1MBrmdGzVUEPYWU4QCwuUHBUqIyNmExIkFBMuJiZgXl+7KhjEV0XNNifviITyi4igIA6CDA0zERE+EA+wOiqHhoapQjxJDAx0dHSWlZVhCghvDAycnJ2JMix5eXnRSjztgn3mi4NTBgZ8JiLvhYChLilaEBBwb2+NjY2+a2TfeHJzOjZONTS8MSYsEhC3OzfHSj/COCnKPzFeIRlxIB13EQpBODfAUUenKimgPDN7GBGGQTmeHx2uWE+iKR2kpqZra2pfNzXBQTZSEhJyGRJyLCKRQjqzREEtFxfGZ2FnLijx8fHc3NyGb23DNCPOfXXTVUrNW1RFHRe/VU42JybUaGJVLiihU0tYQj+xsbFqQDuXS0X///+rcGi5ubnFxcUS/wQPsNxuAAABAHRSTlMAJRRPHg79AQkFX9yL0ehCbiG9su+iON78/qD+VCzz05BnMpATyEpNWW1cXm0MzEmE0CKb4DhXfJX99frmec/9yOuc+vatf5fss5K7tn7j58Crk8Xb49KLUbE7ot7V8Z+Nrsfl//////////////////////////////////////////////////////////////////////////////7///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8Oq5aZ7AAABlxJREFUWMPdl3dYE2ccxxmJl4CMgixFxa11W0cdVRzde+/9nObu4O4gMeMyqlZOjWIwJChZVdmKMpWtiMjGLW7FvffWtk/fSwISVkL9q/3+l/d5Pt/7rTf3Oyen/7NYXv28+3mx/h3MdfXzhFEYAXLvx+kyzpnkCcMwT6xrrKlpTCXd+3eRdw0AuEDUd/joMWPPBZUfI+cM7hLfHWb04XDzj9FjVSePYHO6EkNPBue9x25K50fgAE/nOsxPMj9/ANR8AI1JzKgRvOYo788DOPq6zdksVWLqNAdbAXkwz3dn25xxxx68Ag93sAHmAgS3Ou0vTEb6OhaAD5PAoDbnswpqdQ6NJIupAK9t11kzGrFR4xwwGEpRPNi9bWAuP6Rp9KMgB2YIw0i0nY4NOX26JP/qN/ZL4CsWYUTrqYPGBQ+oyMvNv/qV/QjcYxXEW60iHdLXoFHcQxDTdwPtG0wzaIl3bY8GGyvzKw2HKFgwwIEiji/RE+/Y3mx3DSZA8tJkJNzHgUaOz9UgI2xO+okpcLWlRqOMJnraNxiUqxG9bHs3RTQpWCmVVqQptHoXuwYfmzTilgYDX52sQOiVUgEqyjNUmEbYNQg5rVc8N+AOC1x1L1aBCWCUEpSYKvO/tWsQrNeJmx8z8bPSwOrJOgVCwTQtMFYWmUaNtHsXxFrRT06ckL7TQ4Z8VFpaerPqgU6MwARJYbH5+fpHU758yc4ouiuQnzmD0vQiubT2Zmlg1YkahRgheCSBxubmIQ+ioqa80rlFiJgwuWv1IjwchdHZgVUPLyQdEiE0hgp0eTLe+d+iFi5c3pkF51cTbdRqZTK1gPlnqb388NgdhUwWq0AwmZFS5iw1O2x8s0OLccUnNKf/viYCcfNQmEQenTh2XqI3GkEhRCJ0/7JlvwGH5cs3dnujg3JyZh9/eurZM4OYIAiMQmSG61uK96NinYygMPjOokXLljY5fDCxXYORvxwNun71r5JYgodhiCwt99SfOUEH6pVKJZx1Lu6PJVYHkMXGbp+2zQMaNnNTY3JtiVErxgiExBS5px4X5eScVB0UJqsS4xcAg5YO3T5pdfEnfNFr86bA62IiTYPRYo2Bpg2Piyqe7I2Lj8+Ij4+LWWDjACw+tzGY8HavXtGbdlZXPUGxNJ1MZCqqIClTnhYL+92sOBsHUIiGoNE2t6ZXdHT05p3bq6uO0ahCUVmkKSpBKExHKBMtBpGRMc0OoJtRDUGXgqHnt2Ymg2/etH1V9eWntTyeLPbaKa2MEKAET5kB2MhIq4HFAVg0HE2hvZrfuF9bcMCvWnv/RM0hFJPprmlJWADzlML4SKtirA6gF8suFqb08XZpjmDMucsg/Z0Mv3bN7adXUlFEZEgToCiszM6Im9+kmLANdUvMQRwuUHsOfc5D7O+FxdVWfs3quxeupKAiUWwKrFTWAz6MEWOw4XimKrH88OGTx7eqA1xbvIDZbvilXclbrPzq9Q1Hzkt49/aXHT13NCMurEnz6xILdgAVFB7MTvLwYrfooYtbgJw/I7nsvplfvf7WHjDAZeXxoPlhYXOtCtut2iGVrmQkTQ31t1kXINbQUDk/S5i8xRzA+lvr9pzJyYmzsBvMmlu3OzM7wWKAp/r2brVuQGx/33A85ayw7LaZX7dt294wCzvPojPlB+sT5LhcHh4uSfJzbrsxcZy7T5VLskEQFv7G3OdwRMS8hqBCfgLOp8DLOwnr7tzexgW5uPUI51/aJSxjDCKsdIRZN+6qdqEJfAlJUrzUPpNY7W9sENsrAKQxQ5h8cZ8ZN7MrgPZdzNwqkAOeYnhvVodrAtfZRy6XZAmFxXstOIAXL16xpzwzS4DzweMpKsnTzaWTNQNid5eH80EtD+w244sZ7Uks5DM8RZHqpABXl87XFI5rj3Ac1FJ4ZLEZT0/frSrAcb5EraZpEg61GZ8O0ggFadTvEhbvA3T6vsOZW1Gcr1b38PDt+b6bswPbJsRh0pDMEB44k56+93hmFuCTaB9/NpvD5UKObHrgW8MTpMHMZZ0l/VTSr3eXvjm4LF+QBv+sUFUgT8AlqVT7k9NZGlwwVDievTUhQS5J6uHN6iJvHQkcl0rltNrTjQU5dV0Q29sTWKhpD3ud73gkevtNxUkf+53vOAiWW6ifP/sFPjwhdm9njtMLCYKc/gP6B65EKEwlGmPIAAAAAElFTkSuQmCC
 // @match      http*://daedelus.fr.to/sharing/*
@@ -6918,25 +6918,26 @@
             });
         }
     }
-    var root_8$1 = /* @__PURE__ */ template(`<button class="paper-btn btn-small btn-secondary p-2"><!></button>`);
-    var root_9$1 = /* @__PURE__ */ template(`<button type="button" class="paper-btn btn-secondary"><!></button>`);
-    var root_11 = /* @__PURE__ */ template(`<button type="button" class="paper-btn btn-success btn-large p-4.5"><!></button>`);
+    var root_8$1 = /* @__PURE__ */ template(`<h4>Synchronisation</h4> <div class="flex mb-8 justify-center gap-1 items-center"><div class="flex gap-4 justify-center"><button class="btn primary">Load data from server</button> <button class="btn tertiary">Save data to server</button></div></div>`, 1);
+    var root_9$1 = /* @__PURE__ */ template(`<button class="paper-btn btn-small btn-secondary p-2"><!></button>`);
+    var root_10$1 = /* @__PURE__ */ template(`<button type="button" class="paper-btn btn-secondary"><!></button>`);
     var root_12$1 = /* @__PURE__ */ template(`<button type="button" class="paper-btn btn-success btn-large p-4.5"><!></button>`);
-    var root_13$1 = /* @__PURE__ */ template(`<button type="button" class="paper-btn btn-secondary"><!></button>`);
-    var root_14$1 = /* @__PURE__ */ template(`<button class="paper-btn btn-small btn-secondary p-2"><!></button>`);
-    var root_16$1 = /* @__PURE__ */ template(`<span> </span><br>`, 1);
-    var root_15$1 = /* @__PURE__ */ template(`<div></div>`);
-    var root_17 = /* @__PURE__ */ template(`<button class="paper-btn btn-small btn-secondary p-2"><!></button>`);
-    var root_19 = /* @__PURE__ */ template(`<label for="paragraph-input" class="visually-hidden">Paragraph</label> <input id="paragraph-input" type="number" min="1">`, 1);
-    var root_20 = /* @__PURE__ */ template(`<button type="button" class="btn-small">&times;</button>`);
-    var root_18 = /* @__PURE__ */ template(`<!> <!>`, 1);
-    var root_21 = /* @__PURE__ */ template(`<span class="cursor-pointer"> </span>`);
-    var root_22 = /* @__PURE__ */ template(`<button class="paper-btn btn-small btn-secondary p-2"><!></button>`);
-    var root_7$1 = /* @__PURE__ */ template(`<div class="flex mb-8 justify-center gap-1 items-center"><!> <!> <!> <!> <!></div> <div class="flex flex-col justify-center items-center border-2 text-lg w-[90%] min-w-[320px] h-[400px] overflow-x-hidden overflow-y-auto read-area"></div> <div class="flex gap-4 select-none text-xl justify-center items-center mt-8 mb-4"><!>  <span class="min-w-[112px] text-center"><!></span> <!></div>`, 1);
+    var root_13$1 = /* @__PURE__ */ template(`<button type="button" class="paper-btn btn-success btn-large p-4.5"><!></button>`);
+    var root_14$1 = /* @__PURE__ */ template(`<button type="button" class="paper-btn btn-secondary"><!></button>`);
+    var root_15$1 = /* @__PURE__ */ template(`<button class="paper-btn btn-small btn-secondary p-2"><!></button>`);
+    var root_17 = /* @__PURE__ */ template(`<span> </span><br>`, 1);
+    var root_16$1 = /* @__PURE__ */ template(`<div></div>`);
+    var root_18 = /* @__PURE__ */ template(`<button class="paper-btn btn-small btn-secondary p-2"><!></button>`);
+    var root_20 = /* @__PURE__ */ template(`<label for="paragraph-input" class="visually-hidden">Paragraph</label> <input id="paragraph-input" type="number" min="1">`, 1);
+    var root_21 = /* @__PURE__ */ template(`<button type="button" class="btn-small">&times;</button>`);
+    var root_19 = /* @__PURE__ */ template(`<!> <!>`, 1);
+    var root_22 = /* @__PURE__ */ template(`<span class="cursor-pointer"> </span>`);
+    var root_23 = /* @__PURE__ */ template(`<button class="paper-btn btn-small btn-secondary p-2"><!></button>`);
+    var root_7$1 = /* @__PURE__ */ template(`<!> <div class="flex mb-8 justify-center gap-1 items-center"><!> <!> <!> <!> <!></div> <div class="flex flex-col justify-center items-center border-2 text-lg w-[90%] min-w-[320px] h-[400px] overflow-x-hidden overflow-y-auto read-area"></div> <div class="flex gap-4 select-none text-xl justify-center items-center mt-8 mb-4"><!>  <span class="min-w-[112px] text-center"><!></span> <!></div>`, 1);
     var root_1$3 = /* @__PURE__ */ template(`<div class="flex flex-col justify-center items-center mx-auto min-h-full"><!></div>`);
-    var root_25 = /* @__PURE__ */ template(`<button class="rounded-full p-2"><!></button>`);
     var root_26 = /* @__PURE__ */ template(`<button class="rounded-full p-2"><!></button>`);
-    var root_24 = /* @__PURE__ */ template(`<div slot="right" class="flex items-center gap-2"><!> <!> <!></div>`);
+    var root_27 = /* @__PURE__ */ template(`<button class="rounded-full p-2"><!></button>`);
+    var root_25 = /* @__PURE__ */ template(`<div slot="right" class="flex items-center gap-2"><!> <!> <!></div>`);
     function Reader($$anchor, $$props)
     {
         push($$props, false);
@@ -6973,17 +6974,19 @@
                 sync();
                 return;
             }
-            const prev2 = await readBin($syncBin()) ?? [], index2 = prev2.findIndex((x) => x.url === source2);
-            if (index2 > -1)
-            {
-                let previousIndex = prev2[index2].index;
-                if (previousIndex !== readHistory())
-                {
-                    await historyReader.syncSave($syncBin());
-                }
-                return;
-            }
-            historyReader.syncLoad($syncBin());
+            set(syncOpen, !get$1(syncOpen));
+        }
+        async function saveSync()
+        {
+            set(syncOpen, false);
+            await historyReader.syncSave($syncBin());
+        }
+        async function loadSync()
+        {
+            await get$1(queue).stop();
+            set(syncOpen, false);
+            await historyReader.syncLoad($syncBin());
+            play();
         }
         async function play()
         {
@@ -7045,7 +7048,7 @@
                 playAt(findParagraphQueueIndex(Math.min(get$1(paragraphs).length, index2 + jump)));
             }
         }
-        let queue = mutable_state(), map, paragraphs = mutable_state([]), loading = mutable_state(true), num = mutable_state(1), current = mutable_state(null), paused = mutable_state(true), jump = 50, toggleParagraphSelection = mutable_state(false);
+        let queue = mutable_state(), map, paragraphs = mutable_state([]), loading = mutable_state(true), num = mutable_state(1), current = mutable_state(null), paused = mutable_state(true), jump = 50, toggleParagraphSelection = mutable_state(false), syncOpen = mutable_state(false);
         function updateHistory(index2)
         {
             historyReader.updateItem(source2, index2);
@@ -7186,113 +7189,131 @@
                             var alternate_1 = ($$anchor4, $$elseif2) =>
                             {
                                 {
-                                    var consequent_4 = ($$anchor5) =>
+                                    var consequent_5 = ($$anchor5) =>
                                     {
                                         var fragment_3 = root_7$1();
-                                        var div_1 = first_child(fragment_3);
-                                        var node_1 = child(div_1);
-                                        Tooltip(node_1, {
+                                        var node_1 = first_child(fragment_3);
+                                        {
+                                            var consequent_2 = ($$anchor6) =>
+                                            {
+                                                var fragment_4 = root_8$1();
+                                                var div_1 = sibling(first_child(fragment_4), 2);
+                                                var div_2 = child(div_1);
+                                                var button = child(div_2);
+                                                var button_1 = sibling(button, 2);
+                                                event("click", button, loadSync);
+                                                event("click", button_1, saveSync);
+                                                append($$anchor6, fragment_4);
+                                            };
+                                            if_block(node_1, ($$render) =>
+                                            {
+                                                if (get$1(syncOpen)) $$render(consequent_2);
+                                            });
+                                        }
+                                        var div_3 = sibling(node_1, 2);
+                                        var node_2 = child(div_3);
+                                        Tooltip(node_2, {
                                             label: `Rewind ${jump}`,
                                             children: ($$anchor6, $$slotProps2) =>
                                             {
-                                                var button = root_8$1();
-                                                var node_2 = child(button);
-                                                Player_track_prev(node_2, {});
-                                                template_effect(() => button.disabled = get$1(num) < jump + 1);
-                                                event("click", button, rewind);
-                                                append($$anchor6, button);
+                                                var button_2 = root_9$1();
+                                                var node_3 = child(button_2);
+                                                Player_track_prev(node_3, {});
+                                                template_effect(() => button_2.disabled = get$1(num) < jump + 1);
+                                                event("click", button_2, rewind);
+                                                append($$anchor6, button_2);
                                             },
                                             $$slots: { default: true }
                                         });
-                                        var node_3 = sibling(node_1, 2);
-                                        Tooltip(node_3, {
+                                        var node_4 = sibling(node_2, 2);
+                                        Tooltip(node_4, {
                                             label: "Previous",
                                             children: ($$anchor6, $$slotProps2) =>
                                             {
-                                                var button_1 = root_9$1();
-                                                var node_4 = child(button_1);
-                                                Player_skip_back(node_4, {});
-                                                template_effect(() => button_1.disabled = get$1(num) === 1);
-                                                event("click", button_1, () => get$1(queue).previous());
-                                                append($$anchor6, button_1);
+                                                var button_3 = root_10$1();
+                                                var node_5 = child(button_3);
+                                                Player_skip_back(node_5, {});
+                                                template_effect(() => button_3.disabled = get$1(num) === 1);
+                                                event("click", button_3, () => get$1(queue).previous());
+                                                append($$anchor6, button_3);
                                             },
                                             $$slots: { default: true }
                                         });
-                                        var node_5 = sibling(node_3, 2);
+                                        var node_6 = sibling(node_4, 2);
                                         const expression = /* @__PURE__ */ derived_safe_equal(() => get$1(paused) ? "Play" : "Pause");
-                                        Tooltip(node_5, {
+                                        Tooltip(node_6, {
                                             get label()
                                             {
                                                 return get$1(expression);
                                             },
                                             children: ($$anchor6, $$slotProps2) =>
                                             {
-                                                var fragment_4 = comment();
-                                                var node_6 = first_child(fragment_4);
+                                                var fragment_5 = comment();
+                                                var node_7 = first_child(fragment_5);
                                                 {
-                                                    var consequent_2 = ($$anchor7) =>
+                                                    var consequent_3 = ($$anchor7) =>
                                                     {
-                                                        var button_2 = root_11();
-                                                        var node_7 = child(button_2);
-                                                        Player_pause(node_7, {});
-                                                        event("click", button_2, () => get$1(queue).pause());
-                                                        append($$anchor7, button_2);
+                                                        var button_4 = root_12$1();
+                                                        var node_8 = child(button_4);
+                                                        Player_pause(node_8, {});
+                                                        event("click", button_4, () => get$1(queue).pause());
+                                                        append($$anchor7, button_4);
                                                     };
                                                     var alternate_2 = ($$anchor7) =>
                                                     {
-                                                        var button_3 = root_12$1();
-                                                        var node_8 = child(button_3);
-                                                        Player_play(node_8, {});
-                                                        event("click", button_3, play);
-                                                        append($$anchor7, button_3);
+                                                        var button_5 = root_13$1();
+                                                        var node_9 = child(button_5);
+                                                        Player_play(node_9, {});
+                                                        event("click", button_5, play);
+                                                        append($$anchor7, button_5);
                                                     };
-                                                    if_block(node_6, ($$render) =>
+                                                    if_block(node_7, ($$render) =>
                                                     {
-                                                        if (!get$1(paused)) $$render(consequent_2);
+                                                        if (!get$1(paused)) $$render(consequent_3);
                                                         else $$render(alternate_2, false);
                                                     });
                                                 }
-                                                append($$anchor6, fragment_4);
+                                                append($$anchor6, fragment_5);
                                             },
                                             $$slots: { default: true }
                                         });
-                                        var node_9 = sibling(node_5, 2);
-                                        Tooltip(node_9, {
+                                        var node_10 = sibling(node_6, 2);
+                                        Tooltip(node_10, {
                                             label: "Next",
                                             children: ($$anchor6, $$slotProps2) =>
                                             {
-                                                var button_4 = root_13$1();
-                                                var node_10 = child(button_4);
-                                                Player_skip_forward(node_10, {});
-                                                template_effect(() => button_4.disabled = get$1(queue).position >= get$1(queue).length - 1);
-                                                event("click", button_4, () => get$1(queue).next());
-                                                append($$anchor6, button_4);
+                                                var button_6 = root_14$1();
+                                                var node_11 = child(button_6);
+                                                Player_skip_forward(node_11, {});
+                                                template_effect(() => button_6.disabled = get$1(queue).position >= get$1(queue).length - 1);
+                                                event("click", button_6, () => get$1(queue).next());
+                                                append($$anchor6, button_6);
                                             },
                                             $$slots: { default: true }
                                         });
-                                        var node_11 = sibling(node_9, 2);
-                                        Tooltip(node_11, {
+                                        var node_12 = sibling(node_10, 2);
+                                        Tooltip(node_12, {
                                             label: `Fast forward ${jump}`,
                                             children: ($$anchor6, $$slotProps2) =>
                                             {
-                                                var button_5 = root_14$1();
-                                                var node_12 = child(button_5);
-                                                Player_track_next(node_12, {});
-                                                template_effect(() => button_5.disabled = get$1(queue).position >= get$1(queue).length - (jump + 1));
-                                                event("click", button_5, fastForward);
-                                                append($$anchor6, button_5);
+                                                var button_7 = root_15$1();
+                                                var node_13 = child(button_7);
+                                                Player_track_next(node_13, {});
+                                                template_effect(() => button_7.disabled = get$1(queue).position >= get$1(queue).length - (jump + 1));
+                                                event("click", button_7, fastForward);
+                                                append($$anchor6, button_7);
                                             },
                                             $$slots: { default: true }
                                         });
-                                        var div_2 = sibling(div_1, 2);
-                                        each(div_2, 5, () => get$1(paragraphs), index, ($$anchor6, paragraph) =>
+                                        var div_4 = sibling(div_3, 2);
+                                        each(div_4, 5, () => get$1(paragraphs), index, ($$anchor6, paragraph) =>
                                         {
-                                            var div_3 = root_15$1();
+                                            var div_5 = root_16$1();
                                             let classes;
-                                            each(div_3, 5, () => get$1(paragraph).phrases, index, ($$anchor7, phrase) =>
+                                            each(div_5, 5, () => get$1(paragraph).phrases, index, ($$anchor7, phrase) =>
                                             {
-                                                var fragment_5 = root_16$1();
-                                                var span = first_child(fragment_5);
+                                                var fragment_6 = root_17();
+                                                var span = first_child(fragment_6);
                                                 let classes_1;
                                                 var text_1 = child(span);
                                                 template_effect(
@@ -7308,10 +7329,10 @@
                                                     ],
                                                     derived_safe_equal
                                                 );
-                                                append($$anchor7, fragment_5);
+                                                append($$anchor7, fragment_6);
                                             });
                                             template_effect(
-                                                ($0) => classes = set_class(div_3, 1, "paragraph", null, classes, $0),
+                                                ($0) => classes = set_class(div_5, 1, "paragraph", null, classes, $0),
                                                 [
                                                     () => ({
                                                         focussed: get$1(num) - 1 === get$1(paragraph).index
@@ -7319,63 +7340,63 @@
                                                 ],
                                                 derived_safe_equal
                                             );
-                                            append($$anchor6, div_3);
+                                            append($$anchor6, div_5);
                                         });
-                                        var div_4 = sibling(div_2, 2);
-                                        var node_13 = child(div_4);
-                                        Tooltip(node_13, {
+                                        var div_6 = sibling(div_4, 2);
+                                        var node_14 = child(div_6);
+                                        Tooltip(node_14, {
                                             label: "Previous",
                                             position: "bottom",
                                             children: ($$anchor6, $$slotProps2) =>
                                             {
-                                                var button_6 = root_17();
-                                                var node_14 = child(button_6);
-                                                Chevron_left(node_14, {});
-                                                template_effect(() => button_6.disabled = get$1(num) === 1);
-                                                event("click", button_6, prev);
-                                                append($$anchor6, button_6);
+                                                var button_8 = root_18();
+                                                var node_15 = child(button_8);
+                                                Chevron_left(node_15, {});
+                                                template_effect(() => button_8.disabled = get$1(num) === 1);
+                                                event("click", button_8, prev);
+                                                append($$anchor6, button_8);
                                             },
                                             $$slots: { default: true }
                                         });
-                                        var span_1 = sibling(node_13, 2);
-                                        var node_15 = child(span_1);
+                                        var span_1 = sibling(node_14, 2);
+                                        var node_16 = child(span_1);
                                         {
-                                            var consequent_3 = ($$anchor6) =>
+                                            var consequent_4 = ($$anchor6) =>
                                             {
-                                                var fragment_6 = root_18();
-                                                var node_16 = first_child(fragment_6);
-                                                Tooltip(node_16, {
+                                                var fragment_7 = root_19();
+                                                var node_17 = first_child(fragment_7);
+                                                Tooltip(node_17, {
                                                     label: "Select paragraph",
                                                     children: ($$anchor7, $$slotProps2) =>
                                                     {
-                                                        var fragment_7 = root_19();
-                                                        var input = sibling(first_child(fragment_7), 2);
+                                                        var fragment_8 = root_20();
+                                                        var input = sibling(first_child(fragment_8), 2);
                                                         template_effect(() =>
                                                         {
                                                             set_value(input, get$1(num));
                                                             set_attribute(input, "max", get$1(paragraphs).length);
                                                         });
                                                         event("change", input, paragraphSelectionChange);
-                                                        append($$anchor7, fragment_7);
+                                                        append($$anchor7, fragment_8);
                                                     },
                                                     $$slots: { default: true }
                                                 });
-                                                var node_17 = sibling(node_16, 2);
-                                                Tooltip(node_17, {
+                                                var node_18 = sibling(node_17, 2);
+                                                Tooltip(node_18, {
                                                     label: "Hide selector",
                                                     children: ($$anchor7, $$slotProps2) =>
                                                     {
-                                                        var button_7 = root_20();
-                                                        event("click", button_7, toggleParagraphSelectionClick);
-                                                        append($$anchor7, button_7);
+                                                        var button_9 = root_21();
+                                                        event("click", button_9, toggleParagraphSelectionClick);
+                                                        append($$anchor7, button_9);
                                                     },
                                                     $$slots: { default: true }
                                                 });
-                                                append($$anchor6, fragment_6);
+                                                append($$anchor6, fragment_7);
                                             };
                                             var alternate_3 = ($$anchor6) =>
                                             {
-                                                var span_2 = root_21();
+                                                var span_2 = root_22();
                                                 var text_2 = child(span_2);
                                                 template_effect(
                                                     ($0) => set_text(text_2, $0),
@@ -7387,24 +7408,24 @@
                                                 event("click", span_2, toggleParagraphSelectionClick);
                                                 append($$anchor6, span_2);
                                             };
-                                            if_block(node_15, ($$render) =>
+                                            if_block(node_16, ($$render) =>
                                             {
-                                                if (get$1(toggleParagraphSelection)) $$render(consequent_3);
+                                                if (get$1(toggleParagraphSelection)) $$render(consequent_4);
                                                 else $$render(alternate_3, false);
                                             });
                                         }
-                                        var node_18 = sibling(span_1, 2);
-                                        Tooltip(node_18, {
+                                        var node_19 = sibling(span_1, 2);
+                                        Tooltip(node_19, {
                                             label: "Next",
                                             position: "bottom",
                                             children: ($$anchor6, $$slotProps2) =>
                                             {
-                                                var button_8 = root_22();
-                                                var node_19 = child(button_8);
-                                                Chevron_right(node_19, {});
-                                                template_effect(() => button_8.disabled = get$1(num) === get$1(paragraphs).length);
-                                                event("click", button_8, next);
-                                                append($$anchor6, button_8);
+                                                var button_10 = root_23();
+                                                var node_20 = child(button_10);
+                                                Chevron_right(node_20, {});
+                                                template_effect(() => button_10.disabled = get$1(num) === get$1(paragraphs).length);
+                                                event("click", button_10, next);
+                                                append($$anchor6, button_10);
                                             },
                                             $$slots: { default: true }
                                         });
@@ -7414,7 +7435,7 @@
                                         $$anchor4,
                                         ($$render) =>
                                         {
-                                            if (get$1(queue)) $$render(consequent_4);
+                                            if (get$1(queue)) $$render(consequent_5);
                                         },
                                         $$elseif2
                                     );
@@ -7449,38 +7470,38 @@
                         $$slots: {
                             right: ($$anchor3, $$slotProps2) =>
                             {
-                                var div_5 = root_24();
-                                var node_20 = child(div_5);
-                                DarkMode(node_20, {});
-                                var node_21 = sibling(node_20, 2);
-                                Tooltip(node_21, {
+                                var div_7 = root_25();
+                                var node_21 = child(div_7);
+                                DarkMode(node_21, {});
+                                var node_22 = sibling(node_21, 2);
+                                Tooltip(node_22, {
                                     label: "Sync",
                                     position: "bottom",
                                     children: ($$anchor4, $$slotProps3) =>
                                     {
-                                        var button_9 = root_25();
-                                        var node_22 = child(button_9);
-                                        Refresh(node_22, {});
-                                        event("click", button_9, openSync);
-                                        append($$anchor4, button_9);
+                                        var button_11 = root_26();
+                                        var node_23 = child(button_11);
+                                        Refresh(node_23, {});
+                                        event("click", button_11, openSync);
+                                        append($$anchor4, button_11);
                                     },
                                     $$slots: { default: true }
                                 });
-                                var node_23 = sibling(node_21, 2);
-                                Tooltip(node_23, {
+                                var node_24 = sibling(node_22, 2);
+                                Tooltip(node_24, {
                                     label: "Settings",
                                     position: "bottom",
                                     children: ($$anchor4, $$slotProps3) =>
                                     {
-                                        var button_10 = root_26();
-                                        var node_24 = child(button_10);
-                                        Settings$1(node_24, {});
-                                        event("click", button_10, openSettings);
-                                        append($$anchor4, button_10);
+                                        var button_12 = root_27();
+                                        var node_25 = child(button_12);
+                                        Settings$1(node_25, {});
+                                        event("click", button_12, openSettings);
+                                        append($$anchor4, button_12);
                                     },
                                     $$slots: { default: true }
                                 });
-                                append($$anchor3, div_5);
+                                append($$anchor3, div_7);
                             }
                         }
                     });
@@ -10940,24 +10961,6 @@
         }
         popup = await settings(true);
     });
-    (() =>
-    {
-        let popup2 = null;
-        menu.addItem("Sync", async () =>
-        {
-            if (popup2 !== null && !popup2.closed)
-            {
-                try
-                {
-                    return popup2.close();
-                } finally
-                {
-                    popup2 = null;
-                }
-            }
-            popup2 = await sync(true);
-        });
-    })();
     if (!new MonkeyStore().getItem("voice"))
     {
         settings();
